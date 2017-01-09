@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+    <info module="Phototo" organisation="com.trebonius.phototo" revision="0.1"/>
+
+    <configurations defaultconfmapping="build->*">
+        <conf name="build" description="normal build"/>
+        <conf name="test" extends="build" visibility="private" description="testing build"/>
+    </configurations>
+
+    <publications>
+        <artifact name="Phototo" type="jar" conf="build" ext="jar"/>
+    </publications>
+
+    <dependencies>
+        <dependency org="com.google.code.gson" name="gson" rev="2.8.0"/>
+        <dependency org="junit" name="junit" rev="4.10" conf="test->*"/>
+    </dependencies>
+</ivy-module>

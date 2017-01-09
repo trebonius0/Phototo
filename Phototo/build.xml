@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Phototo" default="default" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+    <description>Builds, tests, and runs the project Phototo.</description>
+    <import file="nbproject/build-impl.xml"/>
+
+    <property name="ivy.install.version" value="2.4.0" />
+    <property name="ivy.jar.dir" value="${basedir}/ivy" />
+    <property name="ivy.cache.dir" value="${basedir}/ivy" />
+    <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar" />
+    <property name="ivy.lib" value="${basedir}/lib" />
+    <property name="ivy.settings.location" value="${basedir}/ivysettings.xml" />
+
+    <target name="-check-ivy">
+        <available file="${ivy.jar.file}" property="ivy.skip.download"/>
+    </target>
+
+    <target name="-download-ivy" unless="ivy.skip.download" depends="-check-ivy">
+        <mkdir dir="${ivy.jar.dir}"/>
+        <echo message="installing ivy..."/>
+        <get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+             dest="${ivy.jar.file}" usetimestamp="true"/>
+    </target>
+
+    <target name="-load-ivy-tasks" depends="-download-ivy">
+        <path id="ivy.lib.path">
+            <pathelement location="${ivy.jar.file}"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+    </target>
+
+    <target name="download-deps" depends="-load-ivy-tasks"
+            description="Download dependent libraries.">
+        <ivy:resolve/>
+        <ivy:retrieve/>
+
+        <pathconvert property="ivy.classpath.computed" dirsep="/" pathsep=":">
+            <path>
+                <fileset dir="${ivy.lib}" includes="*.jar"/>
+            </path>
+            <map from="${basedir}${file.separator}" to=""/>
+        </pathconvert>
+
+        <propertyfile file="${basedir}/nbproject/project.properties">
+            <entry operation="=" key="ivy.classpath" value="${ivy.classpath.computed}"/>
+        </propertyfile>
+    </target>
+
+    <target name="clean-deps" description="Clean downloaded libraries.">
+        <delete dir="${ivy.lib}"/>
+    </target>
+
+    <target name="clean-ivy" depends="clean-deps" description="Clean ivy.">
+        <delete dir="${ivy.jar.dir}"/>
+        <ivy:cleancache/>
+        <propertyfile file="${basedir}/nbproject/project.properties">
+            <entry operation="=" key="ivy.classpath" value=""/>
+        </propertyfile>
+    </target>
+
+    <target name="-use-ivy-junit" depends="download-deps" unless="netbeans.home">
+        <property name="libs.junit_4.classpath" value="${ivy.lib}/junit-4.10.jar"/>
+    </target>
+
+    <target name="-pre-compile" depends="download-deps"/>
+
+    <target name="-pre-compile-single" depends="download-deps"/>
+
+    <target name="-pre-init" depends="-use-ivy-junit"/>
+</project>
