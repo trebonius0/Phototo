@@ -15,6 +15,6 @@
         <dependency org="com.google.code.gson" name="gson" rev="2.8.0"/>
         <dependency org="io.gsonfire" name="gson-fire" rev="1.8.0"/>
         <dependency org="org.apache.httpcomponents" name="httpcore" rev="4.4.5"/>
-        <dependency org="junit" name="junit" rev="4.10" conf="test->*"/>
+        <dependency org="com.google.jimfs" name="jimfs" rev="1.1" conf="test->*"/>
     </dependencies>
 </ivy-module>

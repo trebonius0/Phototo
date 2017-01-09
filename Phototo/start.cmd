@@ -1,0 +1,1 @@
+java -Dfile.encoding=UTF8 -Xmx512m -jar Phototo.jar "D:\Users\Username\Pictures"
