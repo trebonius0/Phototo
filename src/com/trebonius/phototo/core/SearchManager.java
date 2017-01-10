@@ -4,6 +4,7 @@ import com.trebonius.phototo.helpers.SearchQueryHelper;
 import com.trebonius.phototo.core.entities.PhototoFolder;
 import com.trebonius.phototo.core.entities.PhototoPicture;
 import com.trebonius.phototo.helpers.PartialStringIndex;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,18 +21,16 @@ public class SearchManager {
         this.indexFolderName = indexFolderName;
     }
 
-    public List<PhototoPicture> searchPictureInFolder(String folder, String searchQuery) {
+    public List<PhototoPicture> searchPictureInFolder(Path folder, String searchQuery) {
         List<String> searched = SearchQueryHelper.getSplittedTerms(searchQuery);
 
         if (searched.isEmpty()) {
             return new ArrayList<>();
         }
 
-        final String folder2 = folder.endsWith("/") ? folder : (folder + "/");
-
         List<List<PhototoPicture>> resultsTmp = searched.parallelStream()
                 .map((String searchedTerm) -> this.picturesIndex.findContains(searchedTerm))
-                .map((Collection<PhototoPicture> pictures) -> pictures.stream().filter((PhototoPicture phototoPicture) -> phototoPicture.fsPath.startsWith(folder2)).collect(Collectors.toList()))
+                .map((Collection<PhototoPicture> pictures) -> pictures.stream().filter((PhototoPicture phototoPicture) -> phototoPicture.fsPath.startsWith(folder)).collect(Collectors.toList()))
                 .collect(Collectors.toList());
 
         List<PhototoPicture> result = resultsTmp.get(0);

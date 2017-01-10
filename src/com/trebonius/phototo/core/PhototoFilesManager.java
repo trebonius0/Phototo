@@ -76,7 +76,7 @@ public class PhototoFilesManager implements Closeable {
     }
 
     public List<PhototoPicture> searchPicturesInFolder(String folder, String searchQuery) {
-        return this.searchManager.searchPictureInFolder(folder, searchQuery);
+        return this.searchManager.searchPictureInFolder(this.fileSystem.getPath(folder), searchQuery);
     }
 
     public List<PhototoFolder> searchFoldersInFolder(String folder, String searchQuery) {
