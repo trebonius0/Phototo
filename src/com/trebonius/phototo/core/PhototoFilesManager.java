@@ -37,6 +37,7 @@ public class PhototoFilesManager implements Closeable {
     private final WatchServiceThread watchServiceThread;
     private final Map<Path, WatchKey> watchedDirectoriesKeys;
     private final Map<WatchKey, Path> watchedDirectoriesPaths;
+    private final boolean prefixOnlyMode;
 
     public PhototoFilesManager(String rootFolder, FileSystem fileSystem, IMetadataGetter metadataGetter, IThumbnailGenerator thumbnailGenerator, boolean prefixOnlyMode, boolean indexFolderName) throws IOException {
         this.fileSystem = fileSystem;
@@ -44,6 +45,7 @@ public class PhototoFilesManager implements Closeable {
         this.thumbnailGenerator = thumbnailGenerator;
         this.rootFolder = new PhototoFolder(this.fileSystem.getPath(rootFolder), this.fileSystem.getPath(rootFolder));
         this.searchManager = new SearchManager(prefixOnlyMode, indexFolderName);
+        this.prefixOnlyMode = prefixOnlyMode;
 
         WatchService watcher = this.fileSystem.newWatchService();
         this.watchedDirectoriesKeys = new HashMap<>();
@@ -78,6 +80,7 @@ public class PhototoFilesManager implements Closeable {
     }
 
     public List<PhototoFolder> searchFoldersInFolder(String folder, String searchQuery) {
+        // Search for a folder with the correct name. This is just a recursive exploration since we suppose the number of folders will be low enough and thus we would be able to "bruteforce" it
         List<String> searchQuerySplit = SearchQueryHelper.getSplittedTerms(searchQuery);
         List<PhototoFolder> result = new ArrayList<>();
 
@@ -93,7 +96,7 @@ public class PhototoFilesManager implements Closeable {
 
                 if (!currentFolder.isEmpty()) {
                     List<String> currentFolderCleanedFilename = SearchQueryHelper.getSplittedTerms(currentFolder.filename);
-                    boolean ok = searchQuerySplit.stream().allMatch((s) -> (currentFolderCleanedFilename.stream().anyMatch((String t) -> t.startsWith(s))));
+                    boolean ok = searchQuerySplit.stream().allMatch((s) -> (currentFolderCleanedFilename.stream().anyMatch((String t) -> (prefixOnlyMode && t.startsWith(s)) || (!prefixOnlyMode && t.contains(s)))));
 
                     if (ok) {
                         result.add(currentFolder);
