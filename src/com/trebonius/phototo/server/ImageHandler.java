@@ -13,6 +13,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.message.BasicHeader;
 import com.trebonius.phototo.core.fullscreen.IFullScreenResizeGenerator;
+import com.trebonius.phototo.helpers.FileHelper;
 import com.trebonius.phototo.helpers.SafeSimpleDateFormat;
 
 public class ImageHandler extends FileHandler {
@@ -51,7 +52,7 @@ public class ImageHandler extends FileHandler {
 
     @Override
     protected HttpEntity getEntity(String path, String query, File localFile) throws Exception {
-        String extension = this.getExtension(path);
+        String extension = FileHelper.getExtension(path);
         ContentType contentType = ContentType.create(getContentType(extension.toLowerCase()));
 
         if (query != null) {

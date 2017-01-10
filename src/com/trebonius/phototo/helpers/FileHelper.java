@@ -18,11 +18,11 @@ import java.util.zip.GZIPOutputStream;
 
 public class FileHelper {
 
-    public static String readFile(String filename) throws IOException {
+    public synchronized static String readFile(String filename) throws IOException {
         return readFile(new File(filename));
     }
 
-    public static String readFile(File filename) throws IOException {
+    public synchronized static String readFile(File filename) throws IOException {
 
         StringBuilder result = new StringBuilder();
 
@@ -38,7 +38,7 @@ public class FileHelper {
         return result.toString();
     }
 
-    public static String[] readFileLines(File filename) throws IOException {
+    public synchronized static String[] readFileLines(File filename) throws IOException {
 
         List<String> result = new ArrayList<>();
 
@@ -54,7 +54,7 @@ public class FileHelper {
         return result.toArray(new String[result.size()]);
     }
 
-    public static void writeFile(File filename, String data, boolean gzip) throws IOException {
+    public synchronized static void writeFile(File filename, String data, boolean gzip) throws IOException {
         OutputStream outputStream = null;
 
         try {
@@ -74,7 +74,7 @@ public class FileHelper {
         }
     }
 
-    public static void writeFile(File file, byte[] data) throws IOException {
+    public synchronized static void writeFile(File file, byte[] data) throws IOException {
         file.mkdirs();
 
         try (FileOutputStream fos = new FileOutputStream(file)) {
@@ -83,23 +83,23 @@ public class FileHelper {
 
     }
 
-    public static void writeFile(File filename, String data) throws IOException {
+    public synchronized static void writeFile(File filename, String data) throws IOException {
         writeFile(filename, data, false);
     }
 
-    public static void writeLines(File filename, String[] lines, boolean gzip) throws IOException {
+    public synchronized static void writeLines(File filename, String[] lines, boolean gzip) throws IOException {
         writeFile(filename, StringHelper.join(lines, "\n"), gzip);
     }
 
-    public static void writeLines(File filename, Collection<String> lines, boolean gzip) throws IOException {
+    public synchronized static void writeLines(File filename, Collection<String> lines, boolean gzip) throws IOException {
         writeFile(filename, StringHelper.join(lines, "\n"), gzip);
     }
 
-    public static void writeLines(File filename, String[] lines) throws IOException {
+    public synchronized static void writeLines(File filename, String[] lines) throws IOException {
         writeFile(filename, StringHelper.join(lines, "\n"));
     }
 
-    public static void writeLines(File filename, Collection<String> lines) throws IOException {
+    public synchronized static void writeLines(File filename, Collection<String> lines) throws IOException {
         writeFile(filename, StringHelper.join(lines, "\n"));
     }
 
@@ -112,6 +112,10 @@ public class FileHelper {
 
     public synchronized static void appendFileLine(File filename, String data) throws IOException {
         appendFile(filename, data + "\n");
+    }
+
+    public static String getExtension(String path) {
+        return path.substring(path.lastIndexOf(".") + 1);
     }
 
 }

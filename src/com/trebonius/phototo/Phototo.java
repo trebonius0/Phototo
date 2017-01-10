@@ -21,6 +21,7 @@ import com.trebonius.phototo.server.StdErrorExceptionLogger;
 
 public class Phototo {
 
+    public static final String[] supportedExtensions = new String[]{"jpg", "jpeg", "png", "bmp"};
     public static String thumbnailRootUrl = "/img/thumbnail";
     public static String fullSizePicturesRootUrl = "/img/fullsize";
 

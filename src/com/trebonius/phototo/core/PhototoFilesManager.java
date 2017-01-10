@@ -1,9 +1,11 @@
 package com.trebonius.phototo.core;
 
+import com.trebonius.phototo.Phototo;
 import com.trebonius.phototo.core.entities.PhototoFolder;
 import com.trebonius.phototo.core.entities.PhototoPicture;
 import com.trebonius.phototo.core.metadata.IMetadataGetter;
 import com.trebonius.phototo.core.thumbnails.IThumbnailGenerator;
+import com.trebonius.phototo.helpers.FileHelper;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.FileSystem;
@@ -26,7 +28,6 @@ import java.util.stream.Collectors;
 
 public class PhototoFilesManager implements Closeable {
 
-    private static final String[] supportedExtensions = new String[]{".jpg", ".jpeg", ".png", ".bmp"};
     private final FileSystem fileSystem;
     private final IMetadataGetter metadataGetter;
     private final IThumbnailGenerator thumbnailGenerator;
@@ -51,7 +52,6 @@ public class PhototoFilesManager implements Closeable {
         this.watchServiceThread.start();
     }
 
-
     public List<PhototoFolder> getFoldersInFolder(String folder) {
         PhototoFolder currentFolder = this.getCurrentFolder(this.fileSystem.getPath(folder));
 
@@ -71,7 +71,6 @@ public class PhototoFilesManager implements Closeable {
             return new ArrayList<>();
         }
     }
-
 
     public List<PhototoPicture> searchPicturesInFolder(String folder, String searchQuery) {
         return this.searchManager.searchPictureInFolder(folder, searchQuery);
@@ -195,8 +194,9 @@ public class PhototoFilesManager implements Closeable {
 
     private static boolean isPictureFile(Path path) {
         String pathStr = path.toString().toLowerCase();
-        for (String supportedExtension : supportedExtensions) {
-            if (pathStr.endsWith(supportedExtension)) {
+        String extension = FileHelper.getExtension(pathStr);
+        for (String supportedExtension : Phototo.supportedExtensions) {
+            if (supportedExtension.equalsIgnoreCase(extension)) {
                 return true;
             }
         }

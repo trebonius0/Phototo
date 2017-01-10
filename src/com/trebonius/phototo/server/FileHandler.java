@@ -1,5 +1,6 @@
 package com.trebonius.phototo.server;
 
+import com.trebonius.phototo.helpers.FileHelper;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -93,11 +94,8 @@ public abstract class FileHandler implements HttpRequestHandler {
     }
 
     protected HttpEntity getEntity(String path, String query, File localFile) throws Exception {
-        String extension = this.getExtension(path);
+        String extension = FileHelper.getExtension(path);
         return new FileEntity(localFile, ContentType.create(getContentType(extension.toLowerCase())));
     }
 
-    protected final String getExtension(String path) {
-        return path.substring(path.lastIndexOf(".") + 1);
-    }
 }
