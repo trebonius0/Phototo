@@ -88,19 +88,19 @@ public class FileHelper {
     }
 
     public synchronized static void writeLines(File filename, String[] lines, boolean gzip) throws IOException {
-        writeFile(filename, StringHelper.join(lines, "\n"), gzip);
+        writeFile(filename, String.join("\n", lines), gzip);
     }
 
     public synchronized static void writeLines(File filename, Collection<String> lines, boolean gzip) throws IOException {
-        writeFile(filename, StringHelper.join(lines, "\n"), gzip);
+        writeFile(filename, String.join("\n", lines), gzip);
     }
 
     public synchronized static void writeLines(File filename, String[] lines) throws IOException {
-        writeFile(filename, StringHelper.join(lines, "\n"));
+        writeFile(filename, String.join("\n", lines));
     }
 
     public synchronized static void writeLines(File filename, Collection<String> lines) throws IOException {
-        writeFile(filename, StringHelper.join(lines, "\n"));
+        writeFile(filename, String.join("\n", lines));
     }
 
     public synchronized static void appendFile(File filename, String data) throws IOException {

@@ -1,7 +1,6 @@
 package com.trebonius.phototo.core.gps;
 
 import com.trebonius.phototo.helpers.FileHelper;
-import com.trebonius.phototo.helpers.StringHelper;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -35,7 +34,7 @@ public class GpsCoordinatesDescriptionCache {
 
         try {
             if (previous == null) {
-                FileHelper.appendFileLine(new File(this.cacheFileName), getKey(latitude, longitude) + "___" + StringHelper.join(data, ":::"));
+                FileHelper.appendFileLine(new File(this.cacheFileName), getKey(latitude, longitude) + "___" + String.join(":::", data));
             }
         } catch (IOException ex) {
             ex.printStackTrace();
