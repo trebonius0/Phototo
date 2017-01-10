@@ -12,16 +12,16 @@ import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.message.BasicHeader;
-import com.trebonius.phototo.core.fullscreen.IFullScreenResizeGenerator;
 import com.trebonius.phototo.helpers.FileHelper;
 import com.trebonius.phototo.helpers.SafeSimpleDateFormat;
+import com.trebonius.phototo.core.fullscreen.IFullScreenImageEntityGetter;
 
 public class ImageHandler extends FileHandler {
 
     private static final Pattern heightPattern = Pattern.compile("height=([0-9]*)");
     private static final Pattern widthPattern = Pattern.compile("width=([0-9]*)");
     private static final SafeSimpleDateFormat expiresDateFormat;
-    private final IFullScreenResizeGenerator fullScreenResizeGenerator;
+    private final IFullScreenImageEntityGetter fullScreenImageEntityGetter;
 
     static {
         expiresDateFormat = new SafeSimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
@@ -29,10 +29,10 @@ public class ImageHandler extends FileHandler {
         expiresDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
-    public ImageHandler(String prefix, Path folderRoot, IFullScreenResizeGenerator fullScreenResizeGenerator) {
+    public ImageHandler(String prefix, Path folderRoot, IFullScreenImageEntityGetter fullScreenEntityGetter) {
         super(prefix, folderRoot);
 
-        this.fullScreenResizeGenerator = fullScreenResizeGenerator;
+        this.fullScreenImageEntityGetter = fullScreenEntityGetter;
     }
 
     @Override
@@ -62,8 +62,8 @@ public class ImageHandler extends FileHandler {
                 int height = Integer.parseInt(mHeight.group(1));
                 int width = Integer.parseInt(mWidth.group(1));
 
-                if (this.fullScreenResizeGenerator != null) {
-                    return this.fullScreenResizeGenerator.getImage(localFile, contentType, height, width);
+                if (this.fullScreenImageEntityGetter != null) {
+                    return this.fullScreenImageEntityGetter.getImage(localFile, contentType, height, width);
                 } else {
                     throw new IllegalStateException();
                 }

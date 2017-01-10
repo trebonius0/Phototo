@@ -5,7 +5,7 @@ import com.trebonius.phototo.helpers.JpegEncoder;
 import com.trebonius.phototo.helpers.Md5;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
 
-public class FullScreenResizeGenerator implements IFullScreenResizeGenerator {
+public class FullScreenImageEntityGetter implements IFullScreenImageEntityGetter, Closeable {
 
     private static final long maxFileAgeBeforeCleaning = 30 * 86400 * 1000L;
     private static final int wantedQuality = 90;
@@ -26,19 +26,20 @@ public class FullScreenResizeGenerator implements IFullScreenResizeGenerator {
     private final String folderName;
     private final Timer timer;
 
-    public FullScreenResizeGenerator(FileSystem fileSystem, String folderName) throws IOException {
+    public FullScreenImageEntityGetter(FileSystem fileSystem, String cacheFolderName) throws IOException {
         this.fileSystem = fileSystem;
-        this.folderName = folderName;
+        this.folderName = cacheFolderName;
 
-        if (!Files.exists(this.fileSystem.getPath(folderName))) {
-            Files.createDirectory(this.fileSystem.getPath(folderName));
+        if (!Files.exists(this.fileSystem.getPath(cacheFolderName))) {
+            Files.createDirectory(this.fileSystem.getPath(cacheFolderName));
         }
 
+        // Setting up the folder cleaning task
         this.timer = new Timer();
         this.timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                for (File file : fileSystem.getPath(folderName).toFile().listFiles()) {
+                for (File file : fileSystem.getPath(cacheFolderName).toFile().listFiles()) {
                     if (file.lastModified() < System.currentTimeMillis() - maxFileAgeBeforeCleaning) {
                         file.delete();
                     }
@@ -67,8 +68,13 @@ public class FullScreenResizeGenerator implements IFullScreenResizeGenerator {
             }
         }
 
-        fullScreenFile.setLastModified(System.currentTimeMillis());
+        fullScreenFile.setLastModified(System.currentTimeMillis()); // Changing the last modified timestamp to prevent it from being deleted by the folder cleaning task
         return new FileEntity(fullScreenFile, contentType);
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.timer.cancel();
     }
 
     private static String getCachedFilename(File localFile) {
@@ -76,4 +82,5 @@ public class FullScreenResizeGenerator implements IFullScreenResizeGenerator {
 
         return Md5.encodeString(localFile.getAbsolutePath() + "_" + lastModified) + ".jpg";
     }
+
 }

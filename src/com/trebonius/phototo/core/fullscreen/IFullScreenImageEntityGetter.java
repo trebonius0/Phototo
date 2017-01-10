@@ -4,7 +4,7 @@ import java.io.File;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
 
-public interface IFullScreenResizeGenerator {
+public interface IFullScreenImageEntityGetter {
 
     FileEntity getImage(File localFile, ContentType contentType, int height, int width);
 }

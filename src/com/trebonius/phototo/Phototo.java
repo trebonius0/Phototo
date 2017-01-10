@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.bootstrap.HttpServer;
 import org.apache.http.impl.bootstrap.ServerBootstrap;
-import com.trebonius.phototo.core.fullscreen.FullScreenResizeGenerator;
+import com.trebonius.phototo.core.fullscreen.FullScreenImageEntityGetter;
 import com.trebonius.phototo.core.gps.IGpsCoordinatesDescriptionGetter;
 import com.trebonius.phototo.server.CssHandler;
 import com.trebonius.phototo.server.DefaultHandler;
@@ -43,7 +43,7 @@ public class Phototo {
         ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, "cache/thumbnails");
         IGpsCoordinatesDescriptionGetter googleGpsCoordinatesDescriptionGetter = null;
         MetadataGetter metadataGetter = new MetadataGetter(fileSystem, "cache/metadata.cache", googleGpsCoordinatesDescriptionGetter);
-        FullScreenResizeGenerator fullScreenResizeGenerator = new FullScreenResizeGenerator(fileSystem, "cache/fullsize");
+        FullScreenImageEntityGetter fullScreenResizeGenerator = new FullScreenImageEntityGetter(fileSystem, "cache/fullsize");
 
         PhototoFilesManager phototoFilesManager = new PhototoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, prefixModeOnly, indexFolderName);
 
