@@ -60,7 +60,7 @@ public class FullScreenResizeGenerator implements IFullScreenResizeGenerator {
                 }
 
                 try (OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(fullScreenFile))) {
-                    new JpegEncoder(image, 90, outputStream).Compress();
+                    new JpegEncoder(image, wantedQuality, outputStream).Compress();
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();
