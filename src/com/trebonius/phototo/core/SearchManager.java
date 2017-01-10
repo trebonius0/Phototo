@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class SearchManager {
@@ -28,17 +29,17 @@ public class SearchManager {
             return new ArrayList<>();
         }
 
-        List<List<PhototoPicture>> resultsTmp = searched.parallelStream()
+        List<Set<PhototoPicture>> resultsTmp = searched.parallelStream()
                 .map((String searchedTerm) -> this.picturesIndex.findContains(searchedTerm))
-                .map((Collection<PhototoPicture> pictures) -> pictures.stream().filter((PhototoPicture phototoPicture) -> phototoPicture.fsPath.startsWith(folder)).collect(Collectors.toList()))
+                .map((Collection<PhototoPicture> pictures) -> pictures.stream().filter((PhototoPicture phototoPicture) -> phototoPicture.fsPath.startsWith(folder)).collect(Collectors.toSet()))
                 .collect(Collectors.toList());
 
-        List<PhototoPicture> result = resultsTmp.get(0);
+        Set<PhototoPicture> result = resultsTmp.get(0);
         for (int i = 1; i < resultsTmp.size(); i++) {
-            result = result.parallelStream().filter(resultsTmp.get(i)::contains).collect(Collectors.toList());
+            result = result.parallelStream().filter(resultsTmp.get(i)::contains).collect(Collectors.toSet());
         }
 
-        return result;
+        return new ArrayList<>(result);
     }
 
     public void addPicture(PhototoFolder rootFolder, PhototoPicture picture) {
