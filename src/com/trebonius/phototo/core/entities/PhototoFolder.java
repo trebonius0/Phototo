@@ -4,9 +4,8 @@ import io.gsonfire.annotations.ExposeMethodResult;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
+import java.util.Optional;
 import java.util.Set;
 
 public class PhototoFolder extends PhototoItem {
@@ -42,11 +41,13 @@ public class PhototoFolder extends PhototoItem {
 
             return this.pictures.iterator().next().thumbnail;
         } else {
-            for (PhototoFolder folder : this.subFolders.values()) {
-                return folder.getThumbnail();
+            // If the folder does not contain pictures, will return the thumbail of one of its subfolders (if any is available)
+            Optional<PhototoFolder> folderOptional = this.subFolders.values().stream().filter((PhototoFolder folder) -> !folder.isEmpty()).findAny();
+            if (folderOptional.isPresent()) {
+                return folderOptional.get().getThumbnail();
+            } else {
+                return null;
             }
-
-            return null;
         }
     }
 
