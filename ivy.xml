@@ -16,5 +16,7 @@
         <dependency org="io.gsonfire" name="gson-fire" rev="1.8.0"/>
         <dependency org="org.apache.httpcomponents" name="httpcore" rev="4.4.5"/>
         <dependency org="com.google.jimfs" name="jimfs" rev="1.1" conf="test->*"/>
+        <dependency org="junit" name="junit" rev="4.12" conf="test->*"/>
+        <dependency org="org.hamcrest" name="hamcrest-core" rev="1.3" conf="test->*"/>
     </dependencies>
 </ivy-module>
