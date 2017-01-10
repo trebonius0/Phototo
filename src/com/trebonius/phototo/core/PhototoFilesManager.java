@@ -138,6 +138,10 @@ public class PhototoFilesManager implements Closeable {
                         .collect(Collectors.toList());
                 foldersToExplore.addAll(folders);
 
+                for (PhototoFolder folder : folders) {
+                    currentFolder.subFolders.put(folder.fsPath.getFileName().toString(), folder);
+                }
+
                 // Renaming pictures with 2+ spaces in a row since this will cause trouble then
                 Files.list(currentFolder.fsPath).forEach((Path path) -> {
                     if (path.getFileName().toString().contains("  ")) {
@@ -153,10 +157,6 @@ public class PhototoFilesManager implements Closeable {
                         .filter((Path path) -> isPictureFile(path))
                         .map((Path path) -> new PhototoPicture(this.rootFolder.fsPath, path, this.metadataGetter.getMetadata(path, tryGetLastModifiedTimestamp(path), this.thumbnailGenerator), this.thumbnailGenerator.getThumbnailUrl(path, tryGetLastModifiedTimestamp(path)), tryGetLastModifiedTimestamp(path)))
                         .collect(Collectors.toList());
-
-                for (PhototoFolder folder : folders) {
-                    currentFolder.subFolders.put(folder.fsPath.getFileName().toString(), folder);
-                }
 
                 pictures.stream().forEach((PhototoPicture picture) -> { // This could be a parallel stream. However, since thumbnail generation takes a lot of RAM, having it parallel would take too much ram (bad on small machines)
                     try {
