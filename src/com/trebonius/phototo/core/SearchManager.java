@@ -1,5 +1,6 @@
 package com.trebonius.phototo.core;
 
+import com.trebonius.phototo.helpers.SearchQueryHelper;
 import com.trebonius.phototo.core.entities.PhototoFolder;
 import com.trebonius.phototo.core.entities.PhototoPicture;
 import com.trebonius.phototo.helpers.PartialStringIndex;
