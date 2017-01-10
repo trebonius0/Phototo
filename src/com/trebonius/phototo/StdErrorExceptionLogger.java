@@ -1,4 +1,4 @@
-package com.trebonius.phototo.controllers;
+package com.trebonius.phototo;
 
 import java.net.SocketTimeoutException;
 import org.apache.http.ConnectionClosedException;

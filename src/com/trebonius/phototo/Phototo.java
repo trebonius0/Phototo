@@ -17,7 +17,6 @@ import com.trebonius.phototo.controllers.DefaultHandler;
 import com.trebonius.phototo.controllers.FolderListHandler;
 import com.trebonius.phototo.controllers.ImageHandler;
 import com.trebonius.phototo.controllers.JsHandler;
-import com.trebonius.phototo.controllers.StdErrorExceptionLogger;
 
 public class Phototo {
 

@@ -1,4 +1,4 @@
-package com.trebonius.phototo.controllers;
+package com.trebonius.phototo.helpers;
 
 import com.google.gson.Gson;
 import io.gsonfire.GsonFireBuilder;
