@@ -20,7 +20,7 @@ import com.trebonius.phototo.controllers.JsHandler;
 
 public class Phototo {
 
-    public static final String[] supportedExtensions = new String[]{"jpg", "jpeg", "png", "bmp"};
+    public static final String[] supportedPictureExtensions = new String[]{"jpg", "jpeg", "png", "bmp"};
 
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
@@ -54,12 +54,12 @@ public class Phototo {
                 .setServerInfo("Phototo/1.0")
                 .setSocketConfig(socketConfig)
                 .setExceptionLogger(new StdErrorExceptionLogger())
-                .registerHandler(Routes.fullSizePicturesRootUrl + "/*", new ImageHandler(Routes.fullSizePicturesRootUrl, fileSystem.getPath(rootFolder), fullScreenResizeGenerator))
-                .registerHandler(Routes.thumbnailRootUrl + "/*", new ImageHandler(Routes.thumbnailRootUrl, fileSystem.getPath("cache/thumbnails"), null))
-                .registerHandler(Routes.listItemsApiUrl + "/*", new FolderListHandler(Routes.listItemsApiUrl, fileSystem.getPath(rootFolder), phototoFilesManager))
-                .registerHandler("/img/*", new ImageHandler("/img", fileSystem.getPath("www/img"), null))
-                .registerHandler("/js/*", new JsHandler("/js", fileSystem.getPath("www/js")))
-                .registerHandler("/css/*", new CssHandler("/css", fileSystem.getPath("www/css")))
+                .registerHandler(Routes.fullSizePicturesRootUrl + "/*", new ImageHandler(fileSystem.getPath(rootFolder), Routes.fullSizePicturesRootUrl, fullScreenResizeGenerator))
+                .registerHandler(Routes.thumbnailRootUrl + "/*", new ImageHandler(fileSystem.getPath("cache/thumbnails"), Routes.thumbnailRootUrl, null))
+                .registerHandler(Routes.listItemsApiUrl, new FolderListHandler(Routes.listItemsApiUrl, fileSystem.getPath(rootFolder), phototoFilesManager))
+                .registerHandler("/img/*", new ImageHandler(fileSystem.getPath("www/img"), "/img", null))
+                .registerHandler("/js/*", new JsHandler(fileSystem.getPath("www/js"), "/js"))
+                .registerHandler("/css/*", new CssHandler(fileSystem.getPath("www/css"), "/css"))
                 .registerHandler("*", new DefaultHandler(fileSystem.getPath("www")))
                 .create();
         server.start();

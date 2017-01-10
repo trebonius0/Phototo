@@ -1,5 +1,6 @@
 package com.trebonius.phototo.controllers;
 
+import com.trebonius.phototo.Phototo;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Date;
@@ -29,8 +30,8 @@ public class ImageHandler extends FileHandler {
         expiresDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
-    public ImageHandler(String prefix, Path folderRoot, IFullScreenImageEntityGetter fullScreenEntityGetter) {
-        super(prefix, folderRoot);
+    public ImageHandler(Path folderRoot, String prefix, IFullScreenImageEntityGetter fullScreenEntityGetter) {
+        super(folderRoot, prefix, Phototo.supportedPictureExtensions);
 
         this.fullScreenImageEntityGetter = fullScreenEntityGetter;
     }

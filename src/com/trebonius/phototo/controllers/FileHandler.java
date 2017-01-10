@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -24,10 +25,16 @@ public abstract class FileHandler implements HttpRequestHandler {
 
     private final Path folderRoot;
     private final String prefix;
+    private final String[] allowedExtensions;
 
-    public FileHandler(String prefix, Path folderRoot) {
+    public FileHandler(Path folderRoot, String prefix, String allowedExtension) {
+        this(folderRoot, prefix, new String[]{allowedExtension});
+    }
+
+    public FileHandler(Path folderRoot, String prefix, String[] allowedExtensions) {
         this.folderRoot = folderRoot;
         this.prefix = prefix.endsWith("/") ? prefix : (prefix + "/");
+        this.allowedExtensions = allowedExtensions;
     }
 
     @Override
@@ -47,7 +54,7 @@ public abstract class FileHandler implements HttpRequestHandler {
         String pathAndQuery = target.substring(this.prefix.length());
         String path;
         String query;
-        int p = pathAndQuery.indexOf("?");
+        int p = pathAndQuery.indexOf("?"); // TODO: improve parsing
         if (p == -1) {
             path = pathAndQuery;
             query = null;
@@ -57,7 +64,7 @@ public abstract class FileHandler implements HttpRequestHandler {
         }
 
         final Path wantedLocally = this.folderRoot.resolve(path);
-        if (!wantedLocally.startsWith(this.folderRoot)) {
+        if (!wantedLocally.startsWith(this.folderRoot) || Arrays.stream(allowedExtensions).noneMatch(FileHelper.getExtension(path)::equals)) {
             response.setStatusCode(HttpStatus.SC_FORBIDDEN);
             StringEntity entity = new StringEntity("<html><body><h1>Forbidden</h1></body></html>", ContentType.create("text/html", "UTF-8"));
             response.setEntity(entity);

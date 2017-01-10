@@ -199,7 +199,7 @@ public class PhototoFilesManager implements Closeable {
     private static boolean isPictureFile(Path path) {
         String pathStr = path.toString().toLowerCase();
         String extension = FileHelper.getExtension(pathStr);
-        for (String supportedExtension : Phototo.supportedExtensions) {
+        for (String supportedExtension : Phototo.supportedPictureExtensions) {
             if (supportedExtension.equalsIgnoreCase(extension)) {
                 return true;
             }

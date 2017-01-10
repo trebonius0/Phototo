@@ -4,8 +4,8 @@ import java.nio.file.Path;
 
 public class CssHandler extends FileHandler {
 
-    public CssHandler(String prefix, Path folderRoot) {
-        super(prefix, folderRoot);
+    public CssHandler(Path folderRoot, String prefix) {
+        super(folderRoot, prefix, "css");
     }
 
     @Override

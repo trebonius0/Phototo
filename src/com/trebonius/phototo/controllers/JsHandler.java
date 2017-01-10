@@ -4,8 +4,8 @@ import java.nio.file.Path;
 
 public class JsHandler extends FileHandler {
 
-    public JsHandler(String prefix, Path folderRoot) {
-        super(prefix, folderRoot);
+    public JsHandler(Path folderRoot, String prefix) {
+        super(folderRoot, prefix, "js");
     }
 
     @Override
