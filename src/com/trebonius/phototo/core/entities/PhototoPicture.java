@@ -4,7 +4,7 @@ import com.trebonius.phototo.core.gps.Position;
 import com.google.gson.annotations.Expose;
 import com.trebonius.phototo.core.metadata.Metadata;
 import java.nio.file.Path;
-import com.trebonius.phototo.Phototo;
+import com.trebonius.phototo.Routes;
 
 public class PhototoPicture extends PhototoItem {
 
@@ -44,7 +44,7 @@ public class PhototoPicture extends PhototoItem {
         this.thumbnail = new PictureInfos(thumbnailUrl, metadata.thumbnailWidth, metadata.thumbnailHeight);
         this.lastModificationTimestamp = lastModificationTimestamp;
         this.pictureCreationDate = metadata.pictureCreationDate;
-        this.picture = new PictureInfos(Phototo.fullSizePicturesRootUrl + "/" + this.path, metadata.width, metadata.height);
+        this.picture = new PictureInfos(Routes.fullSizePicturesRootUrl + "/" + this.path, metadata.width, metadata.height);
 
         if (this.filename.length() > 40) {
             this.parentAndName = path.getParent().getFileName().toString();

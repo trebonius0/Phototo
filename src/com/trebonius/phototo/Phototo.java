@@ -21,8 +21,6 @@ import com.trebonius.phototo.controllers.JsHandler;
 public class Phototo {
 
     public static final String[] supportedExtensions = new String[]{"jpg", "jpeg", "png", "bmp"};
-    public static String thumbnailRootUrl = "/img/thumbnail";
-    public static String fullSizePicturesRootUrl = "/img/fullsize";
 
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
@@ -56,9 +54,9 @@ public class Phototo {
                 .setServerInfo("Phototo/1.0")
                 .setSocketConfig(socketConfig)
                 .setExceptionLogger(new StdErrorExceptionLogger())
-                .registerHandler(fullSizePicturesRootUrl + "/*", new ImageHandler(fullSizePicturesRootUrl, fileSystem.getPath(rootFolder), fullScreenResizeGenerator))
-                .registerHandler(thumbnailRootUrl + "/*", new ImageHandler(thumbnailRootUrl, fileSystem.getPath("cache/thumbnails"), null))
-                .registerHandler("/api/list", new FolderListHandler("/api/list", fileSystem.getPath(rootFolder), phototoFilesManager))
+                .registerHandler(Routes.fullSizePicturesRootUrl + "/*", new ImageHandler(Routes.fullSizePicturesRootUrl, fileSystem.getPath(rootFolder), fullScreenResizeGenerator))
+                .registerHandler(Routes.thumbnailRootUrl + "/*", new ImageHandler(Routes.thumbnailRootUrl, fileSystem.getPath("cache/thumbnails"), null))
+                .registerHandler(Routes.listItemsApiUrl + "/*", new FolderListHandler(Routes.listItemsApiUrl, fileSystem.getPath(rootFolder), phototoFilesManager))
                 .registerHandler("/img/*", new ImageHandler("/img", fileSystem.getPath("www/img"), null))
                 .registerHandler("/js/*", new JsHandler("/js", fileSystem.getPath("www/js")))
                 .registerHandler("/css/*", new CssHandler("/css", fileSystem.getPath("www/css")))

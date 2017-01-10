@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
-import com.trebonius.phototo.Phototo;
+import com.trebonius.phototo.Routes;
 import com.trebonius.phototo.helpers.ImageHelper;
 import com.trebonius.phototo.helpers.JpegEncoder;
 import com.trebonius.phototo.helpers.Md5;
@@ -89,7 +89,7 @@ public class ThumbnailGenerator implements IThumbnailGenerator {
 
     @Override
     public String getThumbnailUrl(Path originalFilename, long lastModifiedTimestamp) {
-        return Phototo.thumbnailRootUrl + "/" + this.getThumbnailFilename(originalFilename, lastModifiedTimestamp);
+        return Routes.thumbnailRootUrl + "/" + this.getThumbnailFilename(originalFilename, lastModifiedTimestamp);
     }
 
     private String getThumbnailFilename(Path originalFilename, long lastModifiedTimestamp) {
