@@ -1,4 +1,4 @@
-package com.trebonius.phototo.server;
+package com.trebonius.phototo.controllers;
 
 import com.google.gson.annotations.Expose;
 import java.util.Collection;

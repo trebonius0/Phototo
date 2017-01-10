@@ -1,4 +1,4 @@
-package com.trebonius.phototo.server;
+package com.trebonius.phototo.controllers;
 
 import com.trebonius.phototo.helpers.FileHelper;
 import java.io.File;

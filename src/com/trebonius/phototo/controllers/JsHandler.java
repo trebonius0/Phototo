@@ -1,4 +1,4 @@
-package com.trebonius.phototo.server;
+package com.trebonius.phototo.controllers;
 
 import java.nio.file.Path;
 

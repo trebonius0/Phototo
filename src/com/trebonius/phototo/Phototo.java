@@ -12,12 +12,12 @@ import org.apache.http.impl.bootstrap.HttpServer;
 import org.apache.http.impl.bootstrap.ServerBootstrap;
 import com.trebonius.phototo.core.fullscreen.FullScreenImageEntityGetter;
 import com.trebonius.phototo.core.gps.IGpsCoordinatesDescriptionGetter;
-import com.trebonius.phototo.server.CssHandler;
-import com.trebonius.phototo.server.DefaultHandler;
-import com.trebonius.phototo.server.FolderListHandler;
-import com.trebonius.phototo.server.ImageHandler;
-import com.trebonius.phototo.server.JsHandler;
-import com.trebonius.phototo.server.StdErrorExceptionLogger;
+import com.trebonius.phototo.controllers.CssHandler;
+import com.trebonius.phototo.controllers.DefaultHandler;
+import com.trebonius.phototo.controllers.FolderListHandler;
+import com.trebonius.phototo.controllers.ImageHandler;
+import com.trebonius.phototo.controllers.JsHandler;
+import com.trebonius.phototo.controllers.StdErrorExceptionLogger;
 
 public class Phototo {
 
