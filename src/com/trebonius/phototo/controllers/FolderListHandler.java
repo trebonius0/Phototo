@@ -89,7 +89,7 @@ public class FolderListHandler implements HttpRequestHandler {
                     hasMore = false;
                     pictures = new ArrayList<>();
                 }
-                PhototoServerResponse result = new PhototoServerResponse(folders, pictures, beginIndex, endIndex, hasMore);
+                FolderListResponse result = new FolderListResponse(folders, pictures, beginIndex, endIndex, hasMore);
 
                 response.setStatusCode(HttpStatus.SC_OK);
                 StringEntity body = new StringEntity(MyGsonBuilder.getGson().toJson(result), ContentType.create("application/json", "UTF-8"));

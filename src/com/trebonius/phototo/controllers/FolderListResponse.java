@@ -5,7 +5,7 @@ import java.util.Collection;
 import com.trebonius.phototo.core.entities.PhototoFolder;
 import com.trebonius.phototo.core.entities.PhototoPicture;
 
-public class PhototoServerResponse {
+public class FolderListResponse {
 
     @Expose
     public final Collection<PhototoFolder> folders;
@@ -22,7 +22,7 @@ public class PhototoServerResponse {
     @Expose
     public final boolean hasMore;
 
-    public PhototoServerResponse(Collection<PhototoFolder> folders, Collection<PhototoPicture> pictures, int beginIndex, int endIndex, boolean hasMore) {
+    public FolderListResponse(Collection<PhototoFolder> folders, Collection<PhototoPicture> pictures, int beginIndex, int endIndex, boolean hasMore) {
         this.folders = folders;
         this.pictures = pictures;
         this.beginIndex = beginIndex;
