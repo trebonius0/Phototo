@@ -116,10 +116,10 @@ class GalleryViewModel {
 
         var that = this;
 
-        var queryParameter = query ? ("&query=" + query.replace("&", "%26").replace("?", "%3F")) : '';
+        var queryParameter = query ? ("&query=" + encodeURIComponent(query)) : '';
 
         this.currentAjaxRequest && this.currentAjaxRequest.abort();
-        this.currentAjaxRequest = $.ajax("/api/list?folder=" + folder.replace("&", "%26").replace("?", "%3F") + queryParameter + "&beginIndex=0&endIndex=" + GalleryViewModel.batchSize)
+        this.currentAjaxRequest = $.ajax("/api/list?folder=" + encodeURIComponent(folder) + queryParameter + "&beginIndex=0&endIndex=" + GalleryViewModel.batchSize)
             .done(function(res: PhototoRequestResults) {
                 that.folders(res.folders);
                 that.pictures(res.pictures);
