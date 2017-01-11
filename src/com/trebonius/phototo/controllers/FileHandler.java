@@ -5,9 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpException;
@@ -54,7 +52,7 @@ public abstract class FileHandler implements HttpRequestHandler {
         String pathAndQuery = target.substring(this.prefix.length());
         String path;
         String query;
-        int p = pathAndQuery.indexOf("?"); // TODO: improve parsing
+        int p = pathAndQuery.indexOf("?");
         if (p == -1) {
             path = pathAndQuery;
             query = null;
@@ -79,17 +77,10 @@ public abstract class FileHandler implements HttpRequestHandler {
                 StringEntity entity = new StringEntity("<html><body><h1>Forbidden</h1></body></html>", ContentType.create("text/html", "UTF-8"));
                 response.setEntity(entity);
             } else {
-                try {
                     HttpEntity body = this.getEntity(path, query, wantedLocallyFile);
                     response.setStatusCode(HttpStatus.SC_OK);
                     response.setHeaders(this.getHeaders());
                     response.setEntity(body);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    response.setStatusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-                    StringEntity entity = new StringEntity("<html><body><h1>Internal Server Error</h1></body></html>", ContentType.create("text/html", "UTF-8"));
-                    response.setEntity(entity);
-                }
             }
         }
     }
@@ -100,7 +91,7 @@ public abstract class FileHandler implements HttpRequestHandler {
         return new Header[0];
     }
 
-    protected HttpEntity getEntity(String path, String query, File localFile) throws Exception {
+    protected HttpEntity getEntity(String path, String query, File localFile) throws IOException {
         String extension = FileHelper.getExtension(path);
         return new FileEntity(localFile, ContentType.create(getContentType(extension.toLowerCase())));
     }

@@ -16,11 +16,11 @@ import org.apache.http.message.BasicHeader;
 import com.trebonius.phototo.helpers.FileHelper;
 import com.trebonius.phototo.helpers.SafeSimpleDateFormat;
 import com.trebonius.phototo.core.fullscreen.IFullScreenImageEntityGetter;
+import com.trebonius.phototo.helpers.QueryStringHelper;
+import java.util.Map;
 
 public class ImageHandler extends FileHandler {
 
-    private static final Pattern heightPattern = Pattern.compile("height=([0-9]*)");
-    private static final Pattern widthPattern = Pattern.compile("width=([0-9]*)");
     private static final SafeSimpleDateFormat expiresDateFormat;
     private final IFullScreenImageEntityGetter fullScreenImageEntityGetter;
 
@@ -52,24 +52,19 @@ public class ImageHandler extends FileHandler {
     }
 
     @Override
-    protected HttpEntity getEntity(String path, String query, File localFile) throws Exception {
+    protected HttpEntity getEntity(String path, String query, File localFile) {
         String extension = FileHelper.getExtension(path);
         ContentType contentType = ContentType.create(getContentType(extension.toLowerCase()));
 
-        if (query != null) {
-            Matcher mHeight = heightPattern.matcher(query);
-            Matcher mWidth = widthPattern.matcher(query);
-            if (mHeight.find() && mWidth.find()) {
-                int height = Integer.parseInt(mHeight.group(1));
-                int width = Integer.parseInt(mWidth.group(1));
+        Map<String, String> queryStringParameters = QueryStringHelper.splitSearchQuery(query);
+        if (queryStringParameters.containsKey("height") && queryStringParameters.containsKey("width")) {
+            int height = Integer.parseInt(queryStringParameters.get("height"));
+            int width = Integer.parseInt(queryStringParameters.get("width"));
 
-                if (this.fullScreenImageEntityGetter != null) {
-                    return this.fullScreenImageEntityGetter.getImage(localFile, contentType, height, width);
-                } else {
-                    throw new IllegalStateException();
-                }
+            if (this.fullScreenImageEntityGetter != null) {
+                return this.fullScreenImageEntityGetter.getImage(localFile, contentType, height, width);
             } else {
-                return new FileEntity(localFile, contentType);
+                throw new IllegalStateException();
             }
         } else {
             return new FileEntity(localFile, contentType);
