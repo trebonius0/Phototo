@@ -47,7 +47,7 @@ public class FolderListHandler implements HttpRequestHandler {
 
         Map<String, String> queryStringMap = QueryStringHelper.splitSearchQuery(target);
         if (queryStringMap.keySet().containsAll(Arrays.asList(new String[]{"folder", "beginIndex", "endIndex"}))) {
-            String folderTmp = queryStringMap.get("query");
+            String folderTmp = queryStringMap.get("folder");
             while (folderTmp.length() > 0 && folderTmp.startsWith("/")) { // Remove the leading slashes if needed
                 folderTmp = folderTmp.substring(1);
             }

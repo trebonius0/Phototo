@@ -62,7 +62,7 @@ public abstract class FileHandler implements HttpRequestHandler {
         }
 
         final Path wantedLocally = this.folderRoot.resolve(path);
-        if (!wantedLocally.startsWith(this.folderRoot) || Arrays.stream(allowedExtensions).noneMatch(FileHelper.getExtension(path)::equals)) {
+        if (!wantedLocally.startsWith(this.folderRoot) || Arrays.stream(allowedExtensions).noneMatch(FileHelper.getExtension(path).toLowerCase()::equals)) {
             response.setStatusCode(HttpStatus.SC_FORBIDDEN);
             StringEntity entity = new StringEntity("<html><body><h1>Forbidden</h1></body></html>", ContentType.create("text/html", "UTF-8"));
             response.setEntity(entity);
