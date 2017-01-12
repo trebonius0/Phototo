@@ -16,7 +16,6 @@
         <dependency org="io.gsonfire" name="gson-fire" rev="1.8.0"/>
         <dependency org="org.apache.httpcomponents" name="httpcore" rev="4.4.5"/>
         <dependency org="org.apache.httpcomponents" name="httpclient" rev="4.5.2"/>
-        <dependency org="commons-logging" name="commons-logging" rev="1.1.1"/>
         
         <dependency org="com.google.jimfs" name="jimfs" rev="1.1" conf="test->*"/>
         <dependency org="junit" name="junit" rev="4.12" conf="test->*"/>
