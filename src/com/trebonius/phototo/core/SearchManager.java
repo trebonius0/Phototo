@@ -68,7 +68,7 @@ public class SearchManager {
             if (picture.position.hardcodedPosition != null) {
                 all.add(picture.position.hardcodedPosition);
             } else if (picture.position.coordinatesDescription != null) {
-                all.addAll(Arrays.asList(picture.position.coordinatesDescription));
+                all.addAll(SearchQueryHelper.getSplittedTerms(picture.position.coordinatesDescription));
             }
         }
 

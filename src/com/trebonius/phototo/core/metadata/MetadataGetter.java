@@ -122,7 +122,7 @@ public class MetadataGetter implements IMetadataGetter, Closeable {
         if (this.coordinatesDescriptionGetter != null) {
             metadata.position = new Position(coordinates.o1, coordinates.o2, hardcodedPosition, this.coordinatesDescriptionGetter.getCoordinatesDescription(coordinates.o1, coordinates.o2));
         } else {
-            metadata.position = new Position(coordinates.o1, coordinates.o2, hardcodedPosition, new String[0]);
+            metadata.position = new Position(coordinates.o1, coordinates.o2, hardcodedPosition, null);
         }
 
         synchronized (lock) {

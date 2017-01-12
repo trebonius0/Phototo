@@ -37,7 +37,7 @@ public class SearchManagerTest {
         Metadata metadata3 = new Metadata();
         metadata3.persons = new String[]{};
         metadata3.tags = new String[]{};
-        metadata3.position = new Position(7d, 4d, null, new String[]{"waldos"});
+        metadata3.position = new Position(7d, 4d, null, "waldos");
         PhototoPicture phototoPicture3 = new PhototoPicture(rootFolderPath, Paths.get("/home/myself/images/empty/empty.png"), metadata3, "fds", 546435435);
 
         searchManager.addPicture(rootFolder, phototoPicture1);

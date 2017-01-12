@@ -9,7 +9,7 @@ import java.util.Map;
 public class GpsCoordinatesDescriptionCache {
 
     private final String cacheFileName;
-    private final Map<String, String[]> map = new HashMap<>();
+    private final Map<String, String> map = new HashMap<>();
 
     public GpsCoordinatesDescriptionCache(String cacheFileName) {
         this.cacheFileName = cacheFileName;
@@ -18,23 +18,23 @@ public class GpsCoordinatesDescriptionCache {
             String[] lines = FileHelper.readFileLines(new File(cacheFileName));
 
             for (String line : lines) {
-                String[] data = line.split("___");
-                map.put(data[0], data[1].split(":::"));
+                String[] data = line.split(";");
+                map.put(data[0], data[1]);
             }
         } catch (IOException ex) {
         }
     }
 
-    public synchronized String[] getFromCache(double latitude, double longitude) {
+    public synchronized String getFromCache(double latitude, double longitude) {
         return map.get(getKey(latitude, longitude));
     }
 
-    public synchronized void addToCache(double latitude, double longitude, String[] data) {
-        String[] previous = map.put(getKey(latitude, longitude), data);
+    public synchronized void addToCache(double latitude, double longitude, String data) {
+        String previous = map.put(getKey(latitude, longitude), data);
 
         try {
             if (previous == null) {
-                FileHelper.appendFileLine(new File(this.cacheFileName), getKey(latitude, longitude) + "___" + String.join(":::", data));
+                FileHelper.appendFileLine(new File(this.cacheFileName), getKey(latitude, longitude) + ";" + data);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -42,6 +42,6 @@ public class GpsCoordinatesDescriptionCache {
     }
 
     private static String getKey(double latitude, double longitude) {
-        return latitude + "_" + longitude;
+        return latitude + "," + longitude;
     }
 }

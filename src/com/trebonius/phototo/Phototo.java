@@ -17,6 +17,8 @@ import com.trebonius.phototo.controllers.DefaultHandler;
 import com.trebonius.phototo.controllers.FolderListHandler;
 import com.trebonius.phototo.controllers.ImageHandler;
 import com.trebonius.phototo.controllers.JsHandler;
+import com.trebonius.phototo.core.gps.GpsCoordinatesDescriptionCache;
+import com.trebonius.phototo.core.gps.OSMGpsCoordinatesDescriptionGetter;
 
 public class Phototo {
 
@@ -38,8 +40,8 @@ public class Phototo {
         }
 
         ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, "cache/thumbnails");
-        IGpsCoordinatesDescriptionGetter googleGpsCoordinatesDescriptionGetter = null;
-        MetadataGetter metadataGetter = new MetadataGetter(fileSystem, "cache/metadata.cache", googleGpsCoordinatesDescriptionGetter);
+        IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(new GpsCoordinatesDescriptionCache("cache/gps.cache"));
+        MetadataGetter metadataGetter = new MetadataGetter(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
         FullScreenImageEntityGetter fullScreenResizeGenerator = new FullScreenImageEntityGetter(fileSystem, "cache/fullsize");
 
         PhototoFilesManager phototoFilesManager = new PhototoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, prefixModeOnly, indexFolderName);
