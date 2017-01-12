@@ -14,7 +14,7 @@ class PictureInfos {
 
 class PhototoPicturePosition {
     public hardcodedPosition: string;
-    public coordinatesDescription: string[];
+    public coordinatesDescription: string;
 }
 
 abstract class PhototoItem {
