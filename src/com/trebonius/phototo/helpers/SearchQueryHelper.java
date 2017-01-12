@@ -14,7 +14,7 @@ public class SearchQueryHelper {
      * @return 
      */
     public static List<String> getSplittedTerms(String s) {
-        return Arrays.asList(s.split("[ '\\.-]")).parallelStream()
+        return Arrays.asList(s.split("[ '\\,\\.-]")).parallelStream()
                 .map((String str) -> Normalizer.normalize(str.toLowerCase(), Normalizer.Form.NFD).replaceAll("\\p{M}", "").trim())
                 .map((String str) -> str.replaceAll("[^a-z0-9]+", ""))
                 .filter((String str) -> str.length() >= 3)
