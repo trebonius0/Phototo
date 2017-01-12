@@ -27,7 +27,7 @@ public class OSMGpsCoordinatesDescriptionGetter implements IGpsCoordinatesDescri
     }
 
     @Override
-    public String getCoordinatesDescription(Double latitude, Double longitude) {
+    public synchronized String getCoordinatesDescription(Double latitude, Double longitude) {
         if (latitude == null || longitude == null) {
             return null;
         }
