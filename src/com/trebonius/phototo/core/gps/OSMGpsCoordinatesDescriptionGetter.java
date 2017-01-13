@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 
 public class OSMGpsCoordinatesDescriptionGetter implements IGpsCoordinatesDescriptionGetter {
 
@@ -21,8 +20,8 @@ public class OSMGpsCoordinatesDescriptionGetter implements IGpsCoordinatesDescri
     private final HttpClient httpClient;
     private final GpsCoordinatesDescriptionCache cache;
 
-    public OSMGpsCoordinatesDescriptionGetter(GpsCoordinatesDescriptionCache cache) {
-        this.httpClient = HttpClientBuilder.create().build();
+    public OSMGpsCoordinatesDescriptionGetter(GpsCoordinatesDescriptionCache cache, HttpClient httpClient) {
+        this.httpClient = httpClient;
         this.cache = cache;
     }
 
@@ -39,7 +38,6 @@ public class OSMGpsCoordinatesDescriptionGetter implements IGpsCoordinatesDescri
 
         try {
             HttpGet request = new HttpGet("http://nominatim.openstreetmap.org/reverse?format=json&lat=" + latitude + "&lon=" + longitude);
-            request.addHeader("User-Agent", "Phototo 1.0");
             HttpResponse response = this.httpClient.execute(request);
 
             try (BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {

@@ -19,10 +19,14 @@ import com.trebonius.phototo.controllers.ImageHandler;
 import com.trebonius.phototo.controllers.JsHandler;
 import com.trebonius.phototo.core.gps.GpsCoordinatesDescriptionCache;
 import com.trebonius.phototo.core.gps.OSMGpsCoordinatesDescriptionGetter;
+import com.trebonius.phototo.core.metadata.ExifToolsDownloader;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 
 public class Phototo {
 
     public static final String[] supportedPictureExtensions = new String[]{"jpg", "jpeg", "png", "bmp"};
+    private static final String serverName = "Phototo/1.0";
 
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
@@ -39,8 +43,13 @@ public class Phototo {
             Files.createDirectory(fileSystem.getPath("cache"));
         }
 
+        HttpClient httpClient = HttpClientBuilder.create().setUserAgent(serverName).build();
+
+        ExifToolsDownloader exifToolsDownloader = new ExifToolsDownloader(httpClient, fileSystem);
+        exifToolsDownloader.run();
+
         ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, "cache/thumbnails");
-        IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(new GpsCoordinatesDescriptionCache("cache/gps.cache"));
+        IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(new GpsCoordinatesDescriptionCache("cache/gps.cache"), httpClient);
         MetadataGetter metadataGetter = new MetadataGetter(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
         FullScreenImageEntityGetter fullScreenResizeGenerator = new FullScreenImageEntityGetter(fileSystem, "cache/fullsize");
 
@@ -53,7 +62,7 @@ public class Phototo {
 
         final HttpServer server = ServerBootstrap.bootstrap()
                 .setListenerPort(8186)
-                .setServerInfo("Phototo/1.0")
+                .setServerInfo(serverName)
                 .setSocketConfig(socketConfig)
                 .setExceptionLogger(new StdErrorExceptionLogger())
                 .registerHandler(Routes.fullSizePicturesRootUrl + "/*", new ImageHandler(fileSystem.getPath(rootFolder), Routes.fullSizePicturesRootUrl, fullScreenResizeGenerator))
