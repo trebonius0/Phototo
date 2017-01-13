@@ -21,32 +21,25 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 
-public class ExifToolsDownloader {
+public class ExifToolDownloader {
 
     private static final Pattern namePattern = Pattern.compile("http://owl\\.phy\\.queensu\\.ca/~phil/exiftool/exiftool-[0-9]+\\.[0-9]+\\.zip");
     private static final String exifToolRslUrl = "http://owl.phy.queensu.ca/~phil/exiftool/rss.xml";
     private static final String tmpFilename = "tmp.zip";
     private static final String targetFilename = "exiftool.exe";
-    private final HttpClient httpClient;
-    private final FileSystem fileSystem;
 
-    public ExifToolsDownloader(HttpClient httpClient, FileSystem fileSystem) {
-        this.httpClient = httpClient;
-        this.fileSystem = fileSystem;
-    }
-
-    public void run() throws IOException {
+    public static void run(HttpClient httpClient, FileSystem fileSystem) throws IOException {
         boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
         if (isWindows) {
             System.out.println("Starting exifTools download");
-            this.downloadExifTools(this.getExifToolsZipUrl());
+            downloadExifTools(getExifToolsZipUrl(httpClient), httpClient, fileSystem);
             System.out.println("End of exifTools download");
         }
     }
 
-    private String getExifToolsZipUrl() throws IOException {
+    private static String getExifToolsZipUrl(HttpClient httpClient) throws IOException {
         HttpGet request = new HttpGet(exifToolRslUrl);
-        HttpResponse response = this.httpClient.execute(request);
+        HttpResponse response = httpClient.execute(request);
         try (BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
             StringBuilder result = new StringBuilder();
             String line;
@@ -63,13 +56,13 @@ public class ExifToolsDownloader {
         }
     }
 
-    private void downloadExifTools(String exifToolsUrl) throws IOException {
+    private static void downloadExifTools(String exifToolsUrl, HttpClient httpClient, FileSystem fileSystem) throws IOException {
         HttpGet request = new HttpGet(exifToolsUrl);
-        HttpResponse response = this.httpClient.execute(request);
+        HttpResponse response = httpClient.execute(request);
         HttpEntity entity = response.getEntity();
         if (entity != null) {
             // Download the zip file
-            File tmpFile = this.fileSystem.getPath(tmpFilename).toFile();
+            File tmpFile = fileSystem.getPath(tmpFilename).toFile();
             tmpFile.delete(); // Delete the tmp file in case it already exists
             try (InputStream inputStream = entity.getContent();
                     OutputStream outputStream = new FileOutputStream(tmpFile)) {
@@ -81,7 +74,7 @@ public class ExifToolsDownloader {
                 ZipEntry ze = zis.getNextEntry();
 
                 if (ze != null) {
-                    File newFile = this.fileSystem.getPath(targetFilename).toFile();
+                    File newFile = fileSystem.getPath(targetFilename).toFile();
                     newFile.delete(); // Delete in case it already exists
 
                     byte[] buffer = new byte[4096];

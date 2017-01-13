@@ -19,7 +19,7 @@ import com.trebonius.phototo.controllers.ImageHandler;
 import com.trebonius.phototo.controllers.JsHandler;
 import com.trebonius.phototo.core.gps.GpsCoordinatesDescriptionCache;
 import com.trebonius.phototo.core.gps.OSMGpsCoordinatesDescriptionGetter;
-import com.trebonius.phototo.core.metadata.ExifToolsDownloader;
+import com.trebonius.phototo.core.metadata.ExifToolDownloader;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
@@ -45,8 +45,7 @@ public class Phototo {
 
         HttpClient httpClient = HttpClientBuilder.create().setUserAgent(serverName).build();
 
-        ExifToolsDownloader exifToolsDownloader = new ExifToolsDownloader(httpClient, fileSystem);
-        exifToolsDownloader.run();
+        ExifToolDownloader.run(httpClient, fileSystem);
 
         ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, "cache/thumbnails");
         IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(new GpsCoordinatesDescriptionCache("cache/gps.cache"), httpClient);
