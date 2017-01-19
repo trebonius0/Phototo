@@ -128,7 +128,7 @@ public class MetadataAggregator implements IMetadataAggregator, Closeable {
         try {
             // Read metadata from cache
             String data = FileHelper.readFile(fileSystem.getPath(metadataCacheFilename).toFile());
-            Map<String, Metadata> fromCacheFileMap = MyGsonBuilder.getGson().fromJson(data, new TypeToken<Map<String, Metadata>>() {
+            Map<String, Metadata> fromCacheFileMap = new Gson().fromJson(data, new TypeToken<Map<String, Metadata>>() {
             }.getType());
 
             // Remove outdated metadata
