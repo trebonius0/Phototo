@@ -104,7 +104,7 @@ public class ExifMetadata {
         } else if (field instanceof String[]) {
             return (String[]) field;
         } else if (field instanceof List) {
-            return ((List<String>) field).toArray(new String[0]);
+            return (String[]) ((List) field).stream().map((o) -> o.toString()).toArray(String[]::new);
         } else if (field instanceof String) {
             return new String[]{(String) field};
         } else {
