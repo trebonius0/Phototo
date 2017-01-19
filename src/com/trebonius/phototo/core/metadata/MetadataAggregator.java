@@ -37,12 +37,13 @@ public class MetadataAggregator implements IMetadataAggregator, Closeable {
         this.fileSystem = fileSystem;
         this.metadataCacheFilename = metadataCacheFilename;
         this.coordinatesDescriptionGetter = coordinatesDescriptionGetter;
-        this.metadatas = readFromCache(this.fileSystem);
+        this.metadatas = readFromCache(this.fileSystem, metadataCacheFilename);
 
         this.timer = new Timer(false);
         this.startAutoSave();
     }
 
+    @Override
     public Metadata getMetadata(Path path, long lastModifiedTimestamp) {
         List<Tuple<Path, Long>> paths = new ArrayList<>();
         paths.add(new Tuple<>(path, lastModifiedTimestamp));
@@ -50,6 +51,7 @@ public class MetadataAggregator implements IMetadataAggregator, Closeable {
         return getMetadatas(paths).get(path);
     }
 
+    @Override
     public Map<Path, Metadata> getMetadatas(List<Tuple<Path, Long>> paths) {
         Map<Path, Metadata> result = new HashMap<>();
 
@@ -122,10 +124,10 @@ public class MetadataAggregator implements IMetadataAggregator, Closeable {
         }, 0, 20000);
     }
 
-    private Map<String, Metadata> readFromCache(FileSystem fileSystem) {
+    private static Map<String, Metadata> readFromCache(FileSystem fileSystem, String metadataCacheFilename) {
         try {
             // Read metadata from cache
-            String data = FileHelper.readFile(fileSystem.getPath(this.metadataCacheFilename).toFile());
+            String data = FileHelper.readFile(fileSystem.getPath(metadataCacheFilename).toFile());
             Map<String, Metadata> fromCacheFileMap = MyGsonBuilder.getGson().fromJson(data, new TypeToken<Map<String, Metadata>>() {
             }.getType());
 
