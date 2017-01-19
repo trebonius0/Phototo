@@ -36,7 +36,7 @@ public class Phototo {
         String rootFolder = args[0];
         boolean prefixModeOnly = true;
         boolean indexFolderName = false;
-        boolean useParallelThumbnailGeneration = false;
+        boolean useParallelThumbnailGeneration = true;
         boolean forceExifToolsDownload = false;
         System.out.println("Starting exploration of folder " + rootFolder + "...");
 
