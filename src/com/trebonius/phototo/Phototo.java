@@ -2,7 +2,7 @@ package com.trebonius.phototo;
 
 import java.nio.file.FileSystem;
 import com.trebonius.phototo.core.PhototoFilesManager;
-import com.trebonius.phototo.core.metadata.MetadataGetter;
+import com.trebonius.phototo.core.metadata.MetadataAggregator;
 import com.trebonius.phototo.core.thumbnails.ThumbnailGenerator;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -11,15 +11,15 @@ import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.bootstrap.HttpServer;
 import org.apache.http.impl.bootstrap.ServerBootstrap;
 import com.trebonius.phototo.core.fullscreen.FullScreenImageEntityGetter;
-import com.trebonius.phototo.core.gps.IGpsCoordinatesDescriptionGetter;
+import com.trebonius.phototo.core.metadata.gps.IGpsCoordinatesDescriptionGetter;
 import com.trebonius.phototo.controllers.CssHandler;
 import com.trebonius.phototo.controllers.DefaultHandler;
 import com.trebonius.phototo.controllers.FolderListHandler;
 import com.trebonius.phototo.controllers.ImageHandler;
 import com.trebonius.phototo.controllers.JsHandler;
-import com.trebonius.phototo.core.gps.GpsCoordinatesDescriptionCache;
-import com.trebonius.phototo.core.gps.OSMGpsCoordinatesDescriptionGetter;
-import com.trebonius.phototo.core.metaexif.data.ExifToolDownloader;
+import com.trebonius.phototo.core.metadata.exif.ExifToolDownloader;
+import com.trebonius.phototo.core.metadata.gps.GpsCoordinatesDescriptionCache;
+import com.trebonius.phototo.core.metadata.gps.OSMGpsCoordinatesDescriptionGetter;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
@@ -36,6 +36,7 @@ public class Phototo {
         String rootFolder = args[0];
         boolean prefixModeOnly = true;
         boolean indexFolderName = false;
+        boolean useParallelThumbnailGeneration = false;
         System.out.println("Starting exploration of folder " + rootFolder + "...");
 
         FileSystem fileSystem = FileSystems.getDefault();
@@ -49,10 +50,10 @@ public class Phototo {
 
         ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, "cache/thumbnails");
         IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(new GpsCoordinatesDescriptionCache("cache/gps.cache"), httpClient);
-        MetadataGetter metadataGetter = new MetadataGetter(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
+        MetadataAggregator metadataGetter = new MetadataAggregator(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
         FullScreenImageEntityGetter fullScreenResizeGenerator = new FullScreenImageEntityGetter(fileSystem, "cache/fullsize");
 
-        PhototoFilesManager phototoFilesManager = new PhototoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, prefixModeOnly, indexFolderName);
+        PhototoFilesManager phototoFilesManager = new PhototoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, prefixModeOnly, indexFolderName, useParallelThumbnailGeneration);
 
         SocketConfig socketConfig = SocketConfig.custom()
                 .setSoTimeout(60000)

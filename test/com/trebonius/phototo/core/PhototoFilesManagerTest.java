@@ -4,9 +4,10 @@ import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import com.trebonius.phototo.core.entities.PhototoFolder;
 import com.trebonius.phototo.core.entities.PhototoPicture;
-import com.trebonius.phototo.core.metadata.IMetadataGetter;
-import com.trebonius.phototo.core.metadata.exif.ExifMetadata;
+import com.trebonius.phototo.core.metadata.IMetadataAggregator;
+import com.trebonius.phototo.core.metadata.Metadata;
 import com.trebonius.phototo.core.thumbnails.IThumbnailGenerator;
+import com.trebonius.phototo.helpers.Tuple;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,7 +62,7 @@ public class PhototoFilesManagerTest {
 
     }
 
-    private static class MetadataGetterMock implements IMetadataGetter {
+    private static class MetadataGetterMock implements IMetadataAggregator {
 
         private final Map<String, List<String>> map = new HashMap<>();
 
@@ -76,8 +77,8 @@ public class PhototoFilesManagerTest {
         }
 
         @Override
-        public ExifMetadata getMetadata(Path path, long lastModificationTimestamp, IThumbnailGenerator thumbnailGenerator) {
-            ExifMetadata metadata = new ExifMetadata();
+        public Metadata getMetadata(Path path, long lastModificationTimestamp) {
+            Metadata metadata = new Metadata();
 
             List<String> tagsList = this.map.get(path.toString());
             metadata.tags = tagsList == null ? new String[0] : tagsList.toArray(new String[tagsList.size()]);
@@ -87,7 +88,13 @@ public class PhototoFilesManagerTest {
         }
 
         @Override
-        public void startAutoSave() {
+        public Map<Path, Metadata> getMetadatas(List<Tuple<Path, Long>> paths) {
+            Map<Path, Metadata> result = new HashMap<>();
+            for (Tuple<Path, Long> pathTuple : paths) {
+                result.put(pathTuple.o1, this.getMetadata(pathTuple.o1, pathTuple.o2));
+            }
+            
+            return result;
         }
 
     }
@@ -127,7 +134,7 @@ public class PhototoFilesManagerTest {
             metadataGetterMock.addMetadata(phototoPicture2, "Québec");
             metadataGetterMock.addMetadata(phototoPicture2, "Canada");
 
-            try (PhototoFilesManager phototoFilesManager = new PhototoFilesManager(rootFolder, fileSystem, metadataGetterMock, thumbnailsGeneratorMock, true, true)) {
+            try (PhototoFilesManager phototoFilesManager = new PhototoFilesManager(rootFolder, fileSystem, metadataGetterMock, thumbnailsGeneratorMock, true, true, false)) {
                 // TEST SEARCH
                 List<PhototoPicture> res = phototoFilesManager.searchPicturesInFolder("/home/myself/images", "pierre-arthur");
                 Assert.assertEquals(2, res.size());

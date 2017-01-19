@@ -1,5 +1,6 @@
 package com.trebonius.phototo.core.gps;
 
+import com.trebonius.phototo.core.metadata.gps.GpsCoordinatesHelper;
 import com.trebonius.phototo.helpers.Tuple;
 import org.junit.Assert;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.trebonius.phototo.core.gps;
+package com.trebonius.phototo.core.metadata.gps;
 
 public interface IGpsCoordinatesDescriptionGetter {
 

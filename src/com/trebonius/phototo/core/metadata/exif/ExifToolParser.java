@@ -18,7 +18,7 @@ public class ExifToolParser {
 
     private static final int batchSize = 50;
 
-    public static Map<Path, ExifMetadata> readMetadata(List<Path> filenames) throws IOException {
+    public static Map<Path, ExifMetadata> readMetadata(List<Path> filenames) {
         boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
         String applicationName = isWindows ? "exiftool.exe" : "exiftool";
         Map<Path, ExifMetadata> result = new ConcurrentHashMap<>();

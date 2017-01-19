@@ -4,9 +4,13 @@ import com.trebonius.phototo.helpers.SearchQueryHelper;
 import com.trebonius.phototo.Phototo;
 import com.trebonius.phototo.core.entities.PhototoFolder;
 import com.trebonius.phototo.core.entities.PhototoPicture;
-import com.trebonius.phototo.core.metadata.IMetadataGetter;
+import com.trebonius.phototo.core.entities.PictureInfos;
+import com.trebonius.phototo.core.metadata.IMetadataAggregator;
+import com.trebonius.phototo.core.metadata.Metadata;
+import com.trebonius.phototo.core.metadata.MetadataAggregator;
 import com.trebonius.phototo.core.thumbnails.IThumbnailGenerator;
 import com.trebonius.phototo.helpers.FileHelper;
+import com.trebonius.phototo.helpers.Tuple;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.FileSystem;
@@ -25,12 +29,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PhototoFilesManager implements Closeable {
 
     private final FileSystem fileSystem;
-    private final IMetadataGetter metadataGetter;
+    private final IMetadataAggregator metadataAggregator;
     private final IThumbnailGenerator thumbnailGenerator;
     private final PhototoFolder rootFolder;
     private final SearchManager searchManager;
@@ -38,14 +44,16 @@ public class PhototoFilesManager implements Closeable {
     private final Map<Path, WatchKey> watchedDirectoriesKeys;
     private final Map<WatchKey, Path> watchedDirectoriesPaths;
     private final boolean prefixOnlyMode;
+    private final boolean useParallelThumbnailGeneration;
 
-    public PhototoFilesManager(String rootFolder, FileSystem fileSystem, IMetadataGetter metadataGetter, IThumbnailGenerator thumbnailGenerator, boolean prefixOnlyMode, boolean indexFolderName) throws IOException {
+    public PhototoFilesManager(String rootFolder, FileSystem fileSystem, IMetadataAggregator metadataGetter, IThumbnailGenerator thumbnailGenerator, boolean prefixOnlyMode, boolean indexFolderName, boolean useParallelThumbnailGeneration) throws IOException {
         this.fileSystem = fileSystem;
-        this.metadataGetter = metadataGetter;
+        this.metadataAggregator = metadataGetter;
         this.thumbnailGenerator = thumbnailGenerator;
         this.rootFolder = new PhototoFolder(this.fileSystem.getPath(rootFolder), this.fileSystem.getPath(rootFolder));
         this.searchManager = new SearchManager(prefixOnlyMode, indexFolderName);
         this.prefixOnlyMode = prefixOnlyMode;
+        this.useParallelThumbnailGeneration = useParallelThumbnailGeneration;
 
         WatchService watcher = this.fileSystem.newWatchService();
         this.watchedDirectoriesKeys = new HashMap<>();
@@ -153,15 +161,25 @@ public class PhototoFilesManager implements Closeable {
                     }
                 });
 
-                List<PhototoPicture> pictures = Files.list(currentFolder.fsPath).parallel()
-                        .filter((Path path) -> isPictureFile(path))
-                        .map((Path path) -> new PhototoPicture(this.rootFolder.fsPath, path, this.metadataGetter.getMetadata(path, tryGetLastModifiedTimestamp(path), this.thumbnailGenerator), this.thumbnailGenerator.getThumbnailUrl(path, tryGetLastModifiedTimestamp(path)), tryGetLastModifiedTimestamp(path)))
+                // Extraction of pictures metadata
+                Map<Path, Metadata> metadatas = this.metadataAggregator.getMetadatas(
+                        Files.list(currentFolder.fsPath).parallel()
+                                .filter((Path path) -> isPictureFile(path))
+                                .map((path) -> new Tuple<>(path, tryGetLastModifiedTimestamp(path)))
+                                .collect(Collectors.toList()));
+
+                List<PhototoPicture> pictures = metadatas.entrySet().parallelStream()
+                        .map((Map.Entry<Path, Metadata> entry) -> new PhototoPicture(this.rootFolder.fsPath, entry.getKey(), entry.getValue(), new PictureInfos(this.thumbnailGenerator.getThumbnailUrl(entry.getKey(), tryGetLastModifiedTimestamp(entry.getKey())), this.thumbnailGenerator.getThumbnailWidth(entry.getValue().width, entry.getValue().height), this.thumbnailGenerator.getThumbnailHeight(entry.getValue().width, entry.getValue().height)), tryGetLastModifiedTimestamp(entry.getKey())))
                         .collect(Collectors.toList());
 
-                pictures.stream().forEach((PhototoPicture picture) -> { // This could be a parallel stream. However, since thumbnail generation takes a lot of RAM, having it parallel would take too much ram (bad on small machines)
+                pictures.forEach((PhototoPicture picture) -> {
+                    currentFolder.pictures.add(picture);
+                    searchManager.addPicture(rootFolder, picture);
+                });
+
+                Stream<PhototoPicture> thumbnailStream = this.useParallelThumbnailGeneration ? pictures.parallelStream() : pictures.stream(); // This could be a parallel stream. However, since thumbnail generation takes a lot of RAM, having it parallel would take too much ram (bad on small machines)
+                thumbnailStream.forEach((PhototoPicture picture) -> {
                     try {
-                        currentFolder.pictures.add(picture);
-                        searchManager.addPicture(rootFolder, picture);
                         thumbnailGenerator.generateThumbnail(picture.fsPath, picture.lastModificationTimestamp);
                     } catch (IOException ex) {
                         ex.printStackTrace();
@@ -170,7 +188,6 @@ public class PhototoFilesManager implements Closeable {
             }
 
             this.thumbnailGenerator.cleanOutdated();
-            this.metadataGetter.startAutoSave();
         }
     }
 
@@ -285,7 +302,9 @@ public class PhototoFilesManager implements Closeable {
             PhototoFolder folder = getCurrentFolder(filename.getParent());
             if (folder.pictures.stream().noneMatch((PhototoPicture p) -> p.fsPath.equals(filename))) {
                 long lastModificationTimestamp = Files.getLastModifiedTime(filename).toMillis();
-                PhototoPicture picture = new PhototoPicture(rootFolder.fsPath, filename, metadataGetter.getMetadata(filename, lastModificationTimestamp, thumbnailGenerator), thumbnailGenerator.getThumbnailUrl(filename, lastModificationTimestamp), lastModificationTimestamp);
+                Metadata metadata = metadataAggregator.getMetadata(filename, lastModificationTimestamp);
+                PictureInfos thumbnailInfos = new PictureInfos(thumbnailGenerator.getThumbnailUrl(filename, lastModificationTimestamp), thumbnailGenerator.getThumbnailWidth(metadata.width, metadata.height), thumbnailGenerator.getThumbnailHeight(metadata.width, metadata.height));
+                PhototoPicture picture = new PhototoPicture(rootFolder.fsPath, filename, metadataAggregator.getMetadata(filename, lastModificationTimestamp), thumbnailInfos, lastModificationTimestamp);
                 folder.pictures.add(picture);
                 searchManager.addPicture(rootFolder, picture);
                 thumbnailGenerator.generateThumbnail(picture.fsPath, picture.lastModificationTimestamp);

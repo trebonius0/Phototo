@@ -1,4 +1,4 @@
-package com.trebonius.phototo.core.gps;
+package com.trebonius.phototo.core.metadata.gps;
 
 import com.google.gson.annotations.Expose;
 
