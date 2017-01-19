@@ -9,8 +9,6 @@ public interface IThumbnailGenerator {
 
     void deleteThumbnail(Path originalFilename, long lastModifiedTimestamp) throws IOException;
 
-    void cleanOutdated() throws IOException;
-
     String getThumbnailUrl(Path originalFilename, long lastModifiedTimestamp);
 
     int getThumbnailWidth(int originalWidth, int originalHeight);

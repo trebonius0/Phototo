@@ -7,7 +7,6 @@ import com.trebonius.phototo.core.entities.PhototoPicture;
 import com.trebonius.phototo.core.entities.PictureInfos;
 import com.trebonius.phototo.core.metadata.IMetadataAggregator;
 import com.trebonius.phototo.core.metadata.Metadata;
-import com.trebonius.phototo.core.metadata.MetadataAggregator;
 import com.trebonius.phototo.core.thumbnails.IThumbnailGenerator;
 import com.trebonius.phototo.helpers.FileHelper;
 import com.trebonius.phototo.helpers.Tuple;
@@ -29,7 +28,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -186,8 +184,6 @@ public class PhototoFilesManager implements Closeable {
                     }
                 });
             }
-
-            this.thumbnailGenerator.cleanOutdated();
         }
     }
 

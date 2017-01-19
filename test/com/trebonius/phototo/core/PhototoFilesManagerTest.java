@@ -42,10 +42,6 @@ public class PhototoFilesManagerTest {
         }
 
         @Override
-        public void cleanOutdated() {
-        }
-
-        @Override
         public String getThumbnailUrl(Path originalFilename, long lastModifiedTimestamp) {
             return "/thumbnail/" + originalFilename + "_" + lastModifiedTimestamp;
         }
@@ -93,7 +89,7 @@ public class PhototoFilesManagerTest {
             for (Tuple<Path, Long> pathTuple : paths) {
                 result.put(pathTuple.o1, this.getMetadata(pathTuple.o1, pathTuple.o2));
             }
-            
+
             return result;
         }
 

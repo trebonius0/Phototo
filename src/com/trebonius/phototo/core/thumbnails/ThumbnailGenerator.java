@@ -22,36 +22,34 @@ public class ThumbnailGenerator implements IThumbnailGenerator {
     private static final int wantedHeight = 170;
     private static final int wantedQuality = 85;
     private final FileSystem fileSystem;
-    private final String thumbnailsFolderName;
-    private final Set<Path> thisTimeGeneratedThumbnails;
-    private final Set<Path> initiallyGeneratedThumbnails;
+    private final Path thumbnailsFolderName;
+    private final Path rootFolder;
+    private final Set<Path> thumbnailsSet;
     private final Object lock = new Object();
 
-    public ThumbnailGenerator(FileSystem fileSystem, String thumbnailsFolderName) throws IOException {
+    public ThumbnailGenerator(FileSystem fileSystem, Path rootFolder, String thumbnailsFolderName) throws IOException {
         this.fileSystem = fileSystem;
-        this.thumbnailsFolderName = thumbnailsFolderName;
-        this.thisTimeGeneratedThumbnails = new HashSet<>();
+        this.thumbnailsFolderName = this.fileSystem.getPath(thumbnailsFolderName);
+        this.thumbnailsSet = new HashSet<>();
 
-        if (!Files.exists(this.fileSystem.getPath(this.thumbnailsFolderName))) {
-            Files.createDirectory(this.fileSystem.getPath(this.thumbnailsFolderName));
+        if (!Files.exists(this.thumbnailsFolderName)) {
+            Files.createDirectory(this.thumbnailsFolderName);
         }
-        this.initiallyGeneratedThumbnails = Files.list(this.fileSystem.getPath(this.thumbnailsFolderName)).collect(Collectors.toSet());
+        this.rootFolder = rootFolder;
+
+        this.initAndCleanOutdatedThumbnails();
     }
 
     @Override
     public void generateThumbnail(Path originalFilename, long lastModifiedTimestamp) throws IOException {
-        Path path = this.fileSystem.getPath(this.thumbnailsFolderName, getThumbnailFilename(originalFilename, lastModifiedTimestamp));
+        Path path = this.thumbnailsFolderName.resolve(getThumbnailFilename(originalFilename, lastModifiedTimestamp));
 
         synchronized (this.lock) {
-            if (thisTimeGeneratedThumbnails.contains(path)) {
+            if (thumbnailsSet.contains(path)) {
                 return;
             }
 
-            this.thisTimeGeneratedThumbnails.add(path);
-
-            if (this.initiallyGeneratedThumbnails.contains(path)) {
-                return;
-            }
+            this.thumbnailsSet.add(path);
         }
 
         BufferedImage originalImage = ImageIO.read(originalFilename.toFile());
@@ -67,23 +65,9 @@ public class ThumbnailGenerator implements IThumbnailGenerator {
     @Override
     public void deleteThumbnail(Path originalFilename, long lastModifiedTimestamp) throws IOException {
         synchronized (this.lock) {
-            Path p = this.fileSystem.getPath(this.thumbnailsFolderName, getThumbnailFilename(originalFilename, lastModifiedTimestamp));
+            Path p = this.thumbnailsFolderName.resolve(getThumbnailFilename(originalFilename, lastModifiedTimestamp));
             Files.deleteIfExists(p);
-            this.thisTimeGeneratedThumbnails.remove(p);
-        }
-    }
-
-    @Override
-    public void cleanOutdated() {
-        synchronized (this.lock) {
-            for (Path initiallyGeneratedThumbnail : this.initiallyGeneratedThumbnails) {
-                if (!this.thisTimeGeneratedThumbnails.contains(initiallyGeneratedThumbnail)) {
-                    try {
-                        Files.delete(initiallyGeneratedThumbnail);
-                    } catch (Exception ex) {
-                    }
-                }
-            }
+            this.thumbnailsSet.remove(p);
         }
     }
 
@@ -93,7 +77,7 @@ public class ThumbnailGenerator implements IThumbnailGenerator {
     }
 
     private String getThumbnailFilename(Path originalFilename, long lastModifiedTimestamp) {
-        String src = originalFilename + "_" + lastModifiedTimestamp;
+        String src = this.rootFolder.relativize(originalFilename) + "_" + lastModifiedTimestamp;
         return Md5.encodeString(src) + ".jpg";
     }
 
@@ -105,6 +89,26 @@ public class ThumbnailGenerator implements IThumbnailGenerator {
     @Override
     public int getThumbnailHeight(int originalWidth, int originalHeight) {
         return wantedHeight;
+    }
+
+    private void initAndCleanOutdatedThumbnails() {
+        try {
+            Set<Path> existingThumbnails = Files.list(this.thumbnailsFolderName).collect(Collectors.toSet());
+
+            Files.find(this.rootFolder, Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile())
+                    .forEach((Path path) -> {
+                        Path p = this.thumbnailsFolderName.resolve(getThumbnailFilename(path, path.toFile().lastModified()));
+                        existingThumbnails.remove(p);
+                        this.thumbnailsSet.add(p);
+                    });
+
+            // Thumbnails with no real picture anymore
+            for (Path existingThumbnail : existingThumbnails) {
+                existingThumbnail.toFile().delete();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
 }

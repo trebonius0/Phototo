@@ -38,7 +38,7 @@ public class Phototo {
         boolean indexFolderName = false;
         boolean useParallelThumbnailGeneration = true;
         boolean forceExifToolsDownload = false;
-        
+
         FileSystem fileSystem = FileSystems.getDefault();
         Path rootFolder = fileSystem.getPath(args[0]);
         System.out.println("Starting exploration of folder " + rootFolder + "...");
@@ -51,7 +51,7 @@ public class Phototo {
 
         ExifToolDownloader.run(httpClient, fileSystem, forceExifToolsDownload);
 
-        ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, "cache/thumbnails");
+        ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, "cache/thumbnails");
         IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(new GpsCoordinatesDescriptionCache("cache/gps.cache"), httpClient);
         MetadataAggregator metadataGetter = new MetadataAggregator(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
         FullScreenImageEntityGetter fullScreenResizeGenerator = new FullScreenImageEntityGetter(fileSystem, "cache/fullsize");
