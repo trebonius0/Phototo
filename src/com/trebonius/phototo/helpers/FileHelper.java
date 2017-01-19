@@ -11,9 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
@@ -118,11 +116,6 @@ public class FileHelper {
 
     public static String getExtension(String path) {
         return path.substring(path.lastIndexOf(".") + 1);
-    }
-
-    public static String encodeToFilesystemString(String s) {
-        String replacementChar = "~";
-        return s.replace(replacementChar, replacementChar + replacementChar).replace("\\", "/").replace("/", replacementChar);
     }
 
 }
