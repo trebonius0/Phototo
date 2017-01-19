@@ -27,15 +27,4 @@ public final class Md5 {
         }
         return hashString.toString();
     }
-
-    private static String getHexString(byte[] bytes) {
-        StringBuilder sb = new StringBuilder(bytes.length * 2);
-        for (byte b : bytes) {
-            if (b <= 0x0F && b >= 0x00) { // On rajoute le 0 de poid fort ignoré à la conversion.  
-                sb.append('0');
-            }
-            sb.append(String.format("%x", b));
-        }
-        return sb.toString();
-    }
 }
