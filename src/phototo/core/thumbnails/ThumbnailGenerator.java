@@ -54,7 +54,8 @@ public class ThumbnailGenerator implements IThumbnailGenerator {
 
         BufferedImage originalImage = ImageIO.read(originalFilename.toFile());
         int newWidth = getThumbnailWidth(originalImage.getWidth(), originalImage.getHeight());
-        BufferedImage resized = ImageHelper.resizeImageSmooth(originalImage, newWidth, wantedHeight);
+        int newHeight = getThumbnailHeight(originalImage.getWidth(), originalImage.getHeight());
+        BufferedImage resized = ImageHelper.resizeImageSmooth(originalImage, newWidth, newHeight);
 
         try (OutputStream out = new BufferedOutputStream(new FileOutputStream(path.toFile()))) {
             new JpegEncoder(resized, wantedQuality, out).Compress();
