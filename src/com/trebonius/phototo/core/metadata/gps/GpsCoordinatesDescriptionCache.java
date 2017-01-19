@@ -18,7 +18,7 @@ public class GpsCoordinatesDescriptionCache {
             String[] lines = FileHelper.readFileLines(new File(cacheFileName));
 
             for (String line : lines) {
-                String[] data = line.split(";");
+                String[] data = line.split(";", 2);
                 map.put(data[0], data[1]);
             }
         } catch (IOException ex) {
