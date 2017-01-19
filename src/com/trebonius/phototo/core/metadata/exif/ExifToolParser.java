@@ -1,5 +1,6 @@
 package com.trebonius.phototo.core.metadata.exif;
 
+import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.trebonius.phototo.helpers.MyGsonBuilder;
 import java.io.BufferedReader;
@@ -33,7 +34,7 @@ public class ExifToolParser {
                         .map((Path filename) -> "\"" + filename.toString() + "\"")
                         .collect(Collectors.joining(" "));
 
-                String commandLine = applicationName + " " + filenamesCommandLineParameter + " -j -charset utf-8 -c \"%.8f\"";
+                String commandLine = applicationName + " " + filenamesCommandLineParameter + " -charset utf-8 -charset filename=Latin -j -c \"%.8f\"";
                 Process p = Runtime.getRuntime().exec(commandLine);
 
                 BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream(), "UTF-8"));
@@ -44,7 +45,7 @@ public class ExifToolParser {
                 }
                 p.waitFor();
 
-                List<ExifMetadata> metadataList = MyGsonBuilder.getGson().fromJson(builder.toString(), new TypeToken<List<ExifMetadata>>() {
+                List<ExifMetadata> metadataList = new Gson().fromJson(builder.toString(), new TypeToken<List<ExifMetadata>>() {
                 }.getType());
                 result.putAll(metadataList.stream().collect(Collectors.toMap(x -> Paths.get(x.getSourceFile()), x -> x)));
             } catch (Exception ex) {

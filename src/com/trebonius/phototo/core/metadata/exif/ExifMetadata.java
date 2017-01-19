@@ -3,6 +3,7 @@ package com.trebonius.phototo.core.metadata.exif;
 import com.google.gson.annotations.SerializedName;
 import com.trebonius.phototo.helpers.SafeSimpleDateFormat;
 import java.text.ParseException;
+import java.util.List;
 
 public class ExifMetadata {
 
@@ -12,13 +13,13 @@ public class ExifMetadata {
     private String sourceFile;
 
     @SerializedName("RegionPersonDisplayName")
-    private String regionPersonDisplayName;
+    private Object regionPersonDisplayName;
 
     @SerializedName("Title")
     private String title;
 
     @SerializedName("Subject")
-    private String subject;
+    private Object subject;
 
     @SerializedName("CreateDate")
     private String createDate;
@@ -49,11 +50,11 @@ public class ExifMetadata {
     }
 
     public String[] getPersons() {
-        return this.regionPersonDisplayName.split(","); // TODO: check if ", " instead
+        return getStringArrayFromField(this.regionPersonDisplayName);
     }
 
     public String[] getTags() {
-        return this.subject.split(","); // TODO: check if ", " instead
+        return getStringArrayFromField(this.subject);
     }
 
     public String getTitle() {
@@ -92,8 +93,22 @@ public class ExifMetadata {
                 return 0;
             }
         } catch (ParseException ex) {
-            System.err.println(ex);
+            ex.printStackTrace();
             return 0;
+        }
+    }
+
+    private static String[] getStringArrayFromField(Object field) {
+        if (field == null) {
+            return null;
+        } else if (field instanceof String[]) {
+            return (String[]) field;
+        } else if (field instanceof List) {
+            return ((List<String>) field).toArray(new String[0]);
+        } else if (field instanceof String) {
+            return new String[]{(String) field};
+        } else {
+            throw new IllegalArgumentException();
         }
     }
 

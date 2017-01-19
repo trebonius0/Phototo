@@ -136,15 +136,15 @@ public class MetadataAggregator implements IMetadataAggregator, Closeable {
                     String filenameLastModified = entry.getKey();
                     Metadata value = entry.getValue();
 
-                    String filename = filenameLastModified.split("_")[0];
-                    long lastModifiedTimestamp = Long.parseLong(filenameLastModified.split("_")[1]);
+                    String filename = filenameLastModified.split("\\?")[0];
+                    long lastModifiedTimestamp = Long.parseLong(filenameLastModified.split("\\?")[1].split("\\.")[0]);
 
                     File f = fileSystem.getPath(filename).toFile();
                     if (f.exists() && f.lastModified() == lastModifiedTimestamp) {
                         resultMap.put(filenameLastModified, value);
                     }
                 } catch (Exception ex) {
-                    System.err.println(ex);
+                    ex.printStackTrace();
                 }
             }
 
@@ -158,6 +158,6 @@ public class MetadataAggregator implements IMetadataAggregator, Closeable {
     }
 
     private static String getKey(Path path, long lastModificationTimestamp) {
-        return path + "_" + lastModificationTimestamp;
+        return path + "?" + lastModificationTimestamp;
     }
 }
