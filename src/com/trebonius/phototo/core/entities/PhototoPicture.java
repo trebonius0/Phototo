@@ -2,7 +2,7 @@ package com.trebonius.phototo.core.entities;
 
 import com.trebonius.phototo.core.gps.Position;
 import com.google.gson.annotations.Expose;
-import com.trebonius.phototo.core.metadata.Metadata;
+import com.trebonius.phototo.core.metadata.exif.ExifMetadata;
 import java.nio.file.Path;
 import com.trebonius.phototo.Routes;
 
@@ -35,7 +35,7 @@ public class PhototoPicture extends PhototoItem {
     @Expose
     public final long pictureCreationDate;
 
-    public PhototoPicture(Path rootFolder, Path path, Metadata metadata, String thumbnailUrl, long lastModificationTimestamp) {
+    public PhototoPicture(Path rootFolder, Path path, ExifMetadata metadata, String thumbnailUrl, long lastModificationTimestamp) {
         super(rootFolder, path);
         this.title = metadata.title;
         this.tags = metadata.tags == null ? new String[]{} : metadata.tags;

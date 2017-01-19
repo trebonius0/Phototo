@@ -5,7 +5,7 @@ import com.google.common.jimfs.Jimfs;
 import com.trebonius.phototo.core.entities.PhototoFolder;
 import com.trebonius.phototo.core.entities.PhototoPicture;
 import com.trebonius.phototo.core.metadata.IMetadataGetter;
-import com.trebonius.phototo.core.metadata.Metadata;
+import com.trebonius.phototo.core.metadata.exif.ExifMetadata;
 import com.trebonius.phototo.core.thumbnails.IThumbnailGenerator;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
@@ -76,8 +76,8 @@ public class PhototoFilesManagerTest {
         }
 
         @Override
-        public Metadata getMetadata(Path path, long lastModificationTimestamp, IThumbnailGenerator thumbnailGenerator) {
-            Metadata metadata = new Metadata();
+        public ExifMetadata getMetadata(Path path, long lastModificationTimestamp, IThumbnailGenerator thumbnailGenerator) {
+            ExifMetadata metadata = new ExifMetadata();
 
             List<String> tagsList = this.map.get(path.toString());
             metadata.tags = tagsList == null ? new String[0] : tagsList.toArray(new String[tagsList.size()]);

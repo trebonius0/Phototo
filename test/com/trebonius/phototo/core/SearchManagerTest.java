@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import com.trebonius.phototo.core.entities.PhototoFolder;
 import com.trebonius.phototo.core.entities.PhototoPicture;
 import com.trebonius.phototo.core.gps.Position;
-import com.trebonius.phototo.core.metadata.Metadata;
+import com.trebonius.phototo.core.metadata.exif.ExifMetadata;
 import java.nio.file.Paths;
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,19 +22,19 @@ public class SearchManagerTest {
 
         SearchManager searchManager = new SearchManager(true, true);
 
-        Metadata metadata1 = new Metadata();
+        ExifMetadata metadata1 = new ExifMetadata();
         metadata1.persons = new String[]{"Pierre-Arthur Edouard", "Moi", "Antoine Wolololo Ching"};
         metadata1.tags = new String[]{"Central park", "Manhattan"};
         metadata1.position = new Position(7d, 4d, "Central Park, New-York, États-Unis d'Amérique", null);
         PhototoPicture phototoPicture1 = new PhototoPicture(rootFolderPath, Paths.get("/home/myself/images/new-york/my awesome picture1.jpg"), metadata1, "456454", 546435435);
 
-        Metadata metadata2 = new Metadata();
+        ExifMetadata metadata2 = new ExifMetadata();
         metadata2.persons = new String[]{"Pierre-Arthur Edouard", "Antoine Prout"};
         metadata2.tags = new String[]{"Mont Royal"};
         metadata2.position = new Position(7d, 4d, "Montréal, Québec, Canada", null);
         PhototoPicture phototoPicture2 = new PhototoPicture(rootFolderPath, Paths.get("/home/myself/images/cacadada/cool me.png"), metadata2, "fds", 546435435);
 
-        Metadata metadata3 = new Metadata();
+        ExifMetadata metadata3 = new ExifMetadata();
         metadata3.persons = new String[]{};
         metadata3.tags = new String[]{};
         metadata3.position = new Position(7d, 4d, null, "waldos");

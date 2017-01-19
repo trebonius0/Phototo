@@ -1,5 +1,6 @@
 package com.trebonius.phototo.core.metadata;
 
+import com.trebonius.phototo.core.metadata.exif.ExifMetadata;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.io.Closeable;
@@ -13,71 +14,57 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import com.trebonius.phototo.core.gps.Position;
-import com.trebonius.phototo.core.thumbnails.IThumbnailGenerator;
 import com.trebonius.phototo.core.gps.GpsCoordinatesHelper;
 import com.trebonius.phototo.core.gps.IGpsCoordinatesDescriptionGetter;
+import com.trebonius.phototo.core.metadata.exif.ExifToolParser;
 import com.trebonius.phototo.helpers.FileHelper;
+import com.trebonius.phototo.helpers.MyGsonBuilder;
 import com.trebonius.phototo.helpers.SafeSimpleDateFormat;
 import com.trebonius.phototo.helpers.Tuple;
+import java.io.File;
 
 public class MetadataGetter implements IMetadataGetter, Closeable {
 
     private static final SafeSimpleDateFormat DATE_FORMAT = new SafeSimpleDateFormat("yyyy:MM:dd HH:mm:ss");
-    private static final String personTagKey = "Region Person Display Name";
-    private static final String legendTagKey = "Title";
-    private static final String keywordsTagKey = "Subject";
-    private static final String createDateTagKey = "Create Date";
-    private static final String createDateTagKey2 = "Modify Date";
-    private static final String imageWidthTagKey = "Image Width";
-    private static final String imageHeightTagKey = "Image Height";
-    private static final String createdLocalisationTagKey1 = "Location Created City";
-    private static final String createdLocalisationTagKey2 = "Location Created Province State";
-    private static final String createdLocalisationTagKey3 = "Location Created Country Name";
-    private static final String gpsPositionTagKey = "GPS Position";
+
     private final FileSystem fileSystem;
     private final String metadataCacheFilename;
     private final IGpsCoordinatesDescriptionGetter coordinatesDescriptionGetter;
     private final Timer timer;
     private boolean hasNewInfos;
-    private final Map<String, Metadata> newMetadata;
-    private final Map<String, Metadata> previousMetadata;
+    private final Map<String, ExifMetadata> metadatas;
     private final Object lock = new Object();
 
     public MetadataGetter(FileSystem fileSystem, String metadataCacheFilename, IGpsCoordinatesDescriptionGetter coordinatesDescriptionGetter) {
         this.fileSystem = fileSystem;
         this.metadataCacheFilename = metadataCacheFilename;
         this.coordinatesDescriptionGetter = coordinatesDescriptionGetter;
-        this.newMetadata = new HashMap<>();
+        this.metadatas = readFromCache(this.fileSystem);
 
         this.timer = new Timer(false);
-
-        this.previousMetadata = readFromCache(this.fileSystem);
+        this.startAutoSave();
     }
 
     @Override
-    public Metadata getMetadata(Path path, long lastModificationTimestamp, IThumbnailGenerator thumbnailGenerator) {
+    public ExifMetadata getMetadata(Path path, long lastModificationTimestamp) {
         String key = getKey(path, lastModificationTimestamp);
 
-        synchronized (lock) {
-            if (this.previousMetadata.containsKey(key)) {
-                this.newMetadata.put(key, this.previousMetadata.get(key));
-                this.hasNewInfos = true;
-                return this.newMetadata.get(key);
-            } else if (this.newMetadata.containsKey(key)) {
-                return this.newMetadata.get(key);
+        synchronized (this.lock) {
+            if (this.metadatas.containsKey(key)) {
+                return this.metadatas.get(key);
             }
         }
 
         Map<String, String> exifToolLauncherResult;
 
         try {
-            exifToolLauncherResult = ExifToolLauncher.run(path);
+            exifToolLauncherResult = ExifToolParser.getMetadata(path);
         } catch (IOException ex) {
             ex.printStackTrace();
             exifToolLauncherResult = new HashMap<>();
         }
 
-        Metadata metadata = new Metadata();
+        ExifMetadata metadata = new ExifMetadata();
         // Extraction of persons
         if (exifToolLauncherResult.containsKey(personTagKey)) {
             metadata.persons = Arrays.asList(exifToolLauncherResult.get(personTagKey).split(",")).stream().map((String person) -> person.trim()).toArray(String[]::new);
@@ -113,9 +100,6 @@ public class MetadataGetter implements IMetadataGetter, Closeable {
             metadata.height = Integer.parseInt(exifToolLauncherResult.get(imageHeightTagKey));
         }
 
-        metadata.thumbnailHeight = thumbnailGenerator.getThumbnailHeight(metadata.width, metadata.height);
-        metadata.thumbnailWidth = thumbnailGenerator.getThumbnailWidth(metadata.width, metadata.height);
-
         Tuple<Double, Double> coordinates = GpsCoordinatesHelper.getCoordinates(exifToolLauncherResult.get(gpsPositionTagKey));
         String hardcodedPosition = exifToolLauncherResult.containsKey(createdLocalisationTagKey1) ? (exifToolLauncherResult.get(createdLocalisationTagKey1) + " " + exifToolLauncherResult.get(createdLocalisationTagKey2) + " " + exifToolLauncherResult.get(createdLocalisationTagKey3)) : null;
 
@@ -126,7 +110,7 @@ public class MetadataGetter implements IMetadataGetter, Closeable {
         }
 
         synchronized (lock) {
-            this.newMetadata.put(key, metadata);
+            this.metadatas.put(key, metadata);
             this.hasNewInfos = true;
         }
 
@@ -138,8 +122,7 @@ public class MetadataGetter implements IMetadataGetter, Closeable {
         this.timer.cancel();
     }
 
-    @Override
-    public void startAutoSave() {
+    private void startAutoSave() {
         this.timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -149,7 +132,7 @@ public class MetadataGetter implements IMetadataGetter, Closeable {
                         Gson g = new Gson();
 
                         try {
-                            FileHelper.writeFile(fileSystem.getPath(metadataCacheFilename).toFile(), g.toJson(newMetadata));
+                            FileHelper.writeFile(fileSystem.getPath(metadataCacheFilename).toFile(), g.toJson(metadatas));
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         }
@@ -159,13 +142,34 @@ public class MetadataGetter implements IMetadataGetter, Closeable {
         }, 0, 20000);
     }
 
-    private Map<String, Metadata> readFromCache(FileSystem fileSystem) {
+    private Map<String, ExifMetadata> readFromCache(FileSystem fileSystem) {
         try {
+            // Read metadata from cache
             String data = FileHelper.readFile(fileSystem.getPath(this.metadataCacheFilename).toFile());
-            Map<String, Metadata> res = new Gson().fromJson(data, new TypeToken<Map<String, Metadata>>() {
+            Map<String, ExifMetadata> fromCacheFileMap = MyGsonBuilder.getGson().fromJson(data, new TypeToken<Map<String, ExifMetadata>>() {
             }.getType());
-            System.out.println("Read " + res.size() + " metadata from cache!");
-            return res;
+
+            // Remove outdated metadata
+            Map<String, ExifMetadata> resultMap = new HashMap<>();
+            for (Map.Entry<String, ExifMetadata> entry : fromCacheFileMap.entrySet()) {
+                try {
+                    String filenameLastModified = entry.getKey();
+                    ExifMetadata value = entry.getValue();
+
+                    String filename = filenameLastModified.split("_")[0];
+                    long lastModifiedTimestamp = Long.parseLong(filenameLastModified.split("_")[1]);
+
+                    File f = fileSystem.getPath(filename).toFile();
+                    if (f.exists() && f.lastModified() == lastModifiedTimestamp) {
+                        resultMap.put(filenameLastModified, value);
+                    }
+                } catch (Exception ex) {
+                    System.err.println(ex);
+                }
+            }
+
+            System.out.println("Read " + resultMap.size() + " metadata from cache!");
+            return resultMap;
         } catch (IOException ex) {
             System.err.println("Cannot read metadata from cache!");
             return new HashMap<>();

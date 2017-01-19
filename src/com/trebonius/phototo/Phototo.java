@@ -19,7 +19,7 @@ import com.trebonius.phototo.controllers.ImageHandler;
 import com.trebonius.phototo.controllers.JsHandler;
 import com.trebonius.phototo.core.gps.GpsCoordinatesDescriptionCache;
 import com.trebonius.phototo.core.gps.OSMGpsCoordinatesDescriptionGetter;
-import com.trebonius.phototo.core.metadata.ExifToolDownloader;
+import com.trebonius.phototo.core.metaexif.data.ExifToolDownloader;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
