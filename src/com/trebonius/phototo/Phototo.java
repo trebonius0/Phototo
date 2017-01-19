@@ -20,6 +20,7 @@ import com.trebonius.phototo.controllers.JsHandler;
 import com.trebonius.phototo.core.metadata.exif.ExifToolDownloader;
 import com.trebonius.phototo.core.metadata.gps.GpsCoordinatesDescriptionCache;
 import com.trebonius.phototo.core.metadata.gps.OSMGpsCoordinatesDescriptionGetter;
+import java.nio.file.Path;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
@@ -33,14 +34,16 @@ public class Phototo {
             System.err.println("Usage: <picturesRootFolder>");
             System.exit(-1);
         }
-        String rootFolder = args[0];
+
         boolean prefixModeOnly = true;
         boolean indexFolderName = false;
         boolean useParallelThumbnailGeneration = true;
         boolean forceExifToolsDownload = false;
-        System.out.println("Starting exploration of folder " + rootFolder + "...");
 
         FileSystem fileSystem = FileSystems.getDefault();
+        Path rootFolder = fileSystem.getPath(args[0]);
+
+        System.out.println("Starting exploration of folder " + rootFolder + "...");
         if (!Files.exists(fileSystem.getPath("cache"))) {
             Files.createDirectory(fileSystem.getPath("cache"));
         }
@@ -49,10 +52,10 @@ public class Phototo {
 
         ExifToolDownloader.run(httpClient, fileSystem, forceExifToolsDownload);
 
-        ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, "cache/thumbnails");
+        ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, "cache/thumbnails");
         IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(new GpsCoordinatesDescriptionCache("cache/gps.cache"), httpClient);
         MetadataAggregator metadataGetter = new MetadataAggregator(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
-        FullScreenImageEntityGetter fullScreenResizeGenerator = new FullScreenImageEntityGetter(fileSystem, "cache/fullsize");
+        FullScreenImageEntityGetter fullScreenResizeGenerator = new FullScreenImageEntityGetter(fileSystem, rootFolder, "cache/fullsize");
 
         PhototoFilesManager phototoFilesManager = new PhototoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, prefixModeOnly, indexFolderName, useParallelThumbnailGeneration);
 
@@ -66,9 +69,9 @@ public class Phototo {
                 .setServerInfo(serverName)
                 .setSocketConfig(socketConfig)
                 .setExceptionLogger(new StdErrorExceptionLogger())
-                .registerHandler(Routes.fullSizePicturesRootUrl + "/*", new ImageHandler(fileSystem.getPath(rootFolder), Routes.fullSizePicturesRootUrl, fullScreenResizeGenerator))
+                .registerHandler(Routes.fullSizePicturesRootUrl + "/*", new ImageHandler(rootFolder, Routes.fullSizePicturesRootUrl, fullScreenResizeGenerator))
                 .registerHandler(Routes.thumbnailRootUrl + "/*", new ImageHandler(fileSystem.getPath("cache/thumbnails"), Routes.thumbnailRootUrl, null))
-                .registerHandler(Routes.listItemsApiUrl, new FolderListHandler(Routes.listItemsApiUrl, fileSystem.getPath(rootFolder), phototoFilesManager))
+                .registerHandler(Routes.listItemsApiUrl, new FolderListHandler(Routes.listItemsApiUrl, rootFolder, phototoFilesManager))
                 .registerHandler("/img/*", new ImageHandler(fileSystem.getPath("www/img"), "/img", null))
                 .registerHandler("/js/*", new JsHandler(fileSystem.getPath("www/js"), "/js"))
                 .registerHandler("/css/*", new CssHandler(fileSystem.getPath("www/css"), "/css"))

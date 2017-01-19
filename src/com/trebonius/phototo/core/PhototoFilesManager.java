@@ -46,11 +46,11 @@ public class PhototoFilesManager implements Closeable {
     private final boolean prefixOnlyMode;
     private final boolean useParallelThumbnailGeneration;
 
-    public PhototoFilesManager(String rootFolder, FileSystem fileSystem, IMetadataAggregator metadataGetter, IThumbnailGenerator thumbnailGenerator, boolean prefixOnlyMode, boolean indexFolderName, boolean useParallelThumbnailGeneration) throws IOException {
+    public PhototoFilesManager(Path rootFolder, FileSystem fileSystem, IMetadataAggregator metadataGetter, IThumbnailGenerator thumbnailGenerator, boolean prefixOnlyMode, boolean indexFolderName, boolean useParallelThumbnailGeneration) throws IOException {
         this.fileSystem = fileSystem;
         this.metadataAggregator = metadataGetter;
         this.thumbnailGenerator = thumbnailGenerator;
-        this.rootFolder = new PhototoFolder(this.fileSystem.getPath(rootFolder), this.fileSystem.getPath(rootFolder));
+        this.rootFolder = new PhototoFolder(rootFolder, rootFolder);
         this.searchManager = new SearchManager(prefixOnlyMode, indexFolderName);
         this.prefixOnlyMode = prefixOnlyMode;
         this.useParallelThumbnailGeneration = useParallelThumbnailGeneration;

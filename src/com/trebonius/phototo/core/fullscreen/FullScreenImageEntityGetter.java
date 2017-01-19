@@ -1,8 +1,8 @@
 package com.trebonius.phototo.core.fullscreen;
 
+import com.trebonius.phototo.helpers.FileHelper;
 import com.trebonius.phototo.helpers.ImageHelper;
 import com.trebonius.phototo.helpers.JpegEncoder;
-import com.trebonius.phototo.helpers.Md5;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.imageio.ImageIO;
@@ -23,12 +24,14 @@ public class FullScreenImageEntityGetter implements IFullScreenImageEntityGetter
     private static final long maxFileAgeBeforeCleaning = 30 * 86400 * 1000L;
     private static final int wantedQuality = 90;
     private final FileSystem fileSystem;
+    private final Path rootFolder;
     private final String folderName;
     private final Timer timer;
 
-    public FullScreenImageEntityGetter(FileSystem fileSystem, String cacheFolderName) throws IOException {
+    public FullScreenImageEntityGetter(FileSystem fileSystem, Path rootFolder, String cacheFolderName) throws IOException {
         this.fileSystem = fileSystem;
         this.folderName = cacheFolderName;
+        this.rootFolder = rootFolder;
 
         if (!Files.exists(this.fileSystem.getPath(cacheFolderName))) {
             Files.createDirectory(this.fileSystem.getPath(cacheFolderName));
@@ -77,10 +80,10 @@ public class FullScreenImageEntityGetter implements IFullScreenImageEntityGetter
         this.timer.cancel();
     }
 
-    private static String getCachedFilename(File localFile) {
+    private String getCachedFilename(File localFile) {
         long lastModified = localFile.lastModified();
 
-        return Md5.encodeString(localFile.getAbsolutePath() + "_" + lastModified) + ".jpg";
+        return FileHelper.encodeToFilesystemString(rootFolder.relativize(localFile.toPath()) + "_" + lastModified) + ".jpg";
     }
 
 }

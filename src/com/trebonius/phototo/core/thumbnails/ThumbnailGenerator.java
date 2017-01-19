@@ -13,9 +13,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import com.trebonius.phototo.Routes;
+import com.trebonius.phototo.helpers.FileHelper;
 import com.trebonius.phototo.helpers.ImageHelper;
 import com.trebonius.phototo.helpers.JpegEncoder;
-import com.trebonius.phototo.helpers.Md5;
 
 public class ThumbnailGenerator implements IThumbnailGenerator {
 
@@ -23,13 +23,15 @@ public class ThumbnailGenerator implements IThumbnailGenerator {
     private static final int wantedQuality = 85;
     private final FileSystem fileSystem;
     private final String thumbnailsFolderName;
+    private final Path rootFolder;
     private final Set<Path> thisTimeGeneratedThumbnails;
     private final Set<Path> initiallyGeneratedThumbnails;
     private final Object lock = new Object();
 
-    public ThumbnailGenerator(FileSystem fileSystem, String thumbnailsFolderName) throws IOException {
+    public ThumbnailGenerator(FileSystem fileSystem, Path rootFolder, String thumbnailsFolderName) throws IOException {
         this.fileSystem = fileSystem;
         this.thumbnailsFolderName = thumbnailsFolderName;
+        this.rootFolder = rootFolder;
         this.thisTimeGeneratedThumbnails = new HashSet<>();
 
         if (!Files.exists(this.fileSystem.getPath(this.thumbnailsFolderName))) {
@@ -93,8 +95,7 @@ public class ThumbnailGenerator implements IThumbnailGenerator {
     }
 
     private String getThumbnailFilename(Path originalFilename, long lastModifiedTimestamp) {
-        String src = originalFilename + "_" + lastModifiedTimestamp;
-        return Md5.encodeString(src) + ".jpg";
+        return FileHelper.encodeToFilesystemString(this.rootFolder.relativize(originalFilename) + "_" + lastModifiedTimestamp) + ".jpg";
     }
 
     @Override

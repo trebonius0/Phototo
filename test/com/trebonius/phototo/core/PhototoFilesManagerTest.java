@@ -134,7 +134,7 @@ public class PhototoFilesManagerTest {
             metadataGetterMock.addMetadata(phototoPicture2, "Québec");
             metadataGetterMock.addMetadata(phototoPicture2, "Canada");
 
-            try (PhototoFilesManager phototoFilesManager = new PhototoFilesManager(rootFolder, fileSystem, metadataGetterMock, thumbnailsGeneratorMock, true, true, false)) {
+            try (PhototoFilesManager phototoFilesManager = new PhototoFilesManager(fileSystem.getPath(rootFolder), fileSystem, metadataGetterMock, thumbnailsGeneratorMock, true, true, false)) {
                 // TEST SEARCH
                 List<PhototoPicture> res = phototoFilesManager.searchPicturesInFolder("/home/myself/images", "pierre-arthur");
                 Assert.assertEquals(2, res.size());
