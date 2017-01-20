@@ -115,7 +115,12 @@ public class FileHelper {
     }
 
     public static String getExtension(String path) {
-        return path.substring(path.lastIndexOf(".") + 1);
+        int p = path.lastIndexOf(".");
+        if (p == -1) {
+            return null;
+        } else {
+            return path.substring(path.lastIndexOf(".") + 1);
+        }
     }
 
 }
