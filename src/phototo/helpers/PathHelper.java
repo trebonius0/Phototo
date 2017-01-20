@@ -1,5 +1,7 @@
 package phototo.helpers;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,15 +18,19 @@ public class PathHelper {
             path = pathAndQuery.substring(0, p);
             query = pathAndQuery.substring(p + 1);
         }
-        
+
         while (path.startsWith("/")) {
             path = path.substring(1);
         }
 
-        return new Tuple<>(path, PathHelper.splitQuery(query));
+        try {
+            return new Tuple<>(URLDecoder.decode(path, "UTF-8"), PathHelper.splitQuery(query));
+        } catch (UnsupportedEncodingException ex) {
+            return null;
+        }
     }
 
-    private static Map<String, String> splitQuery(String query) {
+    private static Map<String, String> splitQuery(String query) throws UnsupportedEncodingException {
         if (query == null || query.isEmpty()) {
             return new HashMap<>();
         } else {
@@ -32,7 +38,7 @@ public class PathHelper {
             Map<String, String> map = new HashMap<>();
             for (String param : params) {
                 String[] split = param.split("=");
-                map.put(split[0], split.length > 1 ? split[1] : "");
+                map.put(URLDecoder.decode(split[0], "UTF-8"), URLDecoder.decode(split.length > 1 ? split[1] : "", "UTF-8"));
             }
             return map;
         }

@@ -51,8 +51,7 @@ public abstract class PhototoHandler implements HttpRequestHandler {
             response.setStatusCode(http403.responseCode);
             response.setEntity(http403.entity);
         } else {
-            String target = URLDecoder.decode(request.getRequestLine().getUri(), "UTF-8");
-            Tuple<String, Map<String, String>> pathAndQueryTuple = PathHelper.splitPathAndQuery(target.substring(this.prefix.length()));
+            Tuple<String, Map<String, String>> pathAndQueryTuple = PathHelper.splitPathAndQuery(request.getRequestLine().getUri().substring(this.prefix.length()));
             String path = pathAndQueryTuple.o1;
 
             Map<String, String> query = pathAndQueryTuple.o2;
