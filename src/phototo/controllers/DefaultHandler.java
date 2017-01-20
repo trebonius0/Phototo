@@ -1,30 +1,22 @@
 package phototo.controllers;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import org.apache.http.HttpException;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
+import java.util.Map;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.protocol.HttpRequestHandler;
 
-public class DefaultHandler implements HttpRequestHandler {
+public class DefaultHandler extends PhototoHandler {
 
     private final Path folderRoot;
 
     public DefaultHandler(Path folderRoot) {
+        super("", new String[]{"GET"});
         this.folderRoot = folderRoot;
     }
 
     @Override
-    public void handle(final HttpRequest request, final HttpResponse response, final HttpContext context) throws HttpException, IOException {
-
-        response.setStatusCode(HttpStatus.SC_OK);
-        FileEntity body = new FileEntity(folderRoot.resolve("index.html").toFile(), ContentType.create("text/html; charset=UTF-8"));
-        response.setEntity(body);
+    protected Response getResponse(String path, Map<String, String> query) throws Exception {
+        return new Response(200, new FileEntity(folderRoot.resolve("index.html").toFile(), ContentType.create("text/html; charset=UTF-8")));
     }
 
 }
