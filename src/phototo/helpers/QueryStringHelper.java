@@ -10,12 +10,12 @@ import org.apache.http.client.utils.URLEncodedUtils;
 
 public class QueryStringHelper {
 
-    public static Map<String, String> splitSearchQuery(String searchQuery) {
-        if (searchQuery == null || searchQuery.isEmpty()) {
+    public static Map<String, String> splitQuery(String query) {
+        if (query == null || query.isEmpty()) {
             return new HashMap<>();
         } else {
             try {
-                return URLEncodedUtils.parse(new URI(searchQuery), "UTF-8").stream().collect(Collectors.toMap(NameValuePair::getName, NameValuePair::getValue));
+                return URLEncodedUtils.parse(new URI(query), "UTF-8").stream().collect(Collectors.toMap(NameValuePair::getName, NameValuePair::getValue));
             } catch (URISyntaxException ex) {
                 return new HashMap<>();
             }

@@ -2,12 +2,11 @@ package phototo.controllers;
 
 import phototo.Phototo;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
@@ -16,7 +15,6 @@ import org.apache.http.message.BasicHeader;
 import phototo.helpers.FileHelper;
 import phototo.helpers.SafeSimpleDateFormat;
 import phototo.core.fullscreen.IFullScreenImageEntityGetter;
-import phototo.helpers.QueryStringHelper;
 import java.util.Map;
 
 public class ImageHandler extends FileHandler {
@@ -52,14 +50,13 @@ public class ImageHandler extends FileHandler {
     }
 
     @Override
-    protected HttpEntity getEntity(String path, String query, File localFile) {
+    protected HttpEntity getEntity(String path, Map<String, String> query, File localFile) {
         String extension = FileHelper.getExtension(path);
         ContentType contentType = ContentType.create(getContentType(extension.toLowerCase()));
 
-        Map<String, String> queryStringParameters = QueryStringHelper.splitSearchQuery(query);
-        if (queryStringParameters.containsKey("height") && queryStringParameters.containsKey("width")) {
-            int height = Integer.parseInt(queryStringParameters.get("height"));
-            int width = Integer.parseInt(queryStringParameters.get("width"));
+        if (query.containsKey("height") && query.containsKey("width")) {
+            int height = Integer.parseInt(query.get("height"));
+            int width = Integer.parseInt(query.get("width"));
 
             if (this.fullScreenImageEntityGetter != null) {
                 return this.fullScreenImageEntityGetter.getImage(localFile, contentType, height, width);
