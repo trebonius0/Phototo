@@ -94,18 +94,18 @@ public class ThumbnailGenerator implements IThumbnailGenerator {
 
     private void initAndCleanOutdatedThumbnails() {
         try {
-            Set<Path> existingThumbnails = Files.list(this.thumbnailsFolderName).collect(Collectors.toSet());
+            this.thumbnailsSet.addAll(Files.list(this.thumbnailsFolderName).collect(Collectors.toSet()));
+            Set<Path> toDeleteThumbnails = new HashSet<>(this.thumbnailsSet);
 
             Files.find(this.rootFolder, Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile())
                     .forEach((Path path) -> {
                         Path p = this.thumbnailsFolderName.resolve(getThumbnailFilename(path, path.toFile().lastModified()));
-                        existingThumbnails.remove(p);
-                        this.thumbnailsSet.add(p);
+                        toDeleteThumbnails.remove(p);
                     });
 
             // Thumbnails with no real picture anymore
-            for (Path existingThumbnail : existingThumbnails) {
-                existingThumbnail.toFile().delete();
+            for (Path toDeleteThumbnail : toDeleteThumbnails) {
+                toDeleteThumbnail.toFile().delete();
             }
         } catch (IOException ex) {
             ex.printStackTrace();
