@@ -16,6 +16,10 @@ public class PathHelper {
             path = pathAndQuery.substring(0, p);
             query = pathAndQuery.substring(p + 1);
         }
+        
+        while (path.startsWith("/")) {
+            path = path.substring(1);
+        }
 
         return new Tuple<>(path, PathHelper.splitQuery(query));
     }
