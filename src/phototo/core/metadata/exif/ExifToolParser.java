@@ -2,7 +2,7 @@ package phototo.core.metadata.exif;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import phototo.helpers.MyGsonBuilder;
+import phototo.helpers.SerialisationGsonBuilder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

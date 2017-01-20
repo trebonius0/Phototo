@@ -1,6 +1,6 @@
 package phototo.controllers;
 
-import phototo.helpers.MyGsonBuilder;
+import phototo.helpers.SerialisationGsonBuilder;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -77,7 +77,7 @@ public class FolderListHandler implements HttpRequestHandler {
             FolderListResponse result = new FolderListResponse(folders, pictures, beginIndex, endIndex, hasMore);
 
             response.setStatusCode(HttpStatus.SC_OK);
-            StringEntity body = new StringEntity(MyGsonBuilder.getGson().toJson(result), ContentType.create("application/json", "UTF-8"));
+            StringEntity body = new StringEntity(SerialisationGsonBuilder.getGson().toJson(result), ContentType.create("application/json", "UTF-8"));
             response.setEntity(body);
         } else {
             response.setStatusCode(HttpStatus.SC_NOT_FOUND);

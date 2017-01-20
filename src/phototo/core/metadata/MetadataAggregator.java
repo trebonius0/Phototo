@@ -16,7 +16,7 @@ import phototo.core.metadata.gps.GpsCoordinatesHelper;
 import phototo.core.metadata.gps.IGpsCoordinatesDescriptionGetter;
 import phototo.core.metadata.exif.ExifToolParser;
 import phototo.helpers.FileHelper;
-import phototo.helpers.MyGsonBuilder;
+import phototo.helpers.SerialisationGsonBuilder;
 import phototo.helpers.Tuple;
 import java.io.File;
 import java.util.ArrayList;
