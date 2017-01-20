@@ -1,6 +1,5 @@
-package com.trebonius.phototo.core;
+package phototo.core;
 
-import phototo.core.PhototoFilesManager;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import phototo.core.entities.PhototoFolder;

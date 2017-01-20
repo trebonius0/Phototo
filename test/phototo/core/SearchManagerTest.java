@@ -1,4 +1,4 @@
-package com.trebonius.phototo.core;
+package phototo.core;
 
 import phototo.core.SearchManager;
 import java.nio.file.Path;
