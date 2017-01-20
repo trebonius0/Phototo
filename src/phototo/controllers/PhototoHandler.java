@@ -15,7 +15,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
-import phototo.helpers.QueryStringHelper;
+import phototo.helpers.PathHelper;
 import phototo.helpers.Tuple;
 
 public abstract class PhototoHandler implements HttpRequestHandler {
@@ -52,7 +52,7 @@ public abstract class PhototoHandler implements HttpRequestHandler {
             response.setEntity(http403.entity);
         } else {
             String target = URLDecoder.decode(request.getRequestLine().getUri(), "UTF-8");
-            Tuple<String, Map<String, String>> pathAndQueryTuple = splitPathAndQuery(target.substring(this.prefix.length()));
+            Tuple<String, Map<String, String>> pathAndQueryTuple = PathHelper.splitPathAndQuery(target.substring(this.prefix.length()));
             String path = pathAndQueryTuple.o1;
             while (path.startsWith("/")) {
                 path = path.substring(1);
@@ -82,18 +82,5 @@ public abstract class PhototoHandler implements HttpRequestHandler {
 
     protected abstract Response getResponse(String path, Map<String, String> query) throws Exception;
 
-    private Tuple<String, Map<String, String>> splitPathAndQuery(String pathAndQuery) {
-        String path;
-        String query;
-        int p = pathAndQuery.indexOf("?");
-        if (p == -1) {
-            path = pathAndQuery;
-            query = null;
-        } else {
-            path = pathAndQuery.substring(0, p);
-            query = pathAndQuery.substring(p + 1);
-        }
-
-        return new Tuple<>(path, QueryStringHelper.splitQuery(query));
-    }
+    
 }
