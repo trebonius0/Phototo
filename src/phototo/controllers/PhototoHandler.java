@@ -41,21 +41,23 @@ public abstract class PhototoHandler implements HttpRequestHandler {
     private final Set<String> allowedVerbs;
 
     public PhototoHandler(String prefix, String[] allowedVerbs) {
-        this.prefix = prefix.endsWith("/") ? prefix : (prefix + "/");
+        this.prefix = prefix.endsWith("/") ? prefix.substring(0, prefix.length() - 1) : prefix;
         this.allowedVerbs = new HashSet<>(Arrays.asList(allowedVerbs));
     }
 
     @Override
     public final void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
-        if (!request.getRequestLine().getUri().startsWith(this.prefix) 
-                || !this.allowedVerbs.contains(request.getRequestLine().getMethod().toUpperCase())) {
+        if (!this.allowedVerbs.contains(request.getRequestLine().getMethod().toUpperCase())) {
             response.setStatusCode(http403.responseCode);
             response.setEntity(http403.entity);
         } else {
             String target = URLDecoder.decode(request.getRequestLine().getUri(), "UTF-8");
-            Tuple<String, Map<String,String>> pathAndQueryTuple = splitPathAndQuery(target.substring(this.prefix.length()));
+            Tuple<String, Map<String, String>> pathAndQueryTuple = splitPathAndQuery(target.substring(this.prefix.length()));
             String path = pathAndQueryTuple.o1;
-            Map<String,String> query = pathAndQueryTuple.o2;
+            while (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+            Map<String, String> query = pathAndQueryTuple.o2;
 
             if (this.isAuthorized(path, query)) {
                 try {
@@ -65,6 +67,7 @@ public abstract class PhototoHandler implements HttpRequestHandler {
                 } catch (Exception ex) {
                     response.setStatusCode(http500.responseCode);
                     response.setEntity(http500.entity);
+                    ex.printStackTrace();
                 }
             } else {
                 response.setStatusCode(http403.responseCode);
@@ -73,13 +76,13 @@ public abstract class PhototoHandler implements HttpRequestHandler {
         }
     }
 
-    protected boolean isAuthorized(String path, Map<String,String> query) {
+    protected boolean isAuthorized(String path, Map<String, String> query) {
         return true;
     }
 
-    protected abstract Response getResponse(String path, Map<String,String> query) throws Exception;
+    protected abstract Response getResponse(String path, Map<String, String> query) throws Exception;
 
-    private Tuple<String, Map<String,String>> splitPathAndQuery(String pathAndQuery) {
+    private Tuple<String, Map<String, String>> splitPathAndQuery(String pathAndQuery) {
         String path;
         String query;
         int p = pathAndQuery.indexOf("?");

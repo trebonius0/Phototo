@@ -29,7 +29,7 @@ public class FolderListHandler extends PhototoHandler {
     protected Response getResponse(String path, Map<String, String> queryStringMap) throws Exception {
         if (queryStringMap.keySet().containsAll(Arrays.asList(new String[]{"folder", "beginIndex", "endIndex"}))) {
             String folderTmp = queryStringMap.get("folder");
-            while (folderTmp.length() > 0 && folderTmp.startsWith("/")) { // Remove the leading slashes if needed
+            while (!folderTmp.isEmpty() && folderTmp.startsWith("/")) { // Remove the leading slashes if needed
                 folderTmp = folderTmp.substring(1);
             }
 

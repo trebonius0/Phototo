@@ -1,12 +1,7 @@
 package phototo.helpers;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
 
 public class QueryStringHelper {
 
@@ -14,11 +9,13 @@ public class QueryStringHelper {
         if (query == null || query.isEmpty()) {
             return new HashMap<>();
         } else {
-            try {
-                return URLEncodedUtils.parse(new URI(query), "UTF-8").stream().collect(Collectors.toMap(NameValuePair::getName, NameValuePair::getValue));
-            } catch (URISyntaxException ex) {
-                return new HashMap<>();
+            String[] params = query.split("&");
+            Map<String, String> map = new HashMap<>();
+            for (String param : params) {
+                String[] split = param.split("=");
+                map.put(split[0], split.length > 1 ? split[1] : "");
             }
+            return map;
         }
     }
 }
