@@ -139,7 +139,7 @@ public class PhototoFilesManager implements Closeable {
                 this.watchedDirectoriesPaths.put(key, currentFolder.fsPath);
 
                 List<PhototoFolder> folders = Files.list(currentFolder.fsPath)
-                        .filter((Path path) -> Files.isDirectory(path))
+                        .filter((Path path) -> path.toFile().canRead() && Files.isDirectory(path))
                         .map((Path path) -> new PhototoFolder(this.rootFolder.fsPath, path))
                         .collect(Collectors.toList());
                 foldersToExplore.addAll(folders);

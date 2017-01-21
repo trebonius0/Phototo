@@ -40,7 +40,7 @@ public class Phototo {
         boolean forceExifToolsDownload = false;
 
         FileSystem fileSystem = FileSystems.getDefault();
-        Path rootFolder = fileSystem.getPath(args[0]);
+        Path rootFolder = getRootFolder(fileSystem, args[0]);
         System.out.println("Starting exploration of folder " + rootFolder + "...");
 
         if (!Files.exists(fileSystem.getPath("cache"))) {
@@ -86,6 +86,13 @@ public class Phototo {
                 server.shutdown(5, TimeUnit.SECONDS);
             }
         });
+    }
+
+    private static Path getRootFolder(FileSystem fileSystem, String args0) {
+        if (!args0.endsWith("/")) {
+            args0 += "/";
+        }
+        return fileSystem.getPath(args0);
     }
 
 }
