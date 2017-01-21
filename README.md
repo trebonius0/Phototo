@@ -1,6 +1,6 @@
 # Phototo
 
-Phototo aims Pix is be a self-hosted photo gallery, accessible through a **responsive WebUI**. 
+Phototo aims to be a self-hosted photo gallery, accessible through a **responsive WebUI**. 
 
 Give to Phototo a picture folder and it will index it, using the file system hierarchy. 
 
