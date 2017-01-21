@@ -29,8 +29,7 @@ public class PhototoPicture extends PhototoItem {
     @Expose
     public final PictureInfos picture;
 
-    @Expose
-    public final long lastModificationTimestamp;
+    public final long lastModificationTimestamp; // This field is used to generated the appropriate thumbnail. It is the modifiaction date on the filesystem
 
     @Expose
     public final long pictureCreationDate;

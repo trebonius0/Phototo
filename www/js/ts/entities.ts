@@ -35,8 +35,6 @@ class PhototoPicture extends PhototoItem {
 
     public picture: PictureInfos;
 
-    public lastModificationTimestamp: number;
-
     public pictureCreationDate: number;
 
 }
