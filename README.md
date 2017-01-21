@@ -44,6 +44,7 @@ Here are the features we will implement in the future (you can contribute if you
 - Auto-generated "galleries": persons / tags / locations / dates
 - Easier configuration mechanism
 - File-based Logging
+- Automated offline keywords annotations
 
 ## Disclaimer
 Phototo will rename all pictures with 2+ spaces in a row to the same but with one space (otherwise it would make exiftool crash). For instance "my  picture.jpg" will be renamed to "my picture.jpg"
