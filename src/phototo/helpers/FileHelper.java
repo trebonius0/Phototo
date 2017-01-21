@@ -6,15 +6,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.zip.GZIPOutputStream;
+import org.apache.commons.io.filefilter.NameFileFilter;
 
 public class FileHelper {
 
@@ -120,6 +125,18 @@ public class FileHelper {
             return null;
         } else {
             return path.substring(path.lastIndexOf(".") + 1);
+        }
+    }
+
+    public static boolean folderContainsIgnoreFile(Path folder) {
+        if (Files.isReadable(folder)) {
+            try {
+                return Files.list(folder).anyMatch((Path path) -> path.getFileName().toString().equalsIgnoreCase(".phototoignore"));
+            } catch (IOException ex) {
+                return false;
+            }
+        } else {
+            return false;
         }
     }
 

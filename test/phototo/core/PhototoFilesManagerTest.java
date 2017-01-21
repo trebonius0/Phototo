@@ -109,6 +109,9 @@ public class PhototoFilesManagerTest {
             Files.createDirectory(fileSystem.getPath(rootFolder + "/new-york"));
             Files.createDirectories(fileSystem.getPath(rootFolder + "/cacadada/titi"));
             Files.createDirectory(fileSystem.getPath(rootFolder + "/tmptmp"));
+            Files.createDirectory(fileSystem.getPath(rootFolder + "/toignore"));
+            Files.createFile(fileSystem.getPath(rootFolder + "/toignore/.phototoIgnore"));
+            Files.createFile(fileSystem.getPath(rootFolder + "/toignore/ghost.png"));
 
             Path phototoPicture1 = fileSystem.getPath("/home/myself/images/new-york/my awesome picture1.jpg");
             Path phototoPicture2 = fileSystem.getPath("/home/myself/images/cacadada/titi/cool me.png");
@@ -145,9 +148,9 @@ public class PhototoFilesManagerTest {
                 res = phototoFilesManager.searchPicturesInFolder("/home/myself/images/tmptmp", "pierre-arthur");
                 Assert.assertEquals(0, res.size());
 
-                // TEST DIRECTORY LISTING
+                // TEST DIRECTORY LISTING (Counts take into account ignored folders)
                 List<PhototoFolder> foldersInFolder = phototoFilesManager.getFoldersInFolder("/home/myself/images");
-                Assert.assertEquals(2, foldersInFolder.size()); // Not counting empty folders
+                Assert.assertEquals(2, foldersInFolder.size()); // Not counting empty and .phototoignoreD folders
                 foldersInFolder = phototoFilesManager.getFoldersInFolder("/home/myself/cacadada/titi"); // Parent folder
                 Assert.assertEquals(0, foldersInFolder.size());
                 foldersInFolder = phototoFilesManager.getFoldersInFolder("/home/myself/images/cacadada");

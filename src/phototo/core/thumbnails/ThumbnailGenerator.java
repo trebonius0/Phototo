@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import phototo.Routes;
+import phototo.helpers.FileHelper;
 import phototo.helpers.ImageHelper;
 import phototo.helpers.JpegEncoder;
 import phototo.helpers.Md5;
@@ -107,7 +108,7 @@ public class ThumbnailGenerator implements IThumbnailGenerator {
             while (!toExplore.isEmpty()) {
                 File currentFolder = toExplore.remove().toFile();
 
-                if (currentFolder.canRead()) {
+                if (currentFolder.canRead() && !FileHelper.folderContainsIgnoreFile(currentFolder.toPath())) {
                     File[] files = currentFolder.listFiles();
 
                     if (files != null) {
