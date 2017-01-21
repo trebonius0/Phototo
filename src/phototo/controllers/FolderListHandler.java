@@ -45,7 +45,7 @@ public class FolderListHandler extends PhototoHandler {
 
             folders.sort((PhototoFolder f1, PhototoFolder f2) -> f1.filename.compareTo(f2.filename));
             pictures.sort((PhototoPicture p1, PhototoPicture p2) -> {
-                int c = Long.compare(p1.pictureCreationDate, p2.pictureCreationDate);
+                int c = Long.compare(p1.pictureDate, p2.pictureDate);
                 if (c == 0) {
                     return p1.filename.compareTo(p2.filename);
                 } else {

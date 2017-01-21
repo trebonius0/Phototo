@@ -35,7 +35,7 @@ class PhototoPicture extends PhototoItem {
 
     public picture: PictureInfos;
 
-    public pictureCreationDate: number;
+    public pictureDate: number;
 
 }
 

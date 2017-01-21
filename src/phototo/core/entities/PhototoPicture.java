@@ -32,7 +32,7 @@ public class PhototoPicture extends PhototoItem {
     public final long lastModificationTimestamp; // This field is used to generated the appropriate thumbnail. It is the modifiaction date on the filesystem
 
     @Expose
-    public final long pictureCreationDate;
+    public final long pictureDate;
 
     public PhototoPicture(Path rootFolder, Path path, Metadata metadata, PictureInfos thumbnailInfos, long lastModificationTimestamp) {
         super(rootFolder, path);
@@ -42,7 +42,7 @@ public class PhototoPicture extends PhototoItem {
         this.position = metadata.position;
         this.thumbnail = thumbnailInfos;
         this.lastModificationTimestamp = lastModificationTimestamp;
-        this.pictureCreationDate = metadata.pictureCreationDate;
+        this.pictureDate = metadata.pictureDate;
         this.picture = new PictureInfos(Routes.fullSizePicturesRootUrl + "/" + this.path, metadata.width, metadata.height);
 
         if (this.filename.length() > 40) {
