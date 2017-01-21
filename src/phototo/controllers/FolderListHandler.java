@@ -44,7 +44,15 @@ public class FolderListHandler extends PhototoHandler {
             List<PhototoPicture> pictures = query == null ? this.phototoFilesManager.getPicturesInFolder(folder) : this.phototoFilesManager.searchPicturesInFolder(folder, query);
 
             folders.sort((PhototoFolder f1, PhototoFolder f2) -> f1.filename.compareTo(f2.filename));
-            pictures.sort((PhototoPicture p1, PhototoPicture p2) -> Long.compare(p1.lastModificationTimestamp, p2.lastModificationTimestamp));
+            pictures.sort((PhototoPicture p1, PhototoPicture p2) -> {
+                int c = Long.compare(p1.lastModificationTimestamp, p2.lastModificationTimestamp);
+                if (c == 0) {
+                    return p1.filename.compareTo(p2.filename);
+                } else {
+                    return c;
+                }
+            }
+            );
 
             boolean hasMore;
 
