@@ -10,6 +10,7 @@ class PictureInfos {
     public url: string;
     public width: number;
     public height: number;
+    public rotationId: number;
 }
 
 class PhototoPicturePosition {

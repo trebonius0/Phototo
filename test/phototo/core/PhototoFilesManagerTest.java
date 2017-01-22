@@ -28,7 +28,7 @@ public class PhototoFilesManagerTest {
         private static final Set<String> thumbnails = new HashSet<>();
 
         @Override
-        public void generateThumbnail(Path originalFilename, long lastModifiedTimestamp) {
+        public void generateThumbnail(Path originalFilename, long lastModifiedTimestamp, Metadata metadata) {
             thumbnails.add(originalFilename.toString());
         }
 

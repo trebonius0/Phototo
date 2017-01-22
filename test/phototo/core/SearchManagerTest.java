@@ -28,19 +28,19 @@ public class SearchManagerTest {
         metadata1.persons = new String[]{"Pierre-Arthur Edouard", "Moi", "Antoine Wolololo Ching"};
         metadata1.tags = new String[]{"Central park", "Manhattan"};
         metadata1.position = new Position(7d, 4d, "Central Park, New-York, États-Unis d'Amérique", null);
-        PhototoPicture phototoPicture1 = new PhototoPicture(rootFolderPath, Paths.get("/home/myself/images/new-york/my awesome picture1.jpg"), metadata1, new PictureInfos("456454", 0, 0), 546435435);
+        PhototoPicture phototoPicture1 = new PhototoPicture(rootFolderPath, Paths.get("/home/myself/images/new-york/my awesome picture1.jpg"), metadata1, new PictureInfos("456454", 0, 0, 0), 546435435);
 
         Metadata metadata2 = new Metadata();
         metadata2.persons = new String[]{"Pierre-Arthur Edouard", "Antoine Prout"};
         metadata2.tags = new String[]{"Mont Royal"};
         metadata2.position = new Position(7d, 4d, "Montréal, Québec, Canada", null);
-        PhototoPicture phototoPicture2 = new PhototoPicture(rootFolderPath, Paths.get("/home/myself/images/cacadada/cool me.png"), metadata2, new PictureInfos("fds", 0, 0), 546435435);
+        PhototoPicture phototoPicture2 = new PhototoPicture(rootFolderPath, Paths.get("/home/myself/images/cacadada/cool me.png"), metadata2, new PictureInfos("fds", 0, 0, 0), 546435435);
 
         Metadata metadata3 = new Metadata();
         metadata3.persons = new String[]{};
         metadata3.tags = new String[]{};
         metadata3.position = new Position(7d, 4d, null, "waldos");
-        PhototoPicture phototoPicture3 = new PhototoPicture(rootFolderPath, Paths.get("/home/myself/images/empty/empty.png"), metadata3, new PictureInfos("fds", 0, 0), 546435435);
+        PhototoPicture phototoPicture3 = new PhototoPicture(rootFolderPath, Paths.get("/home/myself/images/empty/empty.png"), metadata3, new PictureInfos("fds", 0, 0, 0), 546435435);
 
         searchManager.addPicture(rootFolder, phototoPicture1);
         searchManager.addPicture(rootFolder, phototoPicture2);

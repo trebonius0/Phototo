@@ -50,11 +50,11 @@ public class FullScreenImageEntityGetter implements IFullScreenImageEntityGetter
     }
 
     @Override
-    public FileEntity getImage(File localFile, ContentType contentType, int height, int width) {
+    public FileEntity getImage(File localFile, ContentType contentType, int height, int width, int orientationId) {
         File fullScreenFile = this.fileSystem.getPath(folderName, getCachedFilename(localFile)).toFile();
         if (!fullScreenFile.exists()) {
             try {
-                BufferedImage image = ImageIO.read(localFile);
+                BufferedImage image = ImageHelper.readImage(localFile.toPath(), orientationId);
 
                 if (height != image.getHeight() || width != image.getWidth()) {
                     image = ImageHelper.resizeImageSmooth(image, width, height);

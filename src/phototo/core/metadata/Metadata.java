@@ -12,6 +12,7 @@ public class Metadata {
     public long pictureDate;
     public int width;
     public int height;
+    public int rotationId;
 
     public Metadata() {
     }
@@ -24,6 +25,7 @@ public class Metadata {
         this.pictureDate = exifMetadata.getPictureDate();
         this.height = exifMetadata.getImageHeight();
         this.width = exifMetadata.getImageWidth();
+        this.rotationId = exifMetadata.getRotationId();
     }
 
 }

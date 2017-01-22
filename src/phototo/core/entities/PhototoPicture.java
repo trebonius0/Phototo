@@ -43,7 +43,7 @@ public class PhototoPicture extends PhototoItem {
         this.thumbnail = thumbnailInfos;
         this.lastModificationTimestamp = lastModificationTimestamp;
         this.pictureDate = metadata.pictureDate;
-        this.picture = new PictureInfos(Routes.fullSizePicturesRootUrl + "/" + this.path, metadata.width, metadata.height);
+        this.picture = new PictureInfos(Routes.fullSizePicturesRootUrl + "/" + this.path, metadata.width, metadata.height, metadata.rotationId);
 
         if (this.filename.length() > 40) {
             this.parentAndName = path.getParent().getFileName().toString();

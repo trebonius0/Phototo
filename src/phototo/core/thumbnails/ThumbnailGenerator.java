@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import phototo.Routes;
+import phototo.core.metadata.Metadata;
 import phototo.helpers.FileHelper;
 import phototo.helpers.ImageHelper;
 import phototo.helpers.JpegEncoder;
@@ -47,7 +48,7 @@ public class ThumbnailGenerator implements IThumbnailGenerator {
     }
 
     @Override
-    public void generateThumbnail(Path originalFilename, long lastModifiedTimestamp) throws IOException {
+    public void generateThumbnail(Path originalFilename, long lastModifiedTimestamp, Metadata metadata) throws IOException {
         Path path = this.thumbnailsFolderName.resolve(getThumbnailFilename(originalFilename, lastModifiedTimestamp));
 
         synchronized (this.lock) {
@@ -58,7 +59,7 @@ public class ThumbnailGenerator implements IThumbnailGenerator {
             this.thumbnailsSet.add(path);
         }
 
-        BufferedImage originalImage = ImageIO.read(originalFilename.toFile());
+        BufferedImage originalImage = ImageHelper.readImage(originalFilename, metadata.rotationId);
         int newWidth = getThumbnailWidth(originalImage.getWidth(), originalImage.getHeight());
         int newHeight = getThumbnailHeight(originalImage.getWidth(), originalImage.getHeight());
         BufferedImage resized = ImageHelper.resizeImageSmooth(originalImage, newWidth, newHeight);

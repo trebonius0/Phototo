@@ -45,6 +45,9 @@ public class ExifMetadata {
     @SerializedName("GPSPosition")
     private String GPSPosition;
 
+    @SerializedName("Orientation")
+    private String orientation;
+
     public String getSourceFile() {
         return sourceFile;
     }
@@ -62,11 +65,23 @@ public class ExifMetadata {
     }
 
     public int getImageWidth() {
-        return Integer.parseInt(this.imageWidth);
+        int rotationId = this.getRotationId();
+
+        if (rotationId < 5) {
+            return Integer.parseInt(this.imageWidth);
+        } else {
+            return Integer.parseInt(this.imageHeight);
+        }
     }
 
     public int getImageHeight() {
-        return Integer.parseInt(this.imageHeight);
+        int rotationId = this.getRotationId();
+
+        if (rotationId < 5) {
+            return Integer.parseInt(this.imageHeight);
+        } else {
+            return Integer.parseInt(this.imageWidth);
+        }
     }
 
     public String getGPSPositionString() {
@@ -80,6 +95,33 @@ public class ExifMetadata {
             return this.locationCreatedCity + " " + this.locationCreatedProvinceState + " " + this.locationCreatedCountryName;
         } else {
             return null;
+        }
+    }
+
+    public int getRotationId() {
+        if (this.orientation == null) {
+            return 1;
+        }
+
+        switch (this.orientation) {
+            case "Horizontal (normal)":
+                return 1;
+            case "Mirror horizontal":
+                return 2;
+            case "Rotate 180":
+                return 3;
+            case "Mirror vertical":
+                return 4;
+            case "Mirror horizontal and rotate 270 CW":
+                return 5;
+            case "Rotate 90 CW":
+                return 6;
+            case "Mirror horizontal and rotate 90 CW":
+                return 7;
+            case "Rotate 270 CW":
+                return 8;
+            default:
+                return 1;
         }
     }
 

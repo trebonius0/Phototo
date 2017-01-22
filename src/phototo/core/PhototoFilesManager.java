@@ -167,7 +167,7 @@ public class PhototoFilesManager implements Closeable {
                                 .collect(Collectors.toList()));
 
                 List<PhototoPicture> pictures = metadatas.entrySet().parallelStream()
-                        .map((Map.Entry<Path, Metadata> entry) -> new PhototoPicture(this.rootFolder.fsPath, entry.getKey(), entry.getValue(), new PictureInfos(this.thumbnailGenerator.getThumbnailUrl(entry.getKey(), tryGetLastModifiedTimestamp(entry.getKey())), this.thumbnailGenerator.getThumbnailWidth(entry.getValue().width, entry.getValue().height), this.thumbnailGenerator.getThumbnailHeight(entry.getValue().width, entry.getValue().height)), tryGetLastModifiedTimestamp(entry.getKey())))
+                        .map((Map.Entry<Path, Metadata> entry) -> new PhototoPicture(this.rootFolder.fsPath, entry.getKey(), entry.getValue(), new PictureInfos(this.thumbnailGenerator.getThumbnailUrl(entry.getKey(), tryGetLastModifiedTimestamp(entry.getKey())), this.thumbnailGenerator.getThumbnailWidth(entry.getValue().width, entry.getValue().height), this.thumbnailGenerator.getThumbnailHeight(entry.getValue().width, entry.getValue().height), 0), tryGetLastModifiedTimestamp(entry.getKey())))
                         .collect(Collectors.toList());
 
                 pictures.forEach((PhototoPicture picture) -> {
@@ -178,7 +178,7 @@ public class PhototoFilesManager implements Closeable {
                 Stream<PhototoPicture> thumbnailStream = this.useParallelThumbnailGeneration ? pictures.parallelStream() : pictures.stream(); // This could be a parallel stream. However, since thumbnail generation takes a lot of RAM, having it parallel would take too much ram (bad on small machines)
                 thumbnailStream.forEach((PhototoPicture picture) -> {
                     try {
-                        thumbnailGenerator.generateThumbnail(picture.fsPath, picture.lastModificationTimestamp);
+                        thumbnailGenerator.generateThumbnail(picture.fsPath, picture.lastModificationTimestamp, metadatas.get(picture.fsPath));
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -299,11 +299,11 @@ public class PhototoFilesManager implements Closeable {
             if (folder.pictures.stream().noneMatch((PhototoPicture p) -> p.fsPath.equals(filename))) {
                 long lastModificationTimestamp = Files.getLastModifiedTime(filename).toMillis();
                 Metadata metadata = metadataAggregator.getMetadata(filename, lastModificationTimestamp);
-                PictureInfos thumbnailInfos = new PictureInfos(thumbnailGenerator.getThumbnailUrl(filename, lastModificationTimestamp), thumbnailGenerator.getThumbnailWidth(metadata.width, metadata.height), thumbnailGenerator.getThumbnailHeight(metadata.width, metadata.height));
+                PictureInfos thumbnailInfos = new PictureInfos(thumbnailGenerator.getThumbnailUrl(filename, lastModificationTimestamp), thumbnailGenerator.getThumbnailWidth(metadata.width, metadata.height), thumbnailGenerator.getThumbnailHeight(metadata.width, metadata.height), 0);
                 PhototoPicture picture = new PhototoPicture(rootFolder.fsPath, filename, metadataAggregator.getMetadata(filename, lastModificationTimestamp), thumbnailInfos, lastModificationTimestamp);
                 folder.pictures.add(picture);
                 searchManager.addPicture(rootFolder, picture);
-                thumbnailGenerator.generateThumbnail(picture.fsPath, picture.lastModificationTimestamp);
+                thumbnailGenerator.generateThumbnail(picture.fsPath, picture.lastModificationTimestamp, metadata);
             }
         }
 

@@ -6,5 +6,5 @@ import org.apache.http.entity.FileEntity;
 
 public interface IFullScreenImageEntityGetter {
 
-    FileEntity getImage(File localFile, ContentType contentType, int height, int width);
+    FileEntity getImage(File localFile, ContentType contentType, int height, int width, int orientationId);
 }
