@@ -38,6 +38,8 @@ public class Photato {
         boolean indexFolderName = false;
         boolean useParallelThumbnailGeneration = true;
         boolean forceExifToolsDownload = false;
+        int thumbnailHeight = 170;
+        int thumbnailQuality = 80;
 
         FileSystem fileSystem = FileSystems.getDefault();
         Path rootFolder = getRootFolder(fileSystem, args[0]);
@@ -51,7 +53,7 @@ public class Photato {
 
         ExifToolDownloader.run(httpClient, fileSystem, forceExifToolsDownload);
 
-        ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, "cache/thumbnails");
+        ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, "cache/thumbnails", thumbnailHeight, thumbnailQuality);
         IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(new GpsCoordinatesDescriptionCache("cache/gps.cache"), httpClient);
         MetadataAggregator metadataGetter = new MetadataAggregator(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
         FullScreenImageEntityGetter fullScreenResizeGenerator = new FullScreenImageEntityGetter(fileSystem, "cache/fullsize");

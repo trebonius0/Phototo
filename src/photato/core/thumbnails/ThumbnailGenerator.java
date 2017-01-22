@@ -26,18 +26,21 @@ import photato.helpers.Md5;
 
 public class ThumbnailGenerator implements IThumbnailGenerator {
 
-    private static final int wantedHeight = 170;
-    private static final int wantedQuality = 85;
+    private final int thumbailHeight;
+    private final int thumbnailQuality;
     private final FileSystem fileSystem;
     private final Path thumbnailsFolderName;
     private final Path rootFolder;
     private final Set<Path> thumbnailsSet;
     private final Object lock = new Object();
 
-    public ThumbnailGenerator(FileSystem fileSystem, Path rootFolder, String thumbnailsFolderName) throws IOException {
+    public ThumbnailGenerator(FileSystem fileSystem, Path rootFolder, String thumbnailsFolderName, int thumbnailHeight, int thumbnailQuality) throws IOException {
         this.fileSystem = fileSystem;
         this.thumbnailsFolderName = this.fileSystem.getPath(thumbnailsFolderName);
         this.thumbnailsSet = new HashSet<>();
+
+        this.thumbailHeight = thumbnailHeight;
+        this.thumbnailQuality = thumbnailQuality;
 
         if (!Files.exists(this.thumbnailsFolderName)) {
             Files.createDirectory(this.thumbnailsFolderName);
@@ -65,7 +68,7 @@ public class ThumbnailGenerator implements IThumbnailGenerator {
         BufferedImage resized = ImageHelper.resizeImageSmooth(originalImage, newWidth, newHeight);
 
         try (OutputStream out = new BufferedOutputStream(new FileOutputStream(path.toFile()))) {
-            new JpegEncoder(resized, wantedQuality, out).Compress();
+            new JpegEncoder(resized, thumbnailQuality, out).Compress();
         }
 
     }
@@ -91,12 +94,12 @@ public class ThumbnailGenerator implements IThumbnailGenerator {
 
     @Override
     public int getThumbnailWidth(int originalWidth, int originalHeight) {
-        return originalWidth * wantedHeight / Math.max(1, originalHeight);
+        return originalWidth * thumbailHeight / Math.max(1, originalHeight);
     }
 
     @Override
     public int getThumbnailHeight(int originalWidth, int originalHeight) {
-        return wantedHeight;
+        return thumbailHeight;
     }
 
     private void initAndCleanOutdatedThumbnails() {
