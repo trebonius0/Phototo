@@ -1,1 +1,1 @@
-java -Dfile.encoding=UTF8 -Xmx1g -jar Phototo-Release.jar "C:\Users\%username%\Pictures"
+java -Dfile.encoding=UTF8 -Xmx1g -jar Photato-Release.jar "C:\Users\%username%\Pictures"

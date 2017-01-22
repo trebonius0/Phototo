@@ -1,6 +1,6 @@
-class PhototoRequestResults {
-    public folders: PhototoFolder[]
-    public pictures: PhototoPicture[]
+class PhotatoRequestResults {
+    public folders: PhotatoFolder[]
+    public pictures: PhotatoPicture[]
     public beginIndex: number;
     public endIndex: number;
     public hasMore: boolean;
@@ -13,17 +13,17 @@ class PictureInfos {
     public rotationId: number;
 }
 
-class PhototoPicturePosition {
+class PhotatoPicturePosition {
     public hardcodedPosition: string;
     public coordinatesDescription: string;
 }
 
-abstract class PhototoItem {
+abstract class PhotatoItem {
     public path: string;
     public thumbnail: PictureInfos;
 }
 
-class PhototoPicture extends PhototoItem {
+class PhotatoPicture extends PhotatoItem {
     public title: string;
 
     public parentAndName: string;
@@ -32,7 +32,7 @@ class PhototoPicture extends PhototoItem {
 
     public persons: string[];
 
-    public position: PhototoPicturePosition;
+    public position: PhotatoPicturePosition;
 
     public picture: PictureInfos;
 
@@ -40,5 +40,5 @@ class PhototoPicture extends PhototoItem {
 
 }
 
-class PhototoFolder extends PhototoItem {
+class PhotatoFolder extends PhotatoItem {
 }

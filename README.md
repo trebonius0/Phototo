@@ -1,8 +1,8 @@
-# Phototo
+# Photato
 
-Phototo aims to be a self-hosted photo gallery, accessible through a **responsive WebUI**. 
+Photato aims to be a self-hosted photo gallery, accessible through a **responsive WebUI**. 
 
-Give to Phototo a picture folder and it will index it, using the file system hierarchy. 
+Give to Photato a picture folder and it will index it, using the file system hierarchy. 
 
 ## Features
 * Folders / pictures gallery
@@ -20,18 +20,18 @@ Give to Phototo a picture folder and it will index it, using the file system hie
 
 ## Try it
 ### On Windows
-* Download and unzip latest version from [https://github.com/trebonius0/Phototo/releases](https://github.com/trebonius0/Phototo/releases)
+* Download and unzip latest version from [https://github.com/trebonius0/Photato/releases](https://github.com/trebonius0/Photato/releases)
 * Download the latest version of Java [here](https://www.java.com/fr/download/).
 * Edit the start.cmd file to select the picture folder you want to index 
 * Run the start.cmd file
-  * At the first start, Phototo will start by indexing the picture folder and generate thumbnails (which can take ~20min for 7000 pictures)
+  * At the first start, Photato will start by indexing the picture folder and generate thumbnails (which can take ~20min for 7000 pictures)
   * When it will have finished, you can access it on [http://127.0.0.1:8186](http://127.0.0.1:8186)
 
 ### On Ubuntu/Debian
-* Download and unzip latest version from [https://github.com/trebonius0/Phototo/releases](https://github.com/trebonius0/Phototo/releases)
+* Download and unzip latest version from [https://github.com/trebonius0/Photato/releases](https://github.com/trebonius0/Photato/releases)
 * *sudo apt install libimage-exiftool-perl openjdk-8-jre*
-* *java -Xmx1g -jar Phototo-Release.jar "[Path to your picture folder]"*
-  * At the first start, Phototo will start by indexing the picture folder and generate thumbnails (which can take ~20min for 7000 pictures)
+* *java -Xmx1g -jar Photato-Release.jar "[Path to your picture folder]"*
+  * At the first start, Photato will start by indexing the picture folder and generate thumbnails (which can take ~20min for 7000 pictures)
   * When it will have finished, you can access it on [http://127.0.0.1:8186](http://127.0.0.1:8186)
 
 ## Roadmap
@@ -47,4 +47,4 @@ Here are the features we will implement in the future (you can contribute if you
 - Automated offline keywords annotations
 
 ## Disclaimer
-Phototo will rename all pictures with 2+ spaces in a row to the same but with one space (otherwise it would make exiftool crash). For instance "my  picture.jpg" will be renamed to "my picture.jpg"
+Photato will rename all pictures with 2+ spaces in a row to the same but with one space (otherwise it would make exiftool crash). For instance "my  picture.jpg" will be renamed to "my picture.jpg"

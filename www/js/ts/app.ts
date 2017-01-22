@@ -8,15 +8,15 @@
 
 class GalleryViewModel {
     private static batchSize: number = 50;
-    public pictures: KnockoutObservableArray<PhototoPicture>;
-    public folders: KnockoutObservableArray<PhototoFolder>;
+    public pictures: KnockoutObservableArray<PhotatoPicture>;
+    public folders: KnockoutObservableArray<PhotatoFolder>;
     public currentFolder: KnockoutObservable<string>;
     public currentFolderName: KnockoutComputed<string>;
     public currentSearchQuery: KnockoutObservable<string>;
     public currentPageTitle: KnockoutComputed<string>;
     public breadcrumbs: KnockoutComputed<Breadcrumb[]>;
     public fullscreenPictureIndex: KnockoutObservable<number>;
-    public fullscreenPicture: KnockoutComputed<PhototoPicture>;
+    public fullscreenPicture: KnockoutComputed<PhotatoPicture>;
     private layoutManager: LayoutManager;
     private fullScreenManager: FullScreenManager;
     private hasMore: boolean;
@@ -25,18 +25,18 @@ class GalleryViewModel {
 
     constructor() {
         this.currentFolder = ko.observable<string>("");
-        this.currentFolderName = ko.computed<string>(() => this.currentFolder().substring(this.currentFolder().lastIndexOf("/") + 1) || "Phototo gallery");
+        this.currentFolderName = ko.computed<string>(() => this.currentFolder().substring(this.currentFolder().lastIndexOf("/") + 1) || "Photato gallery");
 
         this.currentSearchQuery = ko.observable<string>(null);
-        this.pictures = ko.observableArray<PhototoPicture>();
-        this.folders = ko.observableArray<PhototoPicture>();
+        this.pictures = ko.observableArray<PhotatoPicture>();
+        this.folders = ko.observableArray<PhotatoPicture>();
 
         this.fullscreenPictureIndex = ko.observable<number>(-1);
-        this.fullscreenPicture = ko.computed<PhototoPicture>(() => {
+        this.fullscreenPicture = ko.computed<PhotatoPicture>(() => {
             if (this.fullscreenPictureIndex() === -1) {
                 return null;
             } else {
-                return <PhototoPicture>this.pictures()[this.fullscreenPictureIndex()];
+                return <PhotatoPicture>this.pictures()[this.fullscreenPictureIndex()];
             }
         });
 
@@ -95,7 +95,7 @@ class GalleryViewModel {
     }
 
     public moveToFolder(newFolder: string, saveInHistory: boolean): void {
-        document.title = newFolder || "Phototo gallery";
+        document.title = newFolder || "Photato gallery";
 
         this.doAjaxRequest(newFolder, null, saveInHistory);
     }
@@ -120,7 +120,7 @@ class GalleryViewModel {
 
         this.currentAjaxRequest && this.currentAjaxRequest.abort();
         this.currentAjaxRequest = $.ajax("/api/list?folder=" + encodeURIComponent(folder) + queryParameter + "&beginIndex=0&endIndex=" + GalleryViewModel.batchSize)
-            .done(function(res: PhototoRequestResults) {
+            .done(function(res: PhotatoRequestResults) {
                 that.folders(res.folders);
                 that.pictures(res.pictures);
                 that.hasMore = res.hasMore;
@@ -148,7 +148,7 @@ class GalleryViewModel {
 
         this.currentAjaxRequest && this.currentAjaxRequest.abort();
         this.currentAjaxRequest = $.ajax("/api/list?folder=" + this.currentFolder().replace("&", "%26").replace("?", "%3F") + queryParameter + "&beginIndex=" + newBeginIndex + "&endIndex=" + newEndIndex)
-            .done(function(res: PhototoRequestResults) {
+            .done(function(res: PhotatoRequestResults) {
                 that.hasMore = res.hasMore;
                 that.nextBeginIndex = res.endIndex;
 

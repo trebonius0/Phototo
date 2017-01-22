@@ -1,8 +1,8 @@
 class FullScreenManager {
 
-    private fullscreenPicture: KnockoutComputed<PhototoPicture>;
+    private fullscreenPicture: KnockoutComputed<PhotatoPicture>;
 
-    constructor(fullscreenPicture: KnockoutComputed<PhototoPicture>) {
+    constructor(fullscreenPicture: KnockoutComputed<PhotatoPicture>) {
         this.fullscreenPicture = fullscreenPicture;
 
         $(window).resize(() => this.loadImage());

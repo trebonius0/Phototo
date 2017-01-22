@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Phototo" default="default" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-    <description>Builds, tests, and runs the project Phototo.</description>
+<project name="Photato" default="default" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+    <description>Builds, tests, and runs the project Photato.</description>
     <import file="nbproject/build-impl.xml"/>
 
     <property name="ivy.install.version" value="2.4.0" />
@@ -69,7 +69,7 @@
     
     <target name="-post-jar">
 
-        <property name="store.jar.name" value="Phototo-Release"/>
+        <property name="store.jar.name" value="Photato-Release"/>
 
         <property name="store.dir" value="dist"/>
         <property name="store.jar" value="${store.dir}/${store.jar.name}.jar"/>

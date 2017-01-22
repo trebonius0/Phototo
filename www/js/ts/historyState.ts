@@ -2,8 +2,8 @@ class HistoryState {
     public currentSearchQuery: string;
     public currentFolder: string;
     public fullScreenOpened: boolean;
-    public pictures: PhototoPicture[];
-    public folders: PhototoFolder[];
+    public pictures: PhotatoPicture[];
+    public folders: PhotatoFolder[];
     public hasMore: boolean;
     public nextBeginIndex: number;
 

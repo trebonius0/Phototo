@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
-    <info module="Phototo" organisation="phototo" revision="0.1"/>
+    <info module="Photato" organisation="photato" revision="0.1"/>
 
     <configurations defaultconfmapping="build->*">
         <conf name="build" description="normal build"/>
@@ -8,7 +8,7 @@
     </configurations>
 
     <publications>
-        <artifact name="Phototo" type="jar" conf="build" ext="jar"/>
+        <artifact name="Photato" type="jar" conf="build" ext="jar"/>
     </publications>
 
     <dependencies>
