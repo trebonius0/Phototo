@@ -7,7 +7,6 @@ import photato.core.entities.PhotatoPicture;
 import photato.core.entities.PictureInfos;
 import photato.core.metadata.IMetadataAggregator;
 import photato.core.metadata.Metadata;
-import photato.core.thumbnails.IThumbnailGenerator;
 import photato.helpers.FileHelper;
 import photato.helpers.Tuple;
 import java.io.Closeable;
@@ -30,12 +29,13 @@ import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import photato.core.resize.IResizedPictureGenerator;
 
 public class PhotatoFilesManager implements Closeable {
 
     private final FileSystem fileSystem;
     private final IMetadataAggregator metadataAggregator;
-    private final IThumbnailGenerator thumbnailGenerator;
+    private final IResizedPictureGenerator thumbnailGenerator;
     private final PhotatoFolder rootFolder;
     private final SearchManager searchManager;
     private final WatchServiceThread watchServiceThread;
@@ -44,7 +44,7 @@ public class PhotatoFilesManager implements Closeable {
     private final boolean prefixOnlyMode;
     private final boolean useParallelThumbnailGeneration;
 
-    public PhotatoFilesManager(Path rootFolder, FileSystem fileSystem, IMetadataAggregator metadataGetter, IThumbnailGenerator thumbnailGenerator, boolean prefixOnlyMode, boolean indexFolderName, boolean useParallelThumbnailGeneration) throws IOException {
+    public PhotatoFilesManager(Path rootFolder, FileSystem fileSystem, IMetadataAggregator metadataGetter, IResizedPictureGenerator thumbnailGenerator, boolean prefixOnlyMode, boolean indexFolderName, boolean useParallelThumbnailGeneration) throws IOException {
         this.fileSystem = fileSystem;
         this.metadataAggregator = metadataGetter;
         this.thumbnailGenerator = thumbnailGenerator;
@@ -167,7 +167,7 @@ public class PhotatoFilesManager implements Closeable {
                                 .collect(Collectors.toList()));
 
                 List<PhotatoPicture> pictures = metadatas.entrySet().parallelStream()
-                        .map((Map.Entry<Path, Metadata> entry) -> new PhotatoPicture(this.rootFolder.fsPath, entry.getKey(), entry.getValue(), new PictureInfos(this.thumbnailGenerator.getThumbnailUrl(entry.getKey(), tryGetLastModifiedTimestamp(entry.getKey())), this.thumbnailGenerator.getThumbnailWidth(entry.getValue().width, entry.getValue().height), this.thumbnailGenerator.getThumbnailHeight(entry.getValue().width, entry.getValue().height), 0), tryGetLastModifiedTimestamp(entry.getKey())))
+                        .map((Map.Entry<Path, Metadata> entry) -> new PhotatoPicture(this.rootFolder.fsPath, entry.getKey(), entry.getValue(), new PictureInfos(this.thumbnailGenerator.getResizedPictureUrl(entry.getKey(), tryGetLastModifiedTimestamp(entry.getKey())), this.thumbnailGenerator.getResizedPictureWidth(entry.getValue().width, entry.getValue().height), this.thumbnailGenerator.getResizedPictureHeight(entry.getValue().width, entry.getValue().height), 0), tryGetLastModifiedTimestamp(entry.getKey())))
                         .collect(Collectors.toList());
 
                 pictures.forEach((PhotatoPicture picture) -> {
@@ -178,7 +178,7 @@ public class PhotatoFilesManager implements Closeable {
                 Stream<PhotatoPicture> thumbnailStream = this.useParallelThumbnailGeneration ? pictures.parallelStream() : pictures.stream(); // This could be a parallel stream. However, since thumbnail generation takes a lot of RAM, having it parallel would take too much ram (bad on small machines)
                 thumbnailStream.forEach((PhotatoPicture picture) -> {
                     try {
-                        thumbnailGenerator.generateThumbnail(picture.fsPath, picture.lastModificationTimestamp, metadatas.get(picture.fsPath));
+                        thumbnailGenerator.generateResizedPicture(picture.fsPath, picture.lastModificationTimestamp, metadatas.get(picture.fsPath));
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -299,11 +299,11 @@ public class PhotatoFilesManager implements Closeable {
             if (folder.pictures.stream().noneMatch((PhotatoPicture p) -> p.fsPath.equals(filename))) {
                 long lastModificationTimestamp = Files.getLastModifiedTime(filename).toMillis();
                 Metadata metadata = metadataAggregator.getMetadata(filename, lastModificationTimestamp);
-                PictureInfos thumbnailInfos = new PictureInfos(thumbnailGenerator.getThumbnailUrl(filename, lastModificationTimestamp), thumbnailGenerator.getThumbnailWidth(metadata.width, metadata.height), thumbnailGenerator.getThumbnailHeight(metadata.width, metadata.height), 0);
+                PictureInfos thumbnailInfos = new PictureInfos(thumbnailGenerator.getResizedPictureUrl(filename, lastModificationTimestamp), thumbnailGenerator.getResizedPictureWidth(metadata.width, metadata.height), thumbnailGenerator.getResizedPictureHeight(metadata.width, metadata.height), 0);
                 PhotatoPicture picture = new PhotatoPicture(rootFolder.fsPath, filename, metadataAggregator.getMetadata(filename, lastModificationTimestamp), thumbnailInfos, lastModificationTimestamp);
                 folder.pictures.add(picture);
                 searchManager.addPicture(rootFolder, picture);
-                thumbnailGenerator.generateThumbnail(picture.fsPath, picture.lastModificationTimestamp, metadata);
+                thumbnailGenerator.generateResizedPicture(picture.fsPath, picture.lastModificationTimestamp, metadata);
             }
         }
 
@@ -327,7 +327,7 @@ public class PhotatoFilesManager implements Closeable {
                 PhotatoPicture picture = findAny.get();
                 folder.pictures.remove(picture);
                 searchManager.removePicture(picture);
-                thumbnailGenerator.deleteThumbnail(picture.fsPath, picture.lastModificationTimestamp);
+                thumbnailGenerator.deleteResizedPicture(picture.fsPath, picture.lastModificationTimestamp);
             }
         }
 
@@ -345,7 +345,7 @@ public class PhotatoFilesManager implements Closeable {
                 for (PhotatoPicture picture : currentFolder.pictures) {
                     try {
                         searchManager.removePicture(picture);
-                        thumbnailGenerator.deleteThumbnail(picture.fsPath, picture.lastModificationTimestamp);
+                        thumbnailGenerator.deleteResizedPicture(picture.fsPath, picture.lastModificationTimestamp);
                     } catch (IOException ex) {
                     }
                 }

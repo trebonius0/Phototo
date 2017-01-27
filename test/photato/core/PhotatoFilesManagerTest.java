@@ -7,7 +7,6 @@ import photato.core.entities.PhotatoFolder;
 import photato.core.entities.PhotatoPicture;
 import photato.core.metadata.IMetadataAggregator;
 import photato.core.metadata.Metadata;
-import photato.core.thumbnails.IThumbnailGenerator;
 import photato.helpers.Tuple;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
@@ -21,20 +20,21 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
+import photato.core.resize.IResizedPictureGenerator;
 
 public class PhotatoFilesManagerTest {
 
-    private static class ThumbnailsGeneratorMock implements IThumbnailGenerator {
+    private static class ThumbnailsGeneratorMock implements IResizedPictureGenerator {
 
         private static final Set<String> thumbnails = new HashSet<>();
 
         @Override
-        public void generateThumbnail(Path originalFilename, long lastModifiedTimestamp, Metadata metadata) {
+        public void generateResizedPicture(Path originalFilename, long lastModifiedTimestamp, Metadata metadata) {
             thumbnails.add(originalFilename.toString());
         }
 
         @Override
-        public void deleteThumbnail(Path originalFilename, long lastModifiedTimestamp) {
+        public void deleteResizedPicture(Path originalFilename, long lastModifiedTimestamp) {
             thumbnails.remove(originalFilename.toString());
         }
 
@@ -43,17 +43,17 @@ public class PhotatoFilesManagerTest {
         }
 
         @Override
-        public String getThumbnailUrl(Path originalFilename, long lastModifiedTimestamp) {
+        public String getResizedPictureUrl(Path originalFilename, long lastModifiedTimestamp) {
             return "/thumbnail/" + originalFilename + "_" + lastModifiedTimestamp;
         }
 
         @Override
-        public int getThumbnailWidth(int originalWidth, int originalHeight) {
+        public int getResizedPictureWidth(int originalWidth, int originalHeight) {
             return 10;
         }
 
         @Override
-        public int getThumbnailHeight(int originalWidth, int originalHeight) {
+        public int getResizedPictureHeight(int originalWidth, int originalHeight) {
             return 20;
         }
 

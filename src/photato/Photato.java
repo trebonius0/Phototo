@@ -3,7 +3,7 @@ package photato;
 import java.nio.file.FileSystem;
 import photato.core.PhotatoFilesManager;
 import photato.core.metadata.MetadataAggregator;
-import photato.core.thumbnails.ThumbnailGenerator;
+import photato.core.resize.ThumbnailGenerator;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
@@ -38,6 +38,8 @@ public class Photato {
         boolean indexFolderName = false;
         boolean useParallelThumbnailGeneration = true;
         boolean forceExifToolsDownload = false;
+        boolean pregenerateResizedPictures = true;
+        Long resizedPicturesCacheMaxSize = null;
         int thumbnailHeight = 170;
         int thumbnailQuality = 80;
 
