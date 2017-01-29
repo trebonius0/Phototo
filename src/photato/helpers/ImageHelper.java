@@ -48,8 +48,6 @@ public class ImageHelper {
         AffineTransform t = new AffineTransform();
 
         switch (orientation) {
-            case 1:
-                break;
             case 2: // Flip X
                 t.scale(-1.0, 1.0);
                 t.translate(-width, 0);
@@ -81,7 +79,7 @@ public class ImageHelper {
                 t.rotate(3 * Math.PI / 2);
                 break;
             default:
-                break;
+                return image;
         }
 
         AffineTransformOp op = new AffineTransformOp(t, AffineTransformOp.TYPE_BICUBIC);

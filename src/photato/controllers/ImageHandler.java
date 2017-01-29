@@ -10,17 +10,20 @@ import java.util.TimeZone;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.FileEntity;
 import org.apache.http.message.BasicHeader;
 import photato.helpers.FileHelper;
 import photato.helpers.SafeSimpleDateFormat;
-import photato.core.fullscreen.IFullScreenImageEntityGetter;
 import java.util.Map;
+import org.apache.http.entity.FileEntity;
+import photato.core.PhotatoFilesManager;
+import photato.core.entities.PhotatoPicture;
+import photato.core.resize.fullscreen.IFullScreenImageGetter;
 
 public class ImageHandler extends FileHandler {
 
     private static final SafeSimpleDateFormat expiresDateFormat;
-    private final IFullScreenImageEntityGetter fullScreenImageEntityGetter;
+    private final IFullScreenImageGetter fullScreenImageEntityGetter;
+    private final PhotatoFilesManager photatoFilesManager;
 
     static {
         expiresDateFormat = new SafeSimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
@@ -28,10 +31,11 @@ public class ImageHandler extends FileHandler {
         expiresDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
-    public ImageHandler(Path folderRoot, String prefix, IFullScreenImageEntityGetter fullScreenEntityGetter) {
+    public ImageHandler(Path folderRoot, String prefix, IFullScreenImageGetter fullScreenEntityGetter, PhotatoFilesManager photatoFilesManager) {
         super(folderRoot, prefix, Photato.supportedPictureExtensions);
 
         this.fullScreenImageEntityGetter = fullScreenEntityGetter;
+        this.photatoFilesManager = photatoFilesManager;
     }
 
     @Override
@@ -50,24 +54,17 @@ public class ImageHandler extends FileHandler {
     }
 
     @Override
-    protected HttpEntity getEntity(String path, Map<String, String> query, File localFile) {
+    protected HttpEntity getEntity(String path, Map<String, String> query, File localFile) throws IOException {
         String extension = FileHelper.getExtension(path);
         ContentType contentType = ContentType.create(getContentType(extension.toLowerCase()));
 
-        if (query.containsKey("height") && query.containsKey("width") && query.containsKey("rotationId")) {
-            int height = Integer.parseInt(query.get("height"));
-            int width = Integer.parseInt(query.get("width"));
-            int rotationId = Integer.parseInt(query.get("rotationId"));
+        PhotatoPicture picture = this.photatoFilesManager.getPicture(localFile.toPath());
 
-            if (this.fullScreenImageEntityGetter != null) {
-                return this.fullScreenImageEntityGetter.getImage(localFile, contentType, height, width, rotationId);
-            } else {
-                throw new IllegalStateException();
-            }
+        if (this.fullScreenImageEntityGetter != null) {
+            return this.fullScreenImageEntityGetter.getImage(localFile.toPath(), contentType, picture);
         } else {
-            return new FileEntity(localFile, contentType);
+           return new FileEntity(localFile, contentType);
         }
-
     }
 
 }

@@ -13,7 +13,6 @@ public class PictureInfos {
     @Expose
     public final int height;
 
-    @Expose
     public final int rotationId;
 
     public PictureInfos(String url, int width, int height, int rotationId) {

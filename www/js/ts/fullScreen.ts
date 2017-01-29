@@ -14,9 +14,8 @@ class FullScreenManager {
             $('.fullscreenPictureImg').css('z-index', 20);
             $('.fullscreenPictureImg').attr('src', '');
 
-            var imageHeight: number = this.fullscreenPicture().picture.height;
-            var imageWidth: number = this.fullscreenPicture().picture.width;
-            var imageRotationId: number = this.fullscreenPicture().picture.rotationId;
+            var imageHeight: number = this.fullscreenPicture().fullscreenPicture.height;
+            var imageWidth: number = this.fullscreenPicture().fullscreenPicture.width;
             var windowHeight: number = window.innerHeight;
             var windowWidth: number = document.body.scrollWidth;
             var arrowWidth: number = $('#fullscreenPicture .arrow').first().outerWidth();
@@ -40,57 +39,21 @@ class FullScreenManager {
             imgWantedWidth = Math.round(imgWantedWidth);
             imgWantedHeight = Math.round(imgWantedHeight);
 
-            var rotationAngle: number = isMobileOrTablet() ? 0 : this.getRotationAngle(imageRotationId);
-            var imgRotatedWidth: number = rotationAngle == 0 || rotationAngle == 180 ? imgWantedWidth : imgWantedHeight;
-            var imgRotatedHeight: number = rotationAngle == 0 || rotationAngle == 180 ? imgWantedHeight : imgWantedWidth;
+            var imgPositionX = Math.round((windowWidth - imgWantedWidth) / 2);
+            var imgPositionY = Math.round((windowHeight - imgWantedHeight) / 2);
+            var legendPositionX = imgPositionX;
+            var legendPositionY = imgPositionY + imgWantedHeight;
+            var leftArrowPositionX = imgPositionX - arrowWidth;
+            var rightArrowPositionX = imgPositionX + imgWantedWidth;
+            var arrowPositionY = Math.round(imgPositionY + imgWantedHeight / 2 - arrowHeight / 2);
 
-            var imagePositionX = Math.round((windowWidth - imgWantedWidth) / 2);
-            var imagePositionY = Math.round((windowHeight - imgWantedHeight) / 2);
-            var rotatedImgPositionX = Math.round((windowWidth - imgRotatedWidth) / 2);
-            var rotatedImgPositionY = Math.round((windowHeight - imgRotatedHeight) / 2);
-            var legendPositionX = imagePositionX;
-            var legendPositionY = imagePositionY + imgWantedHeight;
-            var leftArrowPositionX = rotatedImgPositionX - arrowWidth;
-            var rightArrowPositionX = rotatedImgPositionX + imgRotatedWidth;
-            var arrowPositionY = Math.round(rotatedImgPositionY + imgRotatedHeight / 2 - arrowHeight / 2);
-
-            $('.fullscreenPictureThumbnail').attr('width', imgWantedWidth).attr('height', imgWantedHeight).css('top', imagePositionY + 'px').css('left', imagePositionX + 'px');
-            $('.fullscreenPictureImg').attr('width', imgRotatedWidth).attr('height', imgRotatedHeight).css('top', rotatedImgPositionY + 'px').css('left', rotatedImgPositionX + 'px');
+            $('#fullscreenPicture img').attr('width', imgWantedWidth).attr('height', imgWantedHeight).css('top', imgPositionY + 'px').css('left', imgPositionX + 'px');
             $('#fullscreenPicture .pictureLegend').css('width', (imgWantedWidth - 5) + 'px').css('top', legendPositionY + 'px').css('left', legendPositionX + 'px');
             $('#fullscreenPicture .left-arrow').css('top', arrowPositionY + 'px').css('left', leftArrowPositionX + 'px');
             $('#fullscreenPicture .right-arrow').css('top', arrowPositionY + 'px').css('left', rightArrowPositionX + 'px');
 
-            var src = this.fullscreenPicture().picture.url;
-            var rotationAngle: number;
-            if (isMobileOrTablet()) {
-                src += '?height=' + imgWantedHeight + '&width=' + imgWantedWidth + '&rotationId=' + imageRotationId;
-                rotationAngle = 0;
-            } else {
-                rotationAngle = this.getRotationAngle(imageRotationId);
-            }
-
+            var src = this.fullscreenPicture().fullscreenPicture.url;
             $('.fullscreenPictureImg').attr('src', src);
-
-            if (rotationAngle > 0) {
-                $('.fullscreenPictureImg').css('transform', 'rotate(' + rotationAngle + 'deg)');
-            }
-        }
-    }
-
-    private getRotationAngle(imageRotationId: number): number {
-        // This method should be removed when the css attribute "image-rotation" will be available in all browsers
-        switch (imageRotationId) {
-            case 3:
-                return 180;
-
-            case 6:
-                return 90;
-
-            case 8:
-                return 270;
-
-            default:
-                return 0;
         }
     }
 }

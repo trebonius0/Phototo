@@ -29,29 +29,34 @@ import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import photato.core.resize.IResizedPictureGenerator;
+import photato.core.resize.fullscreen.IFullScreenImageGetter;
+import photato.core.resize.thumbnails.IThumbnailGenerator;
 
 public class PhotatoFilesManager implements Closeable {
 
     private final FileSystem fileSystem;
     private final IMetadataAggregator metadataAggregator;
-    private final IResizedPictureGenerator thumbnailGenerator;
+    private final IThumbnailGenerator thumbnailGenerator;
+    private final IFullScreenImageGetter fullScreenImageGetter;
     private final PhotatoFolder rootFolder;
     private final SearchManager searchManager;
     private final WatchServiceThread watchServiceThread;
     private final Map<Path, WatchKey> watchedDirectoriesKeys;
     private final Map<WatchKey, Path> watchedDirectoriesPaths;
+    private final Map<Path, PhotatoPicture> pathToPictureMap;
     private final boolean prefixOnlyMode;
     private final boolean useParallelThumbnailGeneration;
 
-    public PhotatoFilesManager(Path rootFolder, FileSystem fileSystem, IMetadataAggregator metadataGetter, IResizedPictureGenerator thumbnailGenerator, boolean prefixOnlyMode, boolean indexFolderName, boolean useParallelThumbnailGeneration) throws IOException {
+    public PhotatoFilesManager(Path rootFolder, FileSystem fileSystem, IMetadataAggregator metadataGetter, IThumbnailGenerator thumbnailGenerator, IFullScreenImageGetter fullScreenImageGetter, boolean prefixOnlyMode, boolean indexFolderName, boolean useParallelThumbnailGeneration) throws IOException {
         this.fileSystem = fileSystem;
         this.metadataAggregator = metadataGetter;
         this.thumbnailGenerator = thumbnailGenerator;
+        this.fullScreenImageGetter = fullScreenImageGetter;
         this.rootFolder = new PhotatoFolder(rootFolder, rootFolder);
         this.searchManager = new SearchManager(prefixOnlyMode, indexFolderName);
         this.prefixOnlyMode = prefixOnlyMode;
         this.useParallelThumbnailGeneration = useParallelThumbnailGeneration;
+        this.pathToPictureMap = new HashMap<>();
 
         WatchService watcher = this.fileSystem.newWatchService();
         this.watchedDirectoriesKeys = new HashMap<>();
@@ -79,6 +84,10 @@ public class PhotatoFilesManager implements Closeable {
         } else {
             return new ArrayList<>();
         }
+    }
+
+    public PhotatoPicture getPicture(Path pictureFsPath) {
+        return this.pathToPictureMap.get(pictureFsPath);
     }
 
     public List<PhotatoPicture> searchPicturesInFolder(String folder, String searchQuery) {
@@ -167,18 +176,26 @@ public class PhotatoFilesManager implements Closeable {
                                 .collect(Collectors.toList()));
 
                 List<PhotatoPicture> pictures = metadatas.entrySet().parallelStream()
-                        .map((Map.Entry<Path, Metadata> entry) -> new PhotatoPicture(this.rootFolder.fsPath, entry.getKey(), entry.getValue(), new PictureInfos(this.thumbnailGenerator.getResizedPictureUrl(entry.getKey(), tryGetLastModifiedTimestamp(entry.getKey())), this.thumbnailGenerator.getResizedPictureWidth(entry.getValue().width, entry.getValue().height), this.thumbnailGenerator.getResizedPictureHeight(entry.getValue().width, entry.getValue().height), 0), tryGetLastModifiedTimestamp(entry.getKey())))
+                        .map((Map.Entry<Path, Metadata> entry) -> new PhotatoPicture(this.rootFolder.fsPath, entry.getKey(), entry.getValue(),
+                        new PictureInfos(this.thumbnailGenerator.getThumbnailUrl(entry.getKey(), tryGetLastModifiedTimestamp(entry.getKey())), this.thumbnailGenerator.getThumbnailWidth(entry.getValue().width, entry.getValue().height), this.thumbnailGenerator.getThumbnailHeight(entry.getValue().width, entry.getValue().height), 0),
+                        new PictureInfos(this.fullScreenImageGetter.getImageUrl(entry.getKey(), tryGetLastModifiedTimestamp(entry.getKey())), this.fullScreenImageGetter.getImageWidth(entry.getValue().width, entry.getValue().height), this.fullScreenImageGetter.getImageHeight(entry.getValue().width, entry.getValue().height), 0),
+                        tryGetLastModifiedTimestamp(entry.getKey())))
                         .collect(Collectors.toList());
 
                 pictures.forEach((PhotatoPicture picture) -> {
                     currentFolder.pictures.add(picture);
                     searchManager.addPicture(rootFolder, picture);
+                    pathToPictureMap.put(picture.fsPath, picture);
                 });
 
                 Stream<PhotatoPicture> thumbnailStream = this.useParallelThumbnailGeneration ? pictures.parallelStream() : pictures.stream(); // This could be a parallel stream. However, since thumbnail generation takes a lot of RAM, having it parallel would take too much ram (bad on small machines)
                 thumbnailStream.forEach((PhotatoPicture picture) -> {
                     try {
-                        thumbnailGenerator.generateResizedPicture(picture.fsPath, picture.lastModificationTimestamp, metadatas.get(picture.fsPath));
+                        thumbnailGenerator.generateThumbnail(picture.fsPath, picture.lastModificationTimestamp, metadatas.get(picture.fsPath));
+
+                        if (fullScreenImageGetter.precomputationsEnabled()) {
+                            fullScreenImageGetter.generateImage(picture.fsPath, picture.lastModificationTimestamp, metadatas.get(picture.fsPath).rotationId);
+                        }
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -299,11 +316,17 @@ public class PhotatoFilesManager implements Closeable {
             if (folder.pictures.stream().noneMatch((PhotatoPicture p) -> p.fsPath.equals(filename))) {
                 long lastModificationTimestamp = Files.getLastModifiedTime(filename).toMillis();
                 Metadata metadata = metadataAggregator.getMetadata(filename, lastModificationTimestamp);
-                PictureInfos thumbnailInfos = new PictureInfos(thumbnailGenerator.getResizedPictureUrl(filename, lastModificationTimestamp), thumbnailGenerator.getResizedPictureWidth(metadata.width, metadata.height), thumbnailGenerator.getResizedPictureHeight(metadata.width, metadata.height), 0);
-                PhotatoPicture picture = new PhotatoPicture(rootFolder.fsPath, filename, metadataAggregator.getMetadata(filename, lastModificationTimestamp), thumbnailInfos, lastModificationTimestamp);
+                PictureInfos thumbnailInfos = new PictureInfos(thumbnailGenerator.getThumbnailUrl(filename, lastModificationTimestamp), thumbnailGenerator.getThumbnailWidth(metadata.width, metadata.height), thumbnailGenerator.getThumbnailHeight(metadata.width, metadata.height), 0);
+                PictureInfos fullScreenInfos = new PictureInfos(fullScreenImageGetter.getImageUrl(filename, lastModificationTimestamp), fullScreenImageGetter.getImageWidth(metadata.width, metadata.height), fullScreenImageGetter.getImageHeight(metadata.width, metadata.height), 0);
+                PhotatoPicture picture = new PhotatoPicture(rootFolder.fsPath, filename, metadataAggregator.getMetadata(filename, lastModificationTimestamp), thumbnailInfos, fullScreenInfos, lastModificationTimestamp);
                 folder.pictures.add(picture);
                 searchManager.addPicture(rootFolder, picture);
-                thumbnailGenerator.generateResizedPicture(picture.fsPath, picture.lastModificationTimestamp, metadata);
+                pathToPictureMap.put(picture.fsPath, picture);
+                thumbnailGenerator.generateThumbnail(picture.fsPath, picture.lastModificationTimestamp, metadata);
+
+                if (fullScreenImageGetter.precomputationsEnabled()) {
+                    fullScreenImageGetter.generateImage(picture.fsPath, picture.lastModificationTimestamp, metadata.rotationId);
+                }
             }
         }
 
@@ -326,8 +349,10 @@ public class PhotatoFilesManager implements Closeable {
             if (findAny.isPresent()) {
                 PhotatoPicture picture = findAny.get();
                 folder.pictures.remove(picture);
+                pathToPictureMap.remove(picture.fsPath);
                 searchManager.removePicture(picture);
-                thumbnailGenerator.deleteResizedPicture(picture.fsPath, picture.lastModificationTimestamp);
+                thumbnailGenerator.deleteThumbnail(picture.fsPath, picture.lastModificationTimestamp);
+                fullScreenImageGetter.deleteImage(picture.fsPath, picture.lastModificationTimestamp);
             }
         }
 
@@ -343,9 +368,12 @@ public class PhotatoFilesManager implements Closeable {
             PhotatoFolder currentFolder = getCurrentFolder(filename);
             if (currentFolder.pictures != null) {
                 for (PhotatoPicture picture : currentFolder.pictures) {
+                    pathToPictureMap.remove(picture.fsPath);
+
                     try {
                         searchManager.removePicture(picture);
-                        thumbnailGenerator.deleteResizedPicture(picture.fsPath, picture.lastModificationTimestamp);
+                        thumbnailGenerator.deleteThumbnail(picture.fsPath, picture.lastModificationTimestamp);
+                        fullScreenImageGetter.deleteImage(picture.fsPath, picture.lastModificationTimestamp);
                     } catch (IOException ex) {
                     }
                 }

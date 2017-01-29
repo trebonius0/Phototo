@@ -20,21 +20,21 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
-import photato.core.resize.IResizedPictureGenerator;
+import photato.core.resize.thumbnails.IThumbnailGenerator;
 
 public class PhotatoFilesManagerTest {
 
-    private static class ThumbnailsGeneratorMock implements IResizedPictureGenerator {
+    private static class ThumbnailsGeneratorMock implements IThumbnailGenerator {
 
         private static final Set<String> thumbnails = new HashSet<>();
 
         @Override
-        public void generateResizedPicture(Path originalFilename, long lastModifiedTimestamp, Metadata metadata) {
+        public void generateThumbnail(Path originalFilename, long lastModifiedTimestamp, Metadata metadata) {
             thumbnails.add(originalFilename.toString());
         }
 
         @Override
-        public void deleteResizedPicture(Path originalFilename, long lastModifiedTimestamp) {
+        public void deleteThumbnail(Path originalFilename, long lastModifiedTimestamp) {
             thumbnails.remove(originalFilename.toString());
         }
 
@@ -43,17 +43,17 @@ public class PhotatoFilesManagerTest {
         }
 
         @Override
-        public String getResizedPictureUrl(Path originalFilename, long lastModifiedTimestamp) {
+        public String getThumbnailUrl(Path originalFilename, long lastModifiedTimestamp) {
             return "/thumbnail/" + originalFilename + "_" + lastModifiedTimestamp;
         }
 
         @Override
-        public int getResizedPictureWidth(int originalWidth, int originalHeight) {
+        public int getThumbnailWidth(int originalWidth, int originalHeight) {
             return 10;
         }
 
         @Override
-        public int getResizedPictureHeight(int originalWidth, int originalHeight) {
+        public int getThumbnailHeight(int originalWidth, int originalHeight) {
             return 20;
         }
 

@@ -3,14 +3,14 @@ package photato;
 import java.nio.file.FileSystem;
 import photato.core.PhotatoFilesManager;
 import photato.core.metadata.MetadataAggregator;
-import photato.core.resize.ThumbnailGenerator;
+import photato.core.resize.thumbnails.ThumbnailGenerator;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.bootstrap.HttpServer;
 import org.apache.http.impl.bootstrap.ServerBootstrap;
-import photato.core.fullscreen.FullScreenImageEntityGetter;
+import photato.core.resize.fullscreen.FullScreenImageGetter;
 import photato.core.metadata.gps.IGpsCoordinatesDescriptionGetter;
 import photato.controllers.CssHandler;
 import photato.controllers.DefaultHandler;
@@ -28,18 +28,23 @@ public class Photato {
 
     public static final String[] supportedPictureExtensions = new String[]{"jpg", "jpeg", "png", "bmp"};
     private static final String serverName = "Photato/1.0";
+    private static final String thumbnailCacheFolder = "cache/thumbnails";
+    private static final String fullscreenCacheFolder = "cache/fullscreen";
 
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
             System.err.println("Usage: <picturesRootFolder>");
             System.exit(-1);
         }
+        
         boolean prefixModeOnly = true;
         boolean indexFolderName = false;
         boolean useParallelThumbnailGeneration = true;
         boolean forceExifToolsDownload = false;
-        boolean pregenerateResizedPictures = true;
         Long resizedPicturesCacheMaxSize = null;
+        int fullSizeQuality = 90;
+        int maxFullSizePictureWitdh = 1800;
+        int maxFullSizePictureHeight = 1200;
         int thumbnailHeight = 170;
         int thumbnailQuality = 80;
 
@@ -55,12 +60,12 @@ public class Photato {
 
         ExifToolDownloader.run(httpClient, fileSystem, forceExifToolsDownload);
 
-        ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, "cache/thumbnails", thumbnailHeight, thumbnailQuality);
+        ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, thumbnailCacheFolder, thumbnailHeight, thumbnailQuality);
         IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(new GpsCoordinatesDescriptionCache("cache/gps.cache"), httpClient);
         MetadataAggregator metadataGetter = new MetadataAggregator(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
-        FullScreenImageEntityGetter fullScreenResizeGenerator = new FullScreenImageEntityGetter(fileSystem, "cache/fullsize");
+        FullScreenImageGetter fullScreenImageGetter = new FullScreenImageGetter(fileSystem, rootFolder, fullscreenCacheFolder, fullSizeQuality, maxFullSizePictureWitdh, maxFullSizePictureHeight, resizedPicturesCacheMaxSize);
 
-        PhotatoFilesManager photatoFilesManager = new PhotatoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, prefixModeOnly, indexFolderName, useParallelThumbnailGeneration);
+        PhotatoFilesManager photatoFilesManager = new PhotatoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, fullScreenImageGetter, prefixModeOnly, indexFolderName, useParallelThumbnailGeneration);
 
         SocketConfig socketConfig = SocketConfig.custom()
                 .setSoTimeout(60000)
@@ -72,10 +77,10 @@ public class Photato {
                 .setServerInfo(serverName)
                 .setSocketConfig(socketConfig)
                 .setExceptionLogger(new StdErrorExceptionLogger())
-                .registerHandler(Routes.fullSizePicturesRootUrl + "/*", new ImageHandler(rootFolder, Routes.fullSizePicturesRootUrl, fullScreenResizeGenerator))
-                .registerHandler(Routes.thumbnailRootUrl + "/*", new ImageHandler(fileSystem.getPath("cache/thumbnails"), Routes.thumbnailRootUrl, null))
+                .registerHandler(Routes.fullSizePicturesRootUrl + "/*", new ImageHandler(fileSystem.getPath(fullscreenCacheFolder), Routes.fullSizePicturesRootUrl, fullScreenImageGetter, photatoFilesManager))
+                .registerHandler(Routes.thumbnailRootUrl + "/*", new ImageHandler(fileSystem.getPath(thumbnailCacheFolder), Routes.thumbnailRootUrl, null, photatoFilesManager))
                 .registerHandler(Routes.listItemsApiUrl, new FolderListHandler(Routes.listItemsApiUrl, rootFolder, photatoFilesManager))
-                .registerHandler("/img/*", new ImageHandler(fileSystem.getPath("www/img"), "/img", null))
+                .registerHandler("/img/*", new ImageHandler(fileSystem.getPath("www/img"), "/img", null, photatoFilesManager))
                 .registerHandler("/js/*", new JsHandler(fileSystem.getPath("www/js"), "/js"))
                 .registerHandler("/css/*", new CssHandler(fileSystem.getPath("www/css"), "/css"))
                 .registerHandler("*", new DefaultHandler(fileSystem.getPath("www")))

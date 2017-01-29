@@ -10,7 +10,6 @@ class PictureInfos {
     public url: string;
     public width: number;
     public height: number;
-    public rotationId: number;
 }
 
 class PhotatoPicturePosition {
@@ -34,7 +33,9 @@ class PhotatoPicture extends PhotatoItem {
 
     public position: PhotatoPicturePosition;
 
-    public picture: PictureInfos;
+    public fullscreenPicture: PictureInfos;
+    
+    public rawPicture: PictureInfos;
 
     public pictureDate: number;
 
