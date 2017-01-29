@@ -30,7 +30,7 @@ public class PhotatoPicture extends PhotatoItem {
     public final PictureInfos fullscreenPicture;
 
     @Expose
-    public final PictureInfos rawPicture;
+    public final PictureInfosWithRotation rawPicture;
 
     public final long lastModificationTimestamp; // This field is used to generated the appropriate thumbnail. It is the modifiaction date on the filesystem
 
@@ -47,7 +47,7 @@ public class PhotatoPicture extends PhotatoItem {
         this.lastModificationTimestamp = lastModificationTimestamp;
         this.pictureDate = metadata.pictureDate;
         this.fullscreenPicture = fullScreenInfos;
-        this.rawPicture = new PictureInfos(Routes.fullSizePicturesRootUrl + "/" + this.path, metadata.width, metadata.height, metadata.rotationId);
+        this.rawPicture = new PictureInfosWithRotation(Routes.fullSizePicturesRootUrl + "/" + this.path, metadata.width, metadata.height, metadata.rotationId);
 
         if (this.filename.length() > 40) {
             this.parentAndName = path.getParent().getFileName().toString();

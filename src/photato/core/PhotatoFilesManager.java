@@ -177,8 +177,8 @@ public class PhotatoFilesManager implements Closeable {
 
                 List<PhotatoPicture> pictures = metadatas.entrySet().parallelStream()
                         .map((Map.Entry<Path, Metadata> entry) -> new PhotatoPicture(this.rootFolder.fsPath, entry.getKey(), entry.getValue(),
-                        new PictureInfos(this.thumbnailGenerator.getThumbnailUrl(entry.getKey(), tryGetLastModifiedTimestamp(entry.getKey())), this.thumbnailGenerator.getThumbnailWidth(entry.getValue().width, entry.getValue().height), this.thumbnailGenerator.getThumbnailHeight(entry.getValue().width, entry.getValue().height), 0),
-                        new PictureInfos(this.fullScreenImageGetter.getImageUrl(entry.getKey(), tryGetLastModifiedTimestamp(entry.getKey())), this.fullScreenImageGetter.getImageWidth(entry.getValue().width, entry.getValue().height), this.fullScreenImageGetter.getImageHeight(entry.getValue().width, entry.getValue().height), 0),
+                        new PictureInfos(this.thumbnailGenerator.getThumbnailUrl(entry.getKey(), tryGetLastModifiedTimestamp(entry.getKey())), this.thumbnailGenerator.getThumbnailWidth(entry.getValue().width, entry.getValue().height), this.thumbnailGenerator.getThumbnailHeight(entry.getValue().width, entry.getValue().height)),
+                        new PictureInfos(this.fullScreenImageGetter.getImageUrl(entry.getKey(), tryGetLastModifiedTimestamp(entry.getKey())), this.fullScreenImageGetter.getImageWidth(entry.getValue().width, entry.getValue().height), this.fullScreenImageGetter.getImageHeight(entry.getValue().width, entry.getValue().height)),
                         tryGetLastModifiedTimestamp(entry.getKey())))
                         .collect(Collectors.toList());
 
@@ -316,8 +316,8 @@ public class PhotatoFilesManager implements Closeable {
             if (folder.pictures.stream().noneMatch((PhotatoPicture p) -> p.fsPath.equals(filename))) {
                 long lastModificationTimestamp = Files.getLastModifiedTime(filename).toMillis();
                 Metadata metadata = metadataAggregator.getMetadata(filename, lastModificationTimestamp);
-                PictureInfos thumbnailInfos = new PictureInfos(thumbnailGenerator.getThumbnailUrl(filename, lastModificationTimestamp), thumbnailGenerator.getThumbnailWidth(metadata.width, metadata.height), thumbnailGenerator.getThumbnailHeight(metadata.width, metadata.height), 0);
-                PictureInfos fullScreenInfos = new PictureInfos(fullScreenImageGetter.getImageUrl(filename, lastModificationTimestamp), fullScreenImageGetter.getImageWidth(metadata.width, metadata.height), fullScreenImageGetter.getImageHeight(metadata.width, metadata.height), 0);
+                PictureInfos thumbnailInfos = new PictureInfos(thumbnailGenerator.getThumbnailUrl(filename, lastModificationTimestamp), thumbnailGenerator.getThumbnailWidth(metadata.width, metadata.height), thumbnailGenerator.getThumbnailHeight(metadata.width, metadata.height));
+                PictureInfos fullScreenInfos = new PictureInfos(fullScreenImageGetter.getImageUrl(filename, lastModificationTimestamp), fullScreenImageGetter.getImageWidth(metadata.width, metadata.height), fullScreenImageGetter.getImageHeight(metadata.width, metadata.height));
                 PhotatoPicture picture = new PhotatoPicture(rootFolder.fsPath, filename, metadataAggregator.getMetadata(filename, lastModificationTimestamp), thumbnailInfos, fullScreenInfos, lastModificationTimestamp);
                 folder.pictures.add(picture);
                 searchManager.addPicture(rootFolder, picture);
