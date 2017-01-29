@@ -45,9 +45,9 @@ public class PhotatoFilesManager implements Closeable {
     private final Map<WatchKey, Path> watchedDirectoriesPaths;
     private final Map<Path, PhotatoPicture> pathToPictureMap;
     private final boolean prefixOnlyMode;
-    private final boolean useParallelThumbnailGeneration;
+    private final boolean useParallelPicturesGeneration;
 
-    public PhotatoFilesManager(Path rootFolder, FileSystem fileSystem, IMetadataAggregator metadataGetter, IThumbnailGenerator thumbnailGenerator, IFullScreenImageGetter fullScreenImageGetter, boolean prefixOnlyMode, boolean indexFolderName, boolean useParallelThumbnailGeneration) throws IOException {
+    public PhotatoFilesManager(Path rootFolder, FileSystem fileSystem, IMetadataAggregator metadataGetter, IThumbnailGenerator thumbnailGenerator, IFullScreenImageGetter fullScreenImageGetter, boolean prefixOnlyMode, boolean indexFolderName, boolean useParallelPicturesGeneration) throws IOException {
         this.fileSystem = fileSystem;
         this.metadataAggregator = metadataGetter;
         this.thumbnailGenerator = thumbnailGenerator;
@@ -55,7 +55,7 @@ public class PhotatoFilesManager implements Closeable {
         this.rootFolder = new PhotatoFolder(rootFolder, rootFolder);
         this.searchManager = new SearchManager(prefixOnlyMode, indexFolderName);
         this.prefixOnlyMode = prefixOnlyMode;
-        this.useParallelThumbnailGeneration = useParallelThumbnailGeneration;
+        this.useParallelPicturesGeneration = useParallelPicturesGeneration;
         this.pathToPictureMap = new HashMap<>();
 
         WatchService watcher = this.fileSystem.newWatchService();
@@ -188,7 +188,7 @@ public class PhotatoFilesManager implements Closeable {
                     pathToPictureMap.put(picture.fsPath, picture);
                 });
 
-                Stream<PhotatoPicture> thumbnailStream = this.useParallelThumbnailGeneration ? pictures.parallelStream() : pictures.stream(); // This could be a parallel stream. However, since thumbnail generation takes a lot of RAM, having it parallel would take too much ram (bad on small machines)
+                Stream<PhotatoPicture> thumbnailStream = this.useParallelPicturesGeneration ? pictures.parallelStream() : pictures.stream(); // This could be a parallel stream. However, since thumbnail generation takes a lot of RAM, having it parallel would take too much ram (bad on small machines)
                 thumbnailStream.forEach((PhotatoPicture picture) -> {
                     try {
                         thumbnailGenerator.generateThumbnail(picture.fsPath, picture.lastModificationTimestamp, metadatas.get(picture.fsPath));

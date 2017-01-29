@@ -39,7 +39,7 @@ public class Photato {
         
         boolean prefixModeOnly = true;
         boolean indexFolderName = false;
-        boolean useParallelThumbnailGeneration = true;
+        boolean useParallelPicturesGeneration = true;
         boolean forceExifToolsDownload = false;
         Long resizedPicturesCacheMaxSize = null;
         int fullSizeQuality = 90;
@@ -65,7 +65,7 @@ public class Photato {
         MetadataAggregator metadataGetter = new MetadataAggregator(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
         FullScreenImageGetter fullScreenImageGetter = new FullScreenImageGetter(fileSystem, rootFolder, fullscreenCacheFolder, fullSizeQuality, maxFullSizePictureWitdh, maxFullSizePictureHeight, resizedPicturesCacheMaxSize);
 
-        PhotatoFilesManager photatoFilesManager = new PhotatoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, fullScreenImageGetter, prefixModeOnly, indexFolderName, useParallelThumbnailGeneration);
+        PhotatoFilesManager photatoFilesManager = new PhotatoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, fullScreenImageGetter, prefixModeOnly, indexFolderName, useParallelPicturesGeneration);
 
         SocketConfig socketConfig = SocketConfig.custom()
                 .setSoTimeout(60000)
