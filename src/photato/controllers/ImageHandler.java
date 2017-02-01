@@ -15,15 +15,10 @@ import photato.helpers.FileHelper;
 import photato.helpers.SafeSimpleDateFormat;
 import java.util.Map;
 import org.apache.http.entity.FileEntity;
-import photato.core.PhotatoFilesManager;
-import photato.core.entities.PhotatoPicture;
-import photato.core.resize.fullscreen.IFullScreenImageGetter;
 
 public class ImageHandler extends FileHandler {
 
     private static final SafeSimpleDateFormat expiresDateFormat;
-    private final IFullScreenImageGetter fullScreenImageEntityGetter;
-    private final PhotatoFilesManager photatoFilesManager;
 
     static {
         expiresDateFormat = new SafeSimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
@@ -31,11 +26,8 @@ public class ImageHandler extends FileHandler {
         expiresDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
-    public ImageHandler(Path folderRoot, String prefix, IFullScreenImageGetter fullScreenEntityGetter, PhotatoFilesManager photatoFilesManager) {
+    public ImageHandler(Path folderRoot, String prefix) {
         super(folderRoot, prefix, Photato.supportedPictureExtensions);
-
-        this.fullScreenImageEntityGetter = fullScreenEntityGetter;
-        this.photatoFilesManager = photatoFilesManager;
     }
 
     @Override
@@ -58,13 +50,7 @@ public class ImageHandler extends FileHandler {
         String extension = FileHelper.getExtension(path);
         ContentType contentType = ContentType.create(getContentType(extension.toLowerCase()));
 
-        PhotatoPicture picture = this.photatoFilesManager.getPicture(localFile.toPath());
-
-        if (this.fullScreenImageEntityGetter != null) {
-            return this.fullScreenImageEntityGetter.getImage(localFile.toPath(), contentType, picture);
-        } else {
-           return new FileEntity(localFile, contentType);
-        }
+        return new FileEntity(localFile, contentType);
     }
 
 }

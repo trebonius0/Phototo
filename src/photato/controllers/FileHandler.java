@@ -28,19 +28,22 @@ public abstract class FileHandler extends PhotatoHandler {
     }
 
     @Override
-    protected Response getResponse(String path, Map<String,String> query) throws Exception {
+    protected final Response getResponse(String path, Map<String, String> query) throws Exception {
         final Path wantedLocally = this.folderRoot.resolve(path);
         if (!wantedLocally.startsWith(this.folderRoot) || Arrays.stream(allowedExtensions).noneMatch(FileHelper.getExtension(path).toLowerCase()::equals)) {
             return PhotatoHandler.http403;
         } else {
-            File wantedLocallyFile = wantedLocally.toFile();
-            if (!wantedLocallyFile.exists()) {
-                return PhotatoHandler.http404;
-            } else if (!wantedLocallyFile.canRead() || wantedLocallyFile.isDirectory()) {
-                return PhotatoHandler.http403;
-            } else {
-                return new Response(HttpStatus.SC_OK, this.getEntity(path, query, wantedLocallyFile), this.getHeaders());
-            }
+            return this.getResponse(path, query, wantedLocally.toFile());
+        }
+    }
+
+    protected Response getResponse(String path, Map<String, String> query, File wantedLocallyFile) throws Exception {
+        if (!wantedLocallyFile.exists()) {
+            return PhotatoHandler.http404;
+        } else if (!wantedLocallyFile.canRead() || wantedLocallyFile.isDirectory()) {
+            return PhotatoHandler.http403;
+        } else {
+            return new Response(HttpStatus.SC_OK, this.getEntity(path, query, wantedLocallyFile), this.getHeaders());
         }
     }
 
@@ -50,7 +53,7 @@ public abstract class FileHandler extends PhotatoHandler {
         return new Header[0];
     }
 
-    protected HttpEntity getEntity(String path, Map<String,String> query, File localFile) throws IOException {
+    protected HttpEntity getEntity(String path, Map<String, String> query, File localFile) throws IOException {
         String extension = FileHelper.getExtension(path);
         return new FileEntity(localFile, ContentType.create(getContentType(extension.toLowerCase())));
     }

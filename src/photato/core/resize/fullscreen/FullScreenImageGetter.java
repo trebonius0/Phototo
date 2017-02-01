@@ -23,24 +23,24 @@ public class FullScreenImageGetter extends ResizedImageGenerator implements IFul
     }
 
     @Override
-    public void generateImage(Path localFile, long lastModifiedTimestamp, int rotationId) throws IOException {
-        this.generateResizedPicture(localFile, lastModifiedTimestamp, rotationId);
+    public void generateImage(PhotatoPicture picture) throws IOException {
+        this.generateResizedPicture(picture.fsPath, picture.lastModificationTimestamp, picture.rawPicture.rotationId);
     }
 
     @Override
-    public void deleteImage(Path localFile, long lastModifiedTimestamp) throws IOException {
-        this.deleteResizedPicture(localFile, lastModifiedTimestamp);
+    public void deleteImage(PhotatoPicture picture) throws IOException {
+        this.deleteResizedPicture(picture.fsPath, picture.lastModificationTimestamp);
     }
 
     @Override
-    public FileEntity getImage(Path localFile, ContentType contentType, PhotatoPicture picture) throws IOException {
-        this.generateImage(localFile, picture.lastModificationTimestamp, picture.rawPicture.rotationId);
-        return new FileEntity(this.fileSystem.getPath(this.resizedPicturesFolder.toString(), this.getResizedPictureFilename(localFile, picture.lastModificationTimestamp)).toFile(), contentType);
+    public FileEntity getImage(PhotatoPicture picture, ContentType contentType) throws IOException {
+        this.generateImage(picture);
+        return new FileEntity(this.fileSystem.getPath(this.resizedPicturesFolder.toString(), this.getResizedPictureFilename(picture.fsPath, picture.lastModificationTimestamp)).toFile(), contentType);
     }
 
     @Override
-    public final String getImageUrl(Path originalFilename, long lastModifiedTimestamp) {
-        return Routes.fullSizePicturesRootUrl + "/" + this.getResizedPictureFilename(originalFilename, lastModifiedTimestamp);
+    public final String getImageUrl(Path originalFilename, long lastModificationTimestamp) {
+        return Routes.fullSizePicturesRootUrl + "/" + this.getResizedPictureFilename(originalFilename, lastModificationTimestamp);
     }
 
     @Override

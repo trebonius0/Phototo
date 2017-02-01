@@ -8,11 +8,11 @@ import photato.core.entities.PhotatoPicture;
 
 public interface IFullScreenImageGetter {
 
-    void generateImage(Path localFile, long lastModifiedTimestamp, int rotationId) throws IOException;
+    void generateImage(PhotatoPicture picture) throws IOException;
 
-    void deleteImage(Path localFile, long lastModifiedTimestamp) throws IOException;
+    void deleteImage(PhotatoPicture picture) throws IOException;
 
-    FileEntity getImage(Path localFile, ContentType contentType, PhotatoPicture picture) throws IOException;
+    FileEntity getImage(PhotatoPicture picture, ContentType contentType) throws IOException;
 
     String getImageUrl(Path originalFilename, long lastModifiedTimestamp);
 

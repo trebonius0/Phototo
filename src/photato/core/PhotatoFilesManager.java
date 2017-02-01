@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -43,7 +44,7 @@ public class PhotatoFilesManager implements Closeable {
     private final WatchServiceThread watchServiceThread;
     private final Map<Path, WatchKey> watchedDirectoriesKeys;
     private final Map<WatchKey, Path> watchedDirectoriesPaths;
-    private final Map<Path, PhotatoPicture> pathToPictureMap;
+    private final Map<String, PhotatoPicture> pictureHashUrlToPictureMap;
     private final boolean prefixOnlyMode;
     private final boolean useParallelPicturesGeneration;
 
@@ -56,7 +57,7 @@ public class PhotatoFilesManager implements Closeable {
         this.searchManager = new SearchManager(prefixOnlyMode, indexFolderName);
         this.prefixOnlyMode = prefixOnlyMode;
         this.useParallelPicturesGeneration = useParallelPicturesGeneration;
-        this.pathToPictureMap = new HashMap<>();
+        this.pictureHashUrlToPictureMap = new HashMap<>();
 
         WatchService watcher = this.fileSystem.newWatchService();
         this.watchedDirectoriesKeys = new HashMap<>();
@@ -86,8 +87,8 @@ public class PhotatoFilesManager implements Closeable {
         }
     }
 
-    public PhotatoPicture getPicture(Path pictureFsPath) {
-        return this.pathToPictureMap.get(pictureFsPath);
+    public PhotatoPicture getPictureFromHashUrl(String hashUrl) {
+        return this.pictureHashUrlToPictureMap.get(hashUrl);
     }
 
     public List<PhotatoPicture> searchPicturesInFolder(String folder, String searchQuery) {
@@ -185,7 +186,7 @@ public class PhotatoFilesManager implements Closeable {
                 pictures.forEach((PhotatoPicture picture) -> {
                     currentFolder.pictures.add(picture);
                     searchManager.addPicture(rootFolder, picture);
-                    pathToPictureMap.put(picture.fsPath, picture);
+                    pictureHashUrlToPictureMap.put(Paths.get(picture.fullscreenPicture.url).getFileName().toString(), picture);
                 });
 
                 Stream<PhotatoPicture> thumbnailStream = this.useParallelPicturesGeneration ? pictures.parallelStream() : pictures.stream(); // This could be a parallel stream. However, since thumbnail generation takes a lot of RAM, having it parallel would take too much ram (bad on small machines)
@@ -194,7 +195,7 @@ public class PhotatoFilesManager implements Closeable {
                         thumbnailGenerator.generateThumbnail(picture.fsPath, picture.lastModificationTimestamp, metadatas.get(picture.fsPath));
 
                         if (fullScreenImageGetter.precomputationsEnabled()) {
-                            fullScreenImageGetter.generateImage(picture.fsPath, picture.lastModificationTimestamp, metadatas.get(picture.fsPath).rotationId);
+                            fullScreenImageGetter.generateImage(picture);
                         }
                     } catch (IOException ex) {
                         ex.printStackTrace();
@@ -321,11 +322,11 @@ public class PhotatoFilesManager implements Closeable {
                 PhotatoPicture picture = new PhotatoPicture(rootFolder.fsPath, filename, metadataAggregator.getMetadata(filename, lastModificationTimestamp), thumbnailInfos, fullScreenInfos, lastModificationTimestamp);
                 folder.pictures.add(picture);
                 searchManager.addPicture(rootFolder, picture);
-                pathToPictureMap.put(picture.fsPath, picture);
+                pictureHashUrlToPictureMap.put(Paths.get(picture.fullscreenPicture.url).getFileName().toString(), picture);
                 thumbnailGenerator.generateThumbnail(picture.fsPath, picture.lastModificationTimestamp, metadata);
 
                 if (fullScreenImageGetter.precomputationsEnabled()) {
-                    fullScreenImageGetter.generateImage(picture.fsPath, picture.lastModificationTimestamp, metadata.rotationId);
+                    fullScreenImageGetter.generateImage(picture);
                 }
             }
         }
@@ -349,10 +350,10 @@ public class PhotatoFilesManager implements Closeable {
             if (findAny.isPresent()) {
                 PhotatoPicture picture = findAny.get();
                 folder.pictures.remove(picture);
-                pathToPictureMap.remove(picture.fsPath);
+                pictureHashUrlToPictureMap.remove(Paths.get(picture.fullscreenPicture.url).getFileName().toString());
                 searchManager.removePicture(picture);
                 thumbnailGenerator.deleteThumbnail(picture.fsPath, picture.lastModificationTimestamp);
-                fullScreenImageGetter.deleteImage(picture.fsPath, picture.lastModificationTimestamp);
+                fullScreenImageGetter.deleteImage(picture);
             }
         }
 
@@ -368,12 +369,12 @@ public class PhotatoFilesManager implements Closeable {
             PhotatoFolder currentFolder = getCurrentFolder(filename);
             if (currentFolder.pictures != null) {
                 for (PhotatoPicture picture : currentFolder.pictures) {
-                    pathToPictureMap.remove(picture.fsPath);
+                    pictureHashUrlToPictureMap.remove(Paths.get(picture.fullscreenPicture.url).getFileName().toString());
 
                     try {
                         searchManager.removePicture(picture);
                         thumbnailGenerator.deleteThumbnail(picture.fsPath, picture.lastModificationTimestamp);
-                        fullScreenImageGetter.deleteImage(picture.fsPath, picture.lastModificationTimestamp);
+                        fullScreenImageGetter.deleteImage(picture);
                     } catch (IOException ex) {
                     }
                 }

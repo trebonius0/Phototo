@@ -23,6 +23,7 @@ import photato.core.metadata.gps.OSMGpsCoordinatesDescriptionGetter;
 import java.nio.file.Path;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import photato.controllers.FullScreenImageHandler;
 
 public class Photato {
 
@@ -36,7 +37,7 @@ public class Photato {
             System.err.println("Usage: <picturesRootFolder>");
             System.exit(-1);
         }
-        
+
         boolean prefixModeOnly = true;
         boolean indexFolderName = false;
         boolean useParallelPicturesGeneration = true;
@@ -77,10 +78,10 @@ public class Photato {
                 .setServerInfo(serverName)
                 .setSocketConfig(socketConfig)
                 .setExceptionLogger(new StdErrorExceptionLogger())
-                .registerHandler(Routes.fullSizePicturesRootUrl + "/*", new ImageHandler(fileSystem.getPath(fullscreenCacheFolder), Routes.fullSizePicturesRootUrl, fullScreenImageGetter, photatoFilesManager))
-                .registerHandler(Routes.thumbnailRootUrl + "/*", new ImageHandler(fileSystem.getPath(thumbnailCacheFolder), Routes.thumbnailRootUrl, null, photatoFilesManager))
+                .registerHandler(Routes.fullSizePicturesRootUrl + "/*", new FullScreenImageHandler(fileSystem.getPath(fullscreenCacheFolder), Routes.fullSizePicturesRootUrl, fullScreenImageGetter, photatoFilesManager))
+                .registerHandler(Routes.thumbnailRootUrl + "/*", new ImageHandler(fileSystem.getPath(thumbnailCacheFolder), Routes.thumbnailRootUrl))
                 .registerHandler(Routes.listItemsApiUrl, new FolderListHandler(Routes.listItemsApiUrl, rootFolder, photatoFilesManager))
-                .registerHandler("/img/*", new ImageHandler(fileSystem.getPath("www/img"), "/img", null, photatoFilesManager))
+                .registerHandler("/img/*", new ImageHandler(fileSystem.getPath("www/img"), "/img"))
                 .registerHandler("/js/*", new JsHandler(fileSystem.getPath("www/js"), "/js"))
                 .registerHandler("/css/*", new CssHandler(fileSystem.getPath("www/css"), "/css"))
                 .registerHandler("*", new DefaultHandler(fileSystem.getPath("www")))
