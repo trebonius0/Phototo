@@ -2,12 +2,15 @@ package photato.core.resize.fullscreen;
 
 import java.io.IOException;
 import java.nio.file.FileSystem;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
 import photato.Routes;
 import photato.core.entities.PhotatoPicture;
 import photato.core.resize.ResizedImageGenerator;
+import photato.helpers.LRUSet;
 
 public class FullScreenImageGetter extends ResizedImageGenerator implements IFullScreenImageGetter {
 
@@ -15,6 +18,7 @@ public class FullScreenImageGetter extends ResizedImageGenerator implements IFul
     private final boolean precomputationsEnabled;
     private final int maxPictureWidth;
     private final int maxPictureHeight;
+    private final LRUSet<Path> picturesLRUSet;
 
     public FullScreenImageGetter(FileSystem fileSystem, Path rootFolder, String cacheFolderName, int wantedQuality, int maxPictureWidth, int maxPictureHeight, Long maxCacheSize, boolean precomputationsEnabled) throws IOException {
         super(fileSystem, rootFolder, cacheFolderName, wantedQuality, false);
@@ -22,15 +26,46 @@ public class FullScreenImageGetter extends ResizedImageGenerator implements IFul
         this.precomputationsEnabled = precomputationsEnabled;
         this.maxPictureHeight = maxPictureHeight;
         this.maxPictureWidth = maxPictureWidth;
+
+        if (maxCacheSize == null) {
+            this.picturesLRUSet = null;
+        } else {
+            this.picturesLRUSet = new LRUSet<>();
+            try {
+                for (Path path : Files.list(this.resizedPicturesFolder).collect(Collectors.toList())) {
+                    long fileSize = Files.size(path);
+                    this.picturesLRUSet.add(path, fileSize);
+                }
+                
+                this.cleanLRUCache();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
     }
 
     @Override
     public void generateImage(PhotatoPicture picture) throws IOException {
-        this.generateResizedPicture(picture.fsPath, picture.lastModificationTimestamp, picture.rotationId);
+        this.cleanLRUCache();
+
+        boolean hasGeneratedNewPicture = this.generateResizedPicture(picture.fsPath, picture.lastModificationTimestamp, picture.rotationId);
+
+        if (this.maxCacheSize != null) {
+            Path resizedPicturePath = this.getResizedPicturePath(picture.fsPath, picture.lastModificationTimestamp);
+            if (hasGeneratedNewPicture) {
+                this.picturesLRUSet.add(resizedPicturePath, Files.size(resizedPicturePath));
+            } else {
+                this.picturesLRUSet.ping(resizedPicturePath);
+            }
+        }
+
     }
 
     @Override
     public void deleteImage(PhotatoPicture picture) throws IOException {
+        if (this.picturesLRUSet != null) {
+            this.picturesLRUSet.remove(picture.fsPath);
+        }
         this.deleteResizedPicture(picture.fsPath, picture.lastModificationTimestamp);
     }
 
@@ -82,6 +117,15 @@ public class FullScreenImageGetter extends ResizedImageGenerator implements IFul
     @Override
     public boolean precomputationsEnabled() {
         return this.precomputationsEnabled;
+    }
+
+    private void cleanLRUCache() throws IOException {
+        if (this.maxCacheSize != null) {
+            while (this.picturesLRUSet.totalWeight() >= this.maxCacheSize) {
+                Path lastPicture = this.picturesLRUSet.removeLast();
+                this.deleteResizedPicture(lastPicture, Files.getLastModifiedTime(lastPicture).toMillis());
+            }
+        }
     }
 
 }

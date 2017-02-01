@@ -42,7 +42,7 @@ public class Photato {
         boolean indexFolderName = false;
         boolean useParallelPicturesGeneration = true;
         boolean forceExifToolsDownload = false;
-        Long resizedPicturesCacheMaxSize = null;
+        Long resizedPicturesCacheMaxSize = 1024 * 1024 * 1024L;
         boolean fullscreenImagePrecomputationEnabled = true;
         int fullSizeQuality = 90;
         int maxFullSizePictureWitdh = 1800;

@@ -46,11 +46,11 @@ public abstract class ResizedImageGenerator {
     }
 
     /**
-     * Generate a resizedPicture
-     * return true if the picture has been properly regenerated, false if it already existed
+     * Generate a resizedPicture return true if the picture has been properly
+     * regenerated, false if it already existed
      */
     protected final boolean generateResizedPicture(Path originalFilename, long lastModifiedTimestamp, int rotationId) throws IOException {
-        Path path = this.resizedPicturesFolder.resolve(getResizedPictureFilename(originalFilename, lastModifiedTimestamp));
+        Path path = this.getResizedPicturePath(originalFilename, lastModifiedTimestamp);
 
         synchronized (this.lock) {
             if (resizedPicturesSet.contains(path)) {
@@ -85,12 +85,15 @@ public abstract class ResizedImageGenerator {
         }
     }
 
+    protected final Path getResizedPicturePath(Path originalFilename, long lastModifiedTimestamp) {
+        return this.resizedPicturesFolder.resolve(getResizedPictureFilename(originalFilename, lastModifiedTimestamp));
+    }
 
     protected final String getResizedPictureFilename(Path originalFilename, long lastModifiedTimestamp) {
         String src = originalFilename.toAbsolutePath() + "_" + lastModifiedTimestamp;
         return Md5.encodeString(src) + ".jpg";
     }
-    
+
     protected abstract int getResizedPictureWidth(int originalWidth, int originalHeight);
 
     protected abstract int getResizedPictureHeight(int originalWidth, int originalHeight);
