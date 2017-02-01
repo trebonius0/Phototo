@@ -24,7 +24,7 @@ public class FullScreenImageGetter extends ResizedImageGenerator implements IFul
 
     @Override
     public void generateImage(PhotatoPicture picture) throws IOException {
-        this.generateResizedPicture(picture.fsPath, picture.lastModificationTimestamp, picture.rawPicture.rotationId);
+        this.generateResizedPicture(picture.fsPath, picture.lastModificationTimestamp, picture.rotationId);
     }
 
     @Override
