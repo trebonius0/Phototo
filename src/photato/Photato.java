@@ -43,6 +43,7 @@ public class Photato {
         boolean useParallelPicturesGeneration = true;
         boolean forceExifToolsDownload = false;
         Long resizedPicturesCacheMaxSize = null;
+        boolean fullscreenImagePrecomputationEnabled = true;
         int fullSizeQuality = 90;
         int maxFullSizePictureWitdh = 1800;
         int maxFullSizePictureHeight = 1200;
@@ -64,7 +65,7 @@ public class Photato {
         ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, thumbnailCacheFolder, thumbnailHeight, thumbnailQuality);
         IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(new GpsCoordinatesDescriptionCache("cache/gps.cache"), httpClient);
         MetadataAggregator metadataGetter = new MetadataAggregator(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
-        FullScreenImageGetter fullScreenImageGetter = new FullScreenImageGetter(fileSystem, rootFolder, fullscreenCacheFolder, fullSizeQuality, maxFullSizePictureWitdh, maxFullSizePictureHeight, resizedPicturesCacheMaxSize);
+        FullScreenImageGetter fullScreenImageGetter = new FullScreenImageGetter(fileSystem, rootFolder, fullscreenCacheFolder, fullSizeQuality, maxFullSizePictureWitdh, maxFullSizePictureHeight, resizedPicturesCacheMaxSize, fullscreenImagePrecomputationEnabled);
 
         PhotatoFilesManager photatoFilesManager = new PhotatoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, fullScreenImageGetter, prefixModeOnly, indexFolderName, useParallelPicturesGeneration);
 
