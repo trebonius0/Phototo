@@ -47,7 +47,7 @@ public class PhotatoPicture extends PhotatoItem {
         this.lastModificationTimestamp = lastModificationTimestamp;
         this.pictureDate = metadata.pictureDate;
         this.fullscreenPicture = fullScreenInfos;
-        this.rawPicture = new PictureInfosWithRotation(Routes.fullSizePicturesRootUrl + "/" + this.path, metadata.width, metadata.height, metadata.rotationId);
+        this.rawPicture = new PictureInfosWithRotation(Routes.rawPicturesRootUrl + "/" + this.path, metadata.width, metadata.height, metadata.rotationId);
 
         if (this.filename.length() > 40) {
             this.parentAndName = path.getParent().getFileName().toString();

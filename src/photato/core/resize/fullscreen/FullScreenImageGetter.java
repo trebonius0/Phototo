@@ -40,7 +40,7 @@ public class FullScreenImageGetter extends ResizedImageGenerator implements IFul
 
     @Override
     public final String getImageUrl(Path originalFilename, long lastModificationTimestamp) {
-        return Routes.fullSizePicturesRootUrl + "/" + this.getResizedPictureFilename(originalFilename, lastModificationTimestamp);
+        return Routes.fullScreenPicturesRootUrl + "/" + this.getResizedPictureFilename(originalFilename, lastModificationTimestamp);
     }
 
     @Override
