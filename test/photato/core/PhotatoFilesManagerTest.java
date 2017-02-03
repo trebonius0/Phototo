@@ -3,6 +3,7 @@ package photato.core;
 import photato.core.PhotatoFilesManager;
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
+import java.io.IOException;
 import photato.core.entities.PhotatoFolder;
 import photato.core.entities.PhotatoPicture;
 import photato.core.metadata.IMetadataAggregator;
@@ -18,8 +19,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.FileEntity;
 import org.junit.Assert;
 import org.junit.Test;
+import photato.core.resize.fullscreen.IFullScreenImageGetter;
 import photato.core.resize.thumbnails.IThumbnailGenerator;
 
 public class PhotatoFilesManagerTest {
@@ -96,6 +100,43 @@ public class PhotatoFilesManagerTest {
 
     }
 
+    private static class FullScreenGetterMock implements IFullScreenImageGetter {
+
+        @Override
+        public void generateImage(PhotatoPicture picture) throws IOException {
+        }
+
+        @Override
+        public void deleteImage(PhotatoPicture picture) throws IOException {
+        }
+
+        @Override
+        public FileEntity getImage(PhotatoPicture picture, ContentType contentType) throws IOException {
+            return null;
+        }
+
+        @Override
+        public String getImageUrl(Path originalFilename, long lastModifiedTimestamp) {
+            return "";
+        }
+
+        @Override
+        public int getImageWidth(int originalWidth, int originalHeight) {
+            return 10;
+        }
+
+        @Override
+        public int getImageHeight(int originalWidth, int originalHeight) {
+            return 10;
+        }
+
+        @Override
+        public boolean precomputationsEnabled() {
+            return true;
+        }
+
+    }
+
     @Test
     public void test() throws Exception {
         String rootFolder = "/home/myself/images";
@@ -103,6 +144,7 @@ public class PhotatoFilesManagerTest {
 
         MetadataGetterMock metadataGetterMock = new MetadataGetterMock();
         ThumbnailsGeneratorMock thumbnailsGeneratorMock = new ThumbnailsGeneratorMock();
+        FullScreenGetterMock fullScreenGetterMock = new FullScreenGetterMock();
 
         try (FileSystem fileSystem = Jimfs.newFileSystem(Configuration.unix())) {
             Files.deleteIfExists(fileSystem.getPath(rootFolder));
@@ -134,7 +176,7 @@ public class PhotatoFilesManagerTest {
             metadataGetterMock.addMetadata(photatoPicture2, "Québec");
             metadataGetterMock.addMetadata(photatoPicture2, "Canada");
 
-            try (PhotatoFilesManager photatoFilesManager = new PhotatoFilesManager(fileSystem.getPath(rootFolder), fileSystem, metadataGetterMock, thumbnailsGeneratorMock, true, true, false)) {
+            try (PhotatoFilesManager photatoFilesManager = new PhotatoFilesManager(fileSystem.getPath(rootFolder), fileSystem, metadataGetterMock, thumbnailsGeneratorMock, fullScreenGetterMock, true, true, false)) {
                 // TEST SEARCH
                 List<PhotatoPicture> res = photatoFilesManager.searchPicturesInFolder("/home/myself/images", "pierre-arthur");
                 Assert.assertEquals(2, res.size());
