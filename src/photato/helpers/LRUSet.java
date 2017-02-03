@@ -110,6 +110,8 @@ public class LRUSet<T> {
         Node<T> firstNext = this.firstNode.next;
         this.firstNode.next = n;
         firstNext.previous = n;
+        n.previous = this.firstNode;
+        n.next = firstNext;
 
     }
 
