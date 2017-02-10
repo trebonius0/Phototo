@@ -38,18 +38,6 @@ public class Photato {
             System.exit(-1);
         }
 
-        boolean prefixModeOnly = true;
-        boolean indexFolderName = false;
-        boolean useParallelPicturesGeneration = true;
-        boolean forceExifToolsDownload = false;
-        Long resizedPicturesCacheMaxSize = 1024 * 1024 * 1024L;
-        boolean fullscreenImagePrecomputationEnabled = true;
-        int fullSizeQuality = 90;
-        int maxFullSizePictureWitdh = 1800;
-        int maxFullSizePictureHeight = 1200;
-        int thumbnailHeight = 170;
-        int thumbnailQuality = 80;
-
         FileSystem fileSystem = FileSystems.getDefault();
         Path rootFolder = getRootFolder(fileSystem, args[0]);
         System.out.println("Starting exploration of folder " + rootFolder + "...");
@@ -60,14 +48,14 @@ public class Photato {
 
         HttpClient httpClient = HttpClientBuilder.create().setUserAgent(serverName).build();
 
-        ExifToolDownloader.run(httpClient, fileSystem, forceExifToolsDownload);
+        ExifToolDownloader.run(httpClient, fileSystem, PhotatoConfig.forceExifToolsDownload);
 
-        ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, thumbnailCacheFolder, thumbnailHeight, thumbnailQuality);
+        ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, thumbnailCacheFolder, PhotatoConfig.thumbnailHeight, PhotatoConfig.thumbnailQuality);
         IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(new GpsCoordinatesDescriptionCache("cache/gps.cache"), httpClient);
         MetadataAggregator metadataGetter = new MetadataAggregator(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
-        FullScreenImageGetter fullScreenImageGetter = new FullScreenImageGetter(fileSystem, rootFolder, fullscreenCacheFolder, fullSizeQuality, maxFullSizePictureWitdh, maxFullSizePictureHeight, resizedPicturesCacheMaxSize, fullscreenImagePrecomputationEnabled);
+        FullScreenImageGetter fullScreenImageGetter = new FullScreenImageGetter(fileSystem, rootFolder, fullscreenCacheFolder, PhotatoConfig.fullSizeQuality, PhotatoConfig.maxFullSizePictureWitdh, PhotatoConfig.maxFullSizePictureHeight, PhotatoConfig.resizedPicturesCacheMaxSize, PhotatoConfig.fullscreenImagePrecomputationEnabled);
 
-        PhotatoFilesManager photatoFilesManager = new PhotatoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, fullScreenImageGetter, prefixModeOnly, indexFolderName, useParallelPicturesGeneration);
+        PhotatoFilesManager photatoFilesManager = new PhotatoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, fullScreenImageGetter, PhotatoConfig.prefixModeOnly, PhotatoConfig.indexFolderName, PhotatoConfig.useParallelPicturesGeneration);
 
         SocketConfig socketConfig = SocketConfig.custom()
                 .setSoTimeout(60000)
