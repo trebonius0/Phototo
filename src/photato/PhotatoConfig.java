@@ -8,9 +8,9 @@ public class PhotatoConfig {
     public static boolean forceExifToolsDownload = false;
     public static Long resizedPicturesCacheMaxSize = 1024 * 1024 * 1024L;
     public static boolean fullscreenImagePrecomputationEnabled = true;
-    public static int fullSizeQuality = 90;
-    public static int maxFullSizePictureWitdh = 1800;
-    public static int maxFullSizePictureHeight = 1200;
+    public static int fullScreenPictureQuality = 90;
+    public static int maxFullScreenPictureWitdh = 1800;
+    public static int maxFullScreenPictureHeight = 1200;
     public static int thumbnailHeight = 170;
     public static int thumbnailQuality = 80;
 }

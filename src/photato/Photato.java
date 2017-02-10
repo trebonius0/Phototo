@@ -53,7 +53,7 @@ public class Photato {
         ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, thumbnailCacheFolder, PhotatoConfig.thumbnailHeight, PhotatoConfig.thumbnailQuality);
         IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(new GpsCoordinatesDescriptionCache("cache/gps.cache"), httpClient);
         MetadataAggregator metadataGetter = new MetadataAggregator(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
-        FullScreenImageGetter fullScreenImageGetter = new FullScreenImageGetter(fileSystem, rootFolder, fullscreenCacheFolder, PhotatoConfig.fullSizeQuality, PhotatoConfig.maxFullSizePictureWitdh, PhotatoConfig.maxFullSizePictureHeight, PhotatoConfig.resizedPicturesCacheMaxSize, PhotatoConfig.fullscreenImagePrecomputationEnabled);
+        FullScreenImageGetter fullScreenImageGetter = new FullScreenImageGetter(fileSystem, rootFolder, fullscreenCacheFolder, PhotatoConfig.fullScreenPictureQuality, PhotatoConfig.maxFullScreenPictureWitdh, PhotatoConfig.maxFullScreenPictureHeight, PhotatoConfig.resizedPicturesCacheMaxSize, PhotatoConfig.fullscreenImagePrecomputationEnabled);
 
         PhotatoFilesManager photatoFilesManager = new PhotatoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, fullScreenImageGetter, PhotatoConfig.prefixModeOnly, PhotatoConfig.indexFolderName, PhotatoConfig.useParallelPicturesGeneration);
 
