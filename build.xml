@@ -68,7 +68,7 @@
     <target name="-pre-init" depends="-use-ivy-junit"/>
     
     <target name="-post-jar">
-
+        <echo message="Creating release ZIP for ${application.title}"/>
         <property name="store.jar.name" value="Photato-Release"/>
 
         <property name="store.dir" value="dist"/>
@@ -76,7 +76,7 @@
 
         <echo message="Packaging ${application.title} into a single JAR at ${store.jar}"/>
 
-        <jar destfile="${store.dir}/temp_final.jar" filesetmanifest="skip">
+        <jar destfile="${store.jar}" filesetmanifest="skip">
             <zipgroupfileset dir="dist" includes="*.jar"/>
             <zipgroupfileset dir="dist/lib" includes="*.jar"/>
 
@@ -84,12 +84,14 @@
                 <attribute name="Main-Class" value="${main.class}"/>
             </manifest>
         </jar>
-
-        <zip destfile="${store.jar}">
-            <zipfileset src="${store.dir}/temp_final.jar"
-                        excludes="META-INF/*.SF, META-INF/*.DSA, META-INF/*.RSA"/>
+        
+        <zip destfile="${store.dir}/${store.jar.name}.zip">
+            <fileset dir="." includes="www/**/*.html"/>
+            <fileset dir="." includes="www/**/*.js"/>
+            <fileset dir="." includes="www/**/*.css"/>
+            <fileset dir="." includes="start.cmd"/>
+            <fileset dir="${store.dir}" includes="${store.jar.name}.jar"/>
         </zip>
-
-        <delete file="${store.dir}/temp_final.jar"/>
+        <delete file="${store.dir}/${store.jar.name}.jar"/>
     </target>
 </project>
