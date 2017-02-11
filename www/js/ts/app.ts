@@ -128,8 +128,25 @@ class GalleryViewModel {
     }
 
 
-    public openFullScreenDisplay(pictureIndex: number): void {
-     
+    public openLightGallery(pictureIndex: number): void {
+        var dynamicEl: any[] = this.allPictures().map((picture: PhotatoPicture) => {
+            return {
+                src: picture.fullscreenPicture.url,
+                thumb: picture.thumbnail.url,
+                subHtml: picture.title
+            }
+        });
+        
+        // Light gallery reset
+        $('#lightgallery').remove();
+        $('body').append('<div id="lightgallery"></div>');
+
+        (<any>$('#lightgallery')).lightGallery({
+            dynamic: true,
+            dynamicEl: dynamicEl,
+            
+            index: pictureIndex,
+        });
     }
 
 
