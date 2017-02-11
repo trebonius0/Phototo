@@ -3,7 +3,6 @@
 /// <reference path="entities.ts" />
 /// <reference path="breadcrumb.ts" />
 /// <reference path="layout.ts" />
-/// <reference path="fullScreen.ts" />
 /// <reference path="historyState.ts" />
 
 class GalleryViewModel {
@@ -15,10 +14,7 @@ class GalleryViewModel {
     public currentSearchQuery: KnockoutObservable<string>;
     public currentPageTitle: KnockoutComputed<string>;
     public breadcrumbs: KnockoutComputed<Breadcrumb[]>;
-    public fullscreenPictureIndex: KnockoutObservable<number>;
-    public fullscreenPicture: KnockoutComputed<PhotatoPicture>;
     private layoutManager: LayoutManager;
-    private fullScreenManager: FullScreenManager;
     private currentAjaxRequest: any;
     private allPictures: KnockoutObservableArray<PhotatoPicture>;
     private displayedPicturesCount: KnockoutObservable<number>;
@@ -42,14 +38,6 @@ class GalleryViewModel {
             }
         });
 
-        this.fullscreenPictureIndex = ko.observable<number>(-1);
-        this.fullscreenPicture = ko.computed<PhotatoPicture>(() => {
-            if (this.fullscreenPictureIndex() === -1) {
-                return null;
-            } else {
-                return <PhotatoPicture>this.pictures()[this.fullscreenPictureIndex()];
-            }
-        });
 
         this.breadcrumbs = ko.computed<Breadcrumb[]>(() => {
             var result: Breadcrumb[] = [new Breadcrumb("Home", "")];
@@ -81,12 +69,9 @@ class GalleryViewModel {
         }
 
         this.layoutManager = new LayoutManager('#pictures-gallery', 3);
-        this.fullScreenManager = new FullScreenManager(this.fullscreenPicture);
 
         this.initOnPopState();
-        this.registerKeysEvents();
         this.registerOnScrollEvents();
-        this.initSwipeDetection();
     }
 
     public runSearchFromForm(searchElement: any): void {
@@ -109,8 +94,6 @@ class GalleryViewModel {
     }
 
     private doAjaxRequest(folder: string, query: string, saveInHistory: boolean) {
-        this.closeFullScreenDisplay();
-
         if (saveInHistory) {
             this.pushState(folder, query, false);
         }
@@ -144,36 +127,11 @@ class GalleryViewModel {
             });
     }
 
-    public moveToPreviousPicture(): void {
-        if (this.fullscreenPictureIndex() >= 0) {
-            if (this.fullscreenPictureIndex() == 0) {
-                this.moveToPicture(this.pictures().length - 1);
-            } else {
-                this.moveToPicture(this.fullscreenPictureIndex() - 1);
-            }
-        }
-    }
-
-    public moveToNextPicture(): void {
-        if (this.fullscreenPictureIndex() >= 0) {
-            this.moveToPicture((this.fullscreenPictureIndex() + 1) % this.pictures().length);
-        }
-    }
-
-    private moveToPicture(index: number): void {
-        this.fullscreenPictureIndex(index);
-        this.fullScreenManager.loadImage();
-    }
 
     public openFullScreenDisplay(pictureIndex: number): void {
-        this.pushState(this.currentFolder(), this.currentSearchQuery(), true);
-        this.fullscreenPictureIndex(pictureIndex);
-        this.fullScreenManager.loadImage();
+     
     }
 
-    public closeFullScreenDisplay(): void {
-        this.fullscreenPictureIndex(-1);
-    }
 
     private static getUrlParameter(wantedParameter: string): string {
         var sPageURL: string = decodeURIComponent(window.location.search.substring(1));
@@ -199,11 +157,11 @@ class GalleryViewModel {
                 newFullScreenOpened = false;
             }
 
-            var state: HistoryState = <HistoryState>{ currentSearchQuery: this.currentSearchQuery(), currentFolder: this.currentFolder(), fullScreenOpened: !!this.fullscreenPicture() || (history.state && history.state.fullScreenOpened), allPictures: this.allPictures(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount() };
+            var state: HistoryState = <HistoryState>{ currentSearchQuery: this.currentSearchQuery(), currentFolder: this.currentFolder(), allPictures: this.allPictures(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount() };
             var newState = { currentSearchQuery: newSearchQuery, currentFolder: newFolder, fullScreenOpened: newFullScreenOpened };
             history.replaceState(state, null, null);
 
-            if (newState.currentSearchQuery !== state.currentSearchQuery || newState.currentFolder !== state.currentFolder || newState.fullScreenOpened !== state.fullScreenOpened) {
+            if (newState.currentSearchQuery !== state.currentSearchQuery || newState.currentFolder !== state.currentFolder) {
                 history.pushState(newState, null, newUrl);
             }
         }
@@ -219,26 +177,12 @@ class GalleryViewModel {
                 this.folders(state.folders);
                 this.allPictures(state.allPictures);
                 this.displayedPicturesCount(state.displayedPicturesCount);
-                this.fullscreenPictureIndex(-1);
             }
 
             this.layoutManager.run();
         };
     }
 
-
-    private registerKeysEvents(): void {
-        window.onkeydown = (e) => {
-            if (e.keyCode == 37) {
-                this.moveToPreviousPicture();
-            } else if (e.keyCode == 39) {
-                this.moveToNextPicture();
-            } else if (e.keyCode == 27) {
-                this.closeFullScreenDisplay();
-            }
-
-        }
-    }
 
     private registerOnScrollEvents(): void {
         window.onscroll = (e) => {
@@ -255,11 +199,6 @@ class GalleryViewModel {
             }
 
         }
-    }
-
-    private initSwipeDetection(): void {
-        $("#fullscreenPicture").hammer().bind("swiperight", () => { this.moveToPreviousPicture() });
-        $("#fullscreenPicture").hammer().bind("swipeleft", () => { this.moveToNextPicture() });
     }
 }
 

@@ -52,34 +52,6 @@
             </div>
         </div>
 
-        <div id="fullscreenPicture" data-bind="visible: fullscreenPicture(), click: closeFullScreenDisplay">
-            <ko data-bind="if: fullscreenPicture()">  
-                <img class="fullscreenPictureThumbnail" data-bind="attr: { src: fullscreenPicture().thumbnail.url }, click: ()=>null, clickBubble: false" />
-                <img class="fullscreenPictureImg" data-bind="click: ()=>null, clickBubble: false" onload="switchPictureIn()" />
-                <div class="pictureLegend">
-                    <div class="pictureTitle row">
-                        <div class="left-medium-up left-align" data-bind="text: (fullscreenPicture().title || fullscreenPicture().parentAndName)"></div>
-                        <div class="right-medium-up right-align-medium-up" data-bind="text: function(){ return new Date(fullscreenPicture().pictureDate).toLocaleDateString()}()"></div>
-                    </div>
-
-                    <div class="pictureSubtitle row">
-                        <div class="left-medium-up left-align">
-                            <span data-bind="text: fullscreenPicture().position.hardcodedPosition || (fullscreenPicture().position.coordinatesDescription && fullscreenPicture().position.coordinatesDescription.length && fullscreenPicture().position.coordinatesDescription) || ''"></span>
-                        </div>
-                        <div class="right-medium-up right-align-medium-up">
-                            <div data-bind="text:  fullscreenPicture().persons && fullscreenPicture().persons.sort().join(', ')"></div>
-                            <div class="pictureSubSubtitle" data-bind="text:  fullscreenPicture().tags && fullscreenPicture().tags.sort().join(', ')"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="arrow left-arrow" data-bind="click: moveToPreviousPicture, clickBubble: false">
-                    <i class="fa fa-angle-left"></i>
-                </div>
-                <div class="arrow right-arrow" data-bind="click: moveToNextPicture, clickBubble: false">
-                    <i class="fa fa-angle-right"></i>
-                </div>
-            </ko>
-        </div>
 
         <script type="text/javascript">
             var appVM = new GalleryViewModel();
