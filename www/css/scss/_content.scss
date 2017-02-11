@@ -1,0 +1,99 @@
+
+#mainContent {
+    margin-top: 70px;
+
+    h2 {
+        @media #{$medium-up} {
+            padding-top: 30px;
+            font-size: 35px;
+        }
+        @media #{$small-only} {
+            padding-top: 20px;
+            font-size: 25px;
+        }
+        color: #999;
+        font-weight: 300;
+        margin: 0;
+    }
+
+    #breadcrumb {
+        list-style: none;
+        padding: 0;
+        margin-top: 0; 
+        font-size: 15px;
+        color: #909090;
+        font-weight: 300;
+
+        li {
+            display: inline;
+
+            &:not(:last-child)::after {
+                content: ">";
+            }
+
+            a {
+                cursor: pointer;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+        }
+    }
+
+    #folders-gallery {
+        margin-bottom: 50px;
+        font-size: 0;
+
+        .folder {
+            position: relative;
+            z-index: 0;
+            display: inline-block;
+            margin: 5px 10px 5px 0px;
+            @media #{$small-only} {
+                margin-right: 5px;
+            }
+
+            padding: 0;
+            background-position: center center; 
+            background-repeat: none;
+            background-size: cover;
+            cursor: pointer;
+
+            max-width: 45vw;
+            max-height: 45vw;
+
+            .legend {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+
+                background-color: rgba(0,0,0,0.5);
+                font-size: 15px;
+                color: #EEE;
+                padding: 7px 10px;
+
+                i {
+                    margin-right: 3px;
+                    font-size: 17px;
+                }
+            }
+        }    
+    }
+
+    #pictures-gallery {
+        font-size: 0;
+
+        img {
+            z-index: 0;
+            padding: 0;
+            margin: 0;
+            background-position: center center; 
+            background-repeat: none;
+            background-size: cover;
+
+            cursor: pointer;
+        }
+    }
+}
