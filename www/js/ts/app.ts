@@ -8,7 +8,7 @@
 
 class GalleryViewModel {
     private static batchSize: number = 50;
-    public pictures: KnockoutObservableArray<PhotatoPicture>;
+    public pictures: KnockoutComputed<PhotatoPicture[]>;
     public folders: KnockoutObservableArray<PhotatoFolder>;
     public currentFolder: KnockoutObservable<string>;
     public currentFolderName: KnockoutComputed<string>;
@@ -20,14 +20,27 @@ class GalleryViewModel {
     private layoutManager: LayoutManager;
     private fullScreenManager: FullScreenManager;
     private currentAjaxRequest: any;
+    private allPictures: KnockoutObservableArray<PhotatoPicture>;
+    private displayedPicturesCount: KnockoutObservable<number>;
 
     constructor() {
         this.currentFolder = ko.observable<string>("");
         this.currentFolderName = ko.computed<string>(() => this.currentFolder().substring(this.currentFolder().lastIndexOf("/") + 1) || "Photato gallery");
 
+        this.currentFolder = ko.observable<string>("");
         this.currentSearchQuery = ko.observable<string>(null);
-        this.pictures = ko.observableArray<PhotatoPicture>();
-        this.folders = ko.observableArray<PhotatoPicture>();
+        this.displayedPicturesCount = ko.observable<number>(GalleryViewModel.batchSize);
+
+        this.folders = ko.observableArray<PhotatoFolder>();
+        this.allPictures = ko.observableArray<PhotatoPicture>();
+
+        this.pictures = ko.computed<PhotatoPicture[]>(() => {
+            if (this.allPictures().length > this.displayedPicturesCount()) {
+                return this.allPictures().slice(0, this.displayedPicturesCount());
+            } else {
+                return this.allPictures();
+            }
+        });
 
         this.fullscreenPictureIndex = ko.observable<number>(-1);
         this.fullscreenPicture = ko.computed<PhotatoPicture>(() => {
@@ -104,7 +117,8 @@ class GalleryViewModel {
 
         window.scroll(0, 0); // Reset scroll to prevent OnScroll events from being sent
         this.folders([]);
-        this.pictures([]);
+        this.allPictures([]);
+        this.displayedPicturesCount(GalleryViewModel.batchSize);
         this.currentSearchQuery(query);
         this.currentFolder(folder);
 
@@ -116,21 +130,18 @@ class GalleryViewModel {
         this.currentAjaxRequest = $.ajax("/api/list?folder=" + encodeURIComponent(folder) + queryParameter + "&beginIndex=0&endIndex=" + GalleryViewModel.batchSize)
             .done(function(res: PhotatoRequestResults) {
                 that.folders(res.folders);
-                that.pictures(res.pictures);
+                that.allPictures(res.pictures);
 
                 var state = <HistoryState>history.state;
                 if (state) {
                     state.folders = that.folders();
-                    state.pictures = that.pictures();
+                    state.allPictures = that.allPictures();
+                    state.displayedPicturesCount = that.displayedPicturesCount();
                     history.replaceState(state, null, null);
                 }
 
                 that.layoutManager.run();
             });
-    }
-
-    private doAjaxRequestMoreResults() {
-   
     }
 
     public moveToPreviousPicture(): void {
@@ -188,8 +199,8 @@ class GalleryViewModel {
                 newFullScreenOpened = false;
             }
 
-            var state: HistoryState = <HistoryState>{ currentSearchQuery: this.currentSearchQuery(), currentFolder: this.currentFolder(), fullScreenOpened: !!this.fullscreenPicture() || (history.state && history.state.fullScreenOpened), pictures: this.pictures(), folders: this.folders() };
-            var newState = { currentSearchQuery: newSearchQuery, currentFolder: newFolder, fullScreenOpened: newFullScreenOpened, items: [], hasMore: false, nextBeginIndex: 0 };
+            var state: HistoryState = <HistoryState>{ currentSearchQuery: this.currentSearchQuery(), currentFolder: this.currentFolder(), fullScreenOpened: !!this.fullscreenPicture() || (history.state && history.state.fullScreenOpened), allPictures: this.allPictures(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount() };
+            var newState = { currentSearchQuery: newSearchQuery, currentFolder: newFolder, fullScreenOpened: newFullScreenOpened };
             history.replaceState(state, null, null);
 
             if (newState.currentSearchQuery !== state.currentSearchQuery || newState.currentFolder !== state.currentFolder || newState.fullScreenOpened !== state.fullScreenOpened) {
@@ -206,7 +217,8 @@ class GalleryViewModel {
                 this.currentSearchQuery(state.currentSearchQuery);
                 this.currentFolder(state.currentFolder);
                 this.folders(state.folders);
-                this.pictures(state.pictures);
+                this.allPictures(state.allPictures);
+                this.displayedPicturesCount(state.displayedPicturesCount);
                 this.fullscreenPictureIndex(-1);
             }
 
@@ -231,7 +243,15 @@ class GalleryViewModel {
     private registerOnScrollEvents(): void {
         window.onscroll = (e) => {
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-                this.doAjaxRequestMoreResults();
+                if (this.displayedPicturesCount() < this.allPictures().length) {
+                    this.displayedPicturesCount(this.displayedPicturesCount() + GalleryViewModel.batchSize);
+
+                    var state = <HistoryState>history.state;
+                    state.displayedPicturesCount = this.displayedPicturesCount();
+                    history.replaceState(state, null, null);
+
+                    this.layoutManager.run();
+                }
             }
 
         }

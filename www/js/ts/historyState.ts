@@ -2,7 +2,7 @@ class HistoryState {
     public currentSearchQuery: string;
     public currentFolder: string;
     public fullScreenOpened: boolean;
-    public pictures: PhotatoPicture[];
+    public allPictures: PhotatoPicture[];
     public folders: PhotatoFolder[];
-
+    public displayedPicturesCount: number;
 }
