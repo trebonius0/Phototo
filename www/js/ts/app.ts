@@ -19,8 +19,6 @@ class GalleryViewModel {
     public fullscreenPicture: KnockoutComputed<PhotatoPicture>;
     private layoutManager: LayoutManager;
     private fullScreenManager: FullScreenManager;
-    private hasMore: boolean;
-    private nextBeginIndex: number;
     private currentAjaxRequest: any;
 
     constructor() {
@@ -72,9 +70,6 @@ class GalleryViewModel {
         this.layoutManager = new LayoutManager('#pictures-gallery', 3);
         this.fullScreenManager = new FullScreenManager(this.fullscreenPicture);
 
-        this.nextBeginIndex = 0;
-        this.hasMore = false;
-
         this.initOnPopState();
         this.registerKeysEvents();
         this.registerOnScrollEvents();
@@ -107,7 +102,6 @@ class GalleryViewModel {
             this.pushState(folder, query, false);
         }
 
-        this.hasMore = false;
         window.scroll(0, 0); // Reset scroll to prevent OnScroll events from being sent
         this.folders([]);
         this.pictures([]);
@@ -123,15 +117,11 @@ class GalleryViewModel {
             .done(function(res: PhotatoRequestResults) {
                 that.folders(res.folders);
                 that.pictures(res.pictures);
-                that.hasMore = res.hasMore;
-                that.nextBeginIndex = res.endIndex;
 
                 var state = <HistoryState>history.state;
                 if (state) {
-                    state.hasMore = that.hasMore;
                     state.folders = that.folders();
                     state.pictures = that.pictures();
-                    state.nextBeginIndex = that.nextBeginIndex;
                     history.replaceState(state, null, null);
                 }
 
@@ -140,36 +130,7 @@ class GalleryViewModel {
     }
 
     private doAjaxRequestMoreResults() {
-        var that = this;
-
-        var queryParameter = this.currentSearchQuery() ? ("&query=" + this.currentSearchQuery().replace("&", "%26").replace("?", "%3F")) : '';
-        var newBeginIndex = this.nextBeginIndex;
-        var newEndIndex = newBeginIndex + GalleryViewModel.batchSize;
-
-        this.currentAjaxRequest && this.currentAjaxRequest.abort();
-        this.currentAjaxRequest = $.ajax("/api/list?folder=" + this.currentFolder().replace("&", "%26").replace("?", "%3F") + queryParameter + "&beginIndex=" + newBeginIndex + "&endIndex=" + newEndIndex)
-            .done(function(res: PhotatoRequestResults) {
-                that.hasMore = res.hasMore;
-                that.nextBeginIndex = res.endIndex;
-
-                for (var i = 0; i < res.pictures.length; i++) {
-                    that.pictures.push(res.pictures[i]);
-                }
-                for (var i = 0; i < res.folders.length; i++) {
-                    that.folders.push(res.folders[i]);
-                }
-
-                var state = <HistoryState>history.state;
-                if (state) {
-                    state.hasMore = that.hasMore;
-                    state.folders = that.folders();
-                    state.pictures = that.pictures();
-                    state.nextBeginIndex = that.nextBeginIndex;
-                    history.replaceState(state, null, null);
-                }
-
-                that.layoutManager.run();
-            });
+   
     }
 
     public moveToPreviousPicture(): void {
@@ -191,10 +152,6 @@ class GalleryViewModel {
     private moveToPicture(index: number): void {
         this.fullscreenPictureIndex(index);
         this.fullScreenManager.loadImage();
-
-        if (this.hasMore && this.pictures().length - index <= 4) {
-            this.doAjaxRequestMoreResults();
-        }
     }
 
     public openFullScreenDisplay(pictureIndex: number): void {
@@ -231,7 +188,7 @@ class GalleryViewModel {
                 newFullScreenOpened = false;
             }
 
-            var state: HistoryState = <HistoryState>{ currentSearchQuery: this.currentSearchQuery(), currentFolder: this.currentFolder(), fullScreenOpened: !!this.fullscreenPicture() || (history.state && history.state.fullScreenOpened), pictures: this.pictures(), folders: this.folders(), hasMore: this.hasMore, nextBeginIndex: this.nextBeginIndex };
+            var state: HistoryState = <HistoryState>{ currentSearchQuery: this.currentSearchQuery(), currentFolder: this.currentFolder(), fullScreenOpened: !!this.fullscreenPicture() || (history.state && history.state.fullScreenOpened), pictures: this.pictures(), folders: this.folders() };
             var newState = { currentSearchQuery: newSearchQuery, currentFolder: newFolder, fullScreenOpened: newFullScreenOpened, items: [], hasMore: false, nextBeginIndex: 0 };
             history.replaceState(state, null, null);
 
@@ -250,8 +207,6 @@ class GalleryViewModel {
                 this.currentFolder(state.currentFolder);
                 this.folders(state.folders);
                 this.pictures(state.pictures);
-                this.hasMore = state.hasMore;
-                this.nextBeginIndex = state.nextBeginIndex;
                 this.fullscreenPictureIndex(-1);
             }
 
@@ -275,8 +230,7 @@ class GalleryViewModel {
 
     private registerOnScrollEvents(): void {
         window.onscroll = (e) => {
-            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && this.hasMore) {
-                this.hasMore = false; // Temporary locking since starting ajax request
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
                 this.doAjaxRequestMoreResults();
             }
 

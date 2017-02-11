@@ -4,7 +4,5 @@ class HistoryState {
     public fullScreenOpened: boolean;
     public pictures: PhotatoPicture[];
     public folders: PhotatoFolder[];
-    public hasMore: boolean;
-    public nextBeginIndex: number;
 
 }

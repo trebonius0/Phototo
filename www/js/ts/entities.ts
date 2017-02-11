@@ -1,9 +1,6 @@
 class PhotatoRequestResults {
-    public folders: PhotatoFolder[]
-    public pictures: PhotatoPicture[]
-    public beginIndex: number;
-    public endIndex: number;
-    public hasMore: boolean;
+    public folders: PhotatoFolder[];
+    public pictures: PhotatoPicture[];
 }
 
 class PictureInfos {
