@@ -133,7 +133,8 @@ class GalleryViewModel {
             return {
                 src: picture.fullscreenPicture.url,
                 thumb: picture.thumbnail.url,
-                subHtml: picture.title
+                subHtml: picture.title,
+                downloadUrl: picture.rawPicture.url,
             }
         });
         
