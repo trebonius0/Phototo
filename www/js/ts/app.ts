@@ -145,8 +145,12 @@ class GalleryViewModel {
         (<any>$('#lightgallery')).lightGallery({
             dynamic: true,
             dynamicEl: dynamicEl,
-            
             index: pictureIndex,
+
+            speed: 400,
+            hideBarsDelay: 2000,
+            loop: false,
+            preload: 2,
         });
     }
 
