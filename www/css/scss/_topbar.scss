@@ -33,11 +33,21 @@
         position: relative;
         display: inline-block;
 
+        @media #{$small-only} {
+            margin-right: 15px;
+        }
+
         /* Search input text field */
         .search-input {
             display: block;
             box-sizing: border-box;
-            width: 15em; /* defines the global width */
+
+            @media #{$medium-up} {
+                width: 15em; /* defines the global width */
+            }
+            @media #{$small-only} {
+                width: 12em; /* defines the global width */
+            }
             height: 2em; /* defines the global height */
             padding: 0 3.5em 0 .5em;
             border: 1px solid #ccc;
