@@ -166,6 +166,7 @@ class GalleryViewModel {
             loop: false,
             counter: false,
             preload: 2,
+            startClass: 'lg-fade'
         });
 
         lg.on('onCloseAfter.lg', (e) => {
