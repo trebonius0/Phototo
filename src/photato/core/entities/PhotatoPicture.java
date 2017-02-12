@@ -12,7 +12,7 @@ public class PhotatoPicture extends PhotatoItem {
     public final String title;
 
     @Expose
-    public final String parentAndName;
+    public final String pictureName;
 
     @Expose
     public final String[] tags;
@@ -52,10 +52,10 @@ public class PhotatoPicture extends PhotatoItem {
         this.rotationId = metadata.rotationId;
         this.rawPicture = new PictureInfos(Routes.rawPicturesRootUrl + "/" + this.path, metadata.width, metadata.height);
 
-        if (this.filename.length() > 40) {
-            this.parentAndName = path.getParent().getFileName().toString();
+        if (this.filename.length() > 40 || this.filename.contains("_")) {
+            this.pictureName = path.getParent().getFileName().toString();
         } else {
-            this.parentAndName = path.getParent().getFileName() + "/" + this.filename;
+            this.pictureName = path.getParent().getFileName() + "/" + this.filename;
         }
     }
 

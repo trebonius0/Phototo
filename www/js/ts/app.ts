@@ -134,7 +134,7 @@ class GalleryViewModel {
             return {
                 src: picture.fullscreenPicture.url,
                 thumb: picture.thumbnail.url,
-                subHtml: picture.title,
+                subHtml: GalleryViewModel.getLightGallerySubHtml(picture),
                 downloadUrl: picture.rawPicture.url,
             }
         });
@@ -227,6 +227,16 @@ class GalleryViewModel {
             }
 
         }
+    }
+
+    private static getLightGallerySubHtml(picture: PhotatoPicture): string {
+        var firstRow = '<div class="dateTitle">' + (new Date(picture.pictureDate).toLocaleDateString()) + '<span class="separator">·</span>' + (picture.title || picture.pictureName) + '</div>';
+        var secondRow = '<div class="subtitle">\n\
+                               '+ (picture.position.hardcodedPosition || (picture.position.coordinatesDescription && picture.position.coordinatesDescription.length && picture.position.coordinatesDescription) || '') + '\n\
+                            <span class="separator">·</span>'+ (picture.persons && picture.persons.sort().join(', ')) + '\n\
+                            <span class="separator">·</span>'+ (picture.tags && picture.tags.sort().join(', ')) + '\n\
+                        </div>';
+        return firstRow + secondRow;
     }
 }
 

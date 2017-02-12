@@ -22,7 +22,7 @@ abstract class PhotatoItem {
 class PhotatoPicture extends PhotatoItem {
     public title: string;
 
-    public parentAndName: string;
+    public pictureName: string;
 
     public tags: string[];
 
