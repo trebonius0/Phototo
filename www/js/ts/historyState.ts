@@ -4,4 +4,5 @@ class HistoryState {
     public allPictures: PhotatoPicture[];
     public folders: PhotatoFolder[];
     public displayedPicturesCount: number;
+    public bannerMessage: string;
 }

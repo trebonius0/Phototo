@@ -4,13 +4,14 @@ $blue: #0f70e8;
 @import "topbar";
 @import "content";
 @import "lightgallery";
+@import "banner";
 
 body {    
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     background-color: #F0F0F0;
-    
+
     @media #{$medium-up} {
-    overflow-y: scroll;
+        overflow-y: scroll;
     }
 }
 

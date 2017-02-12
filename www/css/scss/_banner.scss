@@ -1,0 +1,31 @@
+.banner {
+    margin: 0 -15px 0 -15px;
+    padding: 12px 20px;
+    text-align: center;
+    font-size: rem-calc(14);
+    border-bottom: 1px solid;
+
+    &.warning {
+        color: #9A7E26;
+        background-color: #FFFAED;
+        border-color: #FFE6C9;
+    }
+
+    &.info {
+        color: #3B799A;
+        background-color: #E6F5FD;
+        border-color: #C5F1FA;
+    }
+
+    &.error {
+        color: #A1513C;
+        background-color: #FBE9E6;
+        border-color: #F7D0D1;
+    }
+
+    &.success {
+        color: #687F42;
+        background-color: #F0FBE4;
+        border-color: #EBF8CD;
+    }
+}

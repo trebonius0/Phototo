@@ -4,9 +4,11 @@
 /// <reference path="breadcrumb.ts" />
 /// <reference path="layout.ts" />
 /// <reference path="historyState.ts" />
+/// <reference path="messages.ts" />
 
 class GalleryViewModel {
     private static batchSize: number = 50;
+    public bannerMessage: KnockoutObservable<string>;
     public pictures: KnockoutComputed<PhotatoPicture[]>;
     public folders: KnockoutObservableArray<PhotatoFolder>;
     public currentFolder: KnockoutObservable<string>;
@@ -20,6 +22,7 @@ class GalleryViewModel {
     private displayedPicturesCount: KnockoutObservable<number>;
 
     constructor() {
+        this.bannerMessage = ko.observable<string>("");
         this.currentFolder = ko.observable<string>("");
         this.currentFolderName = ko.computed<string>(() => this.currentFolder().substring(this.currentFolder().lastIndexOf("/") + 1) || "Photato gallery");
 
@@ -101,6 +104,7 @@ class GalleryViewModel {
         window.scroll(0, 0); // Reset scroll to prevent OnScroll events from being sent
         this.folders([]);
         this.allPictures([]);
+        this.bannerMessage("");
         this.displayedPicturesCount(GalleryViewModel.batchSize);
         this.currentSearchQuery(query);
         this.currentFolder(folder);
@@ -111,19 +115,26 @@ class GalleryViewModel {
 
         this.currentAjaxRequest && this.currentAjaxRequest.abort();
         this.currentAjaxRequest = $.ajax("/api/list?folder=" + encodeURIComponent(folder) + queryParameter + "&beginIndex=0&endIndex=" + GalleryViewModel.batchSize)
-            .done(function(res: PhotatoRequestResults) {
+            .success(function(res: PhotatoRequestResults) {
                 that.folders(res.folders);
                 that.allPictures(res.pictures);
+
+                if (res.folders.length == 0 && res.pictures.length == 0) {
+                    that.bannerMessage(Messages.noResult);
+                }
 
                 var state = <HistoryState>history.state;
                 if (state) {
                     state.folders = that.folders();
                     state.allPictures = that.allPictures();
+                    state.bannerMessage = that.bannerMessage();
                     state.displayedPicturesCount = that.displayedPicturesCount();
                     history.replaceState(state, null, null);
                 }
 
                 that.layoutManager.run();
+            }).error(function() {
+                that.bannerMessage(Messages.serverError);
             });
     }
 
@@ -186,8 +197,8 @@ class GalleryViewModel {
             newFullScreenOpened = false;
         }
 
-        var state: HistoryState = <HistoryState>{ currentSearchQuery: this.currentSearchQuery(), currentFolder: this.currentFolder(), allPictures: this.allPictures(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount() };
-        var newState = { currentSearchQuery: newSearchQuery, currentFolder: newFolder, fullScreenOpened: newFullScreenOpened, allPictures: this.allPictures(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount() };
+        var state: HistoryState = <HistoryState>{ currentSearchQuery: this.currentSearchQuery(), currentFolder: this.currentFolder(), allPictures: this.allPictures(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount(), bannerMessage: this.bannerMessage() };
+        var newState = { currentSearchQuery: newSearchQuery, currentFolder: newFolder, fullScreenOpened: newFullScreenOpened, allPictures: this.allPictures(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount(), bannerMessage: this.bannerMessage() };
         history.replaceState(state, null, null);
 
         history.pushState(newState, null, newUrl);
@@ -206,6 +217,7 @@ class GalleryViewModel {
                 this.currentFolder(state.currentFolder);
                 this.folders(state.folders);
                 this.allPictures(state.allPictures);
+                this.bannerMessage(state.bannerMessage);
                 this.displayedPicturesCount(state.displayedPicturesCount);
             }
 
