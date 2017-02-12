@@ -15,15 +15,13 @@ import photato.helpers.LRUSet;
 public class FullScreenImageGetter extends ResizedImageGenerator implements IFullScreenImageGetter {
 
     private final Long maxCacheSize;
-    private final boolean precomputationsEnabled;
     private final int maxPictureWidth;
     private final int maxPictureHeight;
     private final LRUSet<Path> picturesLRUSet;
 
-    public FullScreenImageGetter(FileSystem fileSystem, Path rootFolder, String cacheFolderName, int wantedQuality, int maxPictureWidth, int maxPictureHeight, Long maxCacheSize, boolean precomputationsEnabled) throws IOException {
+    public FullScreenImageGetter(FileSystem fileSystem, Path rootFolder, String cacheFolderName, int wantedQuality, int maxPictureWidth, int maxPictureHeight, Long maxCacheSize) throws IOException {
         super(fileSystem, rootFolder, cacheFolderName, wantedQuality, false);
         this.maxCacheSize = maxCacheSize;
-        this.precomputationsEnabled = precomputationsEnabled;
         this.maxPictureHeight = maxPictureHeight;
         this.maxPictureWidth = maxPictureWidth;
 
@@ -36,7 +34,7 @@ public class FullScreenImageGetter extends ResizedImageGenerator implements IFul
                     long fileSize = Files.size(path);
                     this.picturesLRUSet.add(path, fileSize);
                 }
-                
+
                 this.cleanLRUCache();
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -116,7 +114,7 @@ public class FullScreenImageGetter extends ResizedImageGenerator implements IFul
 
     @Override
     public boolean precomputationsEnabled() {
-        return this.precomputationsEnabled;
+        return this.maxCacheSize == null;
     }
 
     private void cleanLRUCache() throws IOException {

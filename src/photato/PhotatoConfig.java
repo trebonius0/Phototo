@@ -6,8 +6,7 @@ public class PhotatoConfig {
     public static boolean indexFolderName = false;
     public static boolean useParallelPicturesGeneration = true;
     public static boolean forceExifToolsDownload = false;
-    public static Long resizedPicturesCacheMaxSize = 1024 * 1024 * 1024L;
-    public static boolean fullscreenImagePrecomputationEnabled = true;
+    public static Long resizedPicturesCacheMaxSize = null;
     public static int fullScreenPictureQuality = 90;
     public static int maxFullScreenPictureWitdh = 1800;
     public static int maxFullScreenPictureHeight = 1200;
