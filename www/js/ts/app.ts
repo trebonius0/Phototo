@@ -232,13 +232,26 @@ class GalleryViewModel {
     }
 
     private static getLightGallerySubHtml(picture: PhotatoPicture): string {
-        var firstRow = '<div class="dateTitle">' + (new Date(picture.pictureDate).toLocaleDateString()) + '<span class="separator">·</span>' + (picture.title || picture.pictureName) + '</div>';
-        var secondRow = '<div class="subtitle">\n\
-                               '+ (picture.position.hardcodedPosition || (picture.position.coordinatesDescription && picture.position.coordinatesDescription.length && picture.position.coordinatesDescription) || '') + '\n\
-                            <span class="separator">·</span>'+ (picture.persons && picture.persons.sort().join(', ')) + '\n\
-                            <span class="separator">·</span>'+ (picture.tags && picture.tags.sort().join(', ')) + '\n\
-                        </div>';
-        return firstRow + secondRow;
+        var dateStr = (new Date(picture.pictureDate).toLocaleDateString());
+        var title = (picture.title || picture.pictureName);
+        var positionStr = (picture.position.hardcodedPosition || (picture.position.coordinatesDescription && picture.position.coordinatesDescription.length && picture.position.coordinatesDescription) || '')
+        var personsStr = (picture.persons && picture.persons.sort().join(', '));
+        var tagsStr = (picture.tags && picture.tags.sort().join(', '));
+
+        var firstRow = '<div class="dateTitle">' + dateStr + '<span class="separator">·</span>' + title + '</div>';
+
+        var secondRowValues: string[] = [];
+        if (positionStr) {
+            secondRowValues.push(positionStr);
+        }
+        if (personsStr) {
+            secondRowValues.push(personsStr);
+        }
+        if (tagsStr) {
+            secondRowValues.push(tagsStr);
+        }
+        var secondRow = '<div class="subtitle">' + secondRowValues.join('<span class="separator">·</span>') + '</div>';
+        return firstRow + (secondRowValues.length ? secondRow : '');
     }
 }
 
