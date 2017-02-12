@@ -48,7 +48,7 @@ public class FullScreenImageGetter extends ResizedImageGenerator implements IFul
 
         boolean hasGeneratedNewPicture = this.generateResizedPicture(picture.fsPath, picture.lastModificationTimestamp, picture.rotationId);
 
-        if (this.maxCacheSize != null) {
+        if (this.picturesLRUSet != null) {
             Path resizedPicturePath = this.getResizedPicturePath(picture.fsPath, picture.lastModificationTimestamp);
             if (hasGeneratedNewPicture) {
                 this.picturesLRUSet.add(resizedPicturePath, Files.size(resizedPicturePath));
@@ -118,7 +118,7 @@ public class FullScreenImageGetter extends ResizedImageGenerator implements IFul
     }
 
     private void cleanLRUCache() throws IOException {
-        if (this.maxCacheSize != null) {
+        if (this.maxCacheSize != null && this.picturesLRUSet != null) {
             while (this.picturesLRUSet.totalWeight() >= this.maxCacheSize) {
                 Path lastPicture = this.picturesLRUSet.removeLast();
                 this.deleteResizedPicture(lastPicture, Files.getLastModifiedTime(lastPicture).toMillis());
