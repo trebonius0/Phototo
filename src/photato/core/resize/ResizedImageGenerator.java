@@ -64,14 +64,15 @@ public abstract class ResizedImageGenerator {
         int newWidth = getResizedPictureWidth(originalImage.getWidth(), originalImage.getHeight());
         int newHeight = getResizedPictureHeight(originalImage.getWidth(), originalImage.getHeight());
 
+        BufferedImage image;
         if (this.forceResize || (newWidth <= originalImage.getWidth() && newHeight <= originalImage.getHeight())) {
-            BufferedImage resized = ImageHelper.resizeImageSmooth(originalImage, newWidth, newHeight);
-
-            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(path.toFile()))) {
-                new JpegEncoder(resized, resizedPictureQuality, out).Compress();
-            }
+            image = ImageHelper.resizeImageSmooth(originalImage, newWidth, newHeight);
         } else {
-            Files.copy(originalFilename, path);
+            image = originalImage;
+        }
+
+        try (OutputStream out = new BufferedOutputStream(new FileOutputStream(path.toFile()))) {
+            new JpegEncoder(image, this.resizedPictureQuality, out).Compress();
         }
 
         return true;
