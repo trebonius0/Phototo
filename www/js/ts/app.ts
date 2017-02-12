@@ -129,6 +129,7 @@ class GalleryViewModel {
 
 
     public openLightGallery(pictureIndex: number): void {
+        this.pushState(this.currentFolder(), this.currentSearchQuery(), true);
         var dynamicEl: any[] = this.allPictures().map((picture: PhotatoPicture) => {
             return {
                 src: picture.fullscreenPicture.url,
@@ -142,7 +143,8 @@ class GalleryViewModel {
         $('#lightgallery').remove();
         $('body').append('<div id="lightgallery"></div>');
 
-        (<any>$('#lightgallery')).lightGallery({
+        var lg = (<any>$('#lightgallery'));
+        lg.lightGallery({
             dynamic: true,
             dynamicEl: dynamicEl,
             index: pictureIndex,
@@ -151,6 +153,10 @@ class GalleryViewModel {
             hideBarsDelay: 2000,
             loop: false,
             preload: 2,
+        });
+
+        lg.on('onCloseAfter.lg', (e) => {
+            history.back();
         });
     }
 
@@ -169,29 +175,29 @@ class GalleryViewModel {
     }
 
     private pushState(newFolder: string, newSearchQuery: string, newFullScreenOpened: boolean): void {
-        if (history && history.pushState) {
-            var newUrl = "/" + newFolder;
-            if (newSearchQuery) {
-                newUrl += "?search=" + newSearchQuery;
-            }
-
-            if (!isMobileOrTablet()) { // Desktop, we dont care about the previous button for closing the fullscreen
-                newFullScreenOpened = false;
-            }
-
-            var state: HistoryState = <HistoryState>{ currentSearchQuery: this.currentSearchQuery(), currentFolder: this.currentFolder(), allPictures: this.allPictures(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount() };
-            var newState = { currentSearchQuery: newSearchQuery, currentFolder: newFolder, fullScreenOpened: newFullScreenOpened };
-            history.replaceState(state, null, null);
-
-            if (newState.currentSearchQuery !== state.currentSearchQuery || newState.currentFolder !== state.currentFolder) {
-                history.pushState(newState, null, newUrl);
-            }
+        var newUrl = "/" + newFolder;
+        if (newSearchQuery) {
+            newUrl += "?search=" + newSearchQuery;
         }
+
+        if (!isMobileOrTablet()) { // Desktop, we dont care about the previous button for closing the fullscreen
+            newFullScreenOpened = false;
+        }
+
+        var state: HistoryState = <HistoryState>{ currentSearchQuery: this.currentSearchQuery(), currentFolder: this.currentFolder(), allPictures: this.allPictures(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount() };
+        var newState = { currentSearchQuery: newSearchQuery, currentFolder: newFolder, fullScreenOpened: newFullScreenOpened, allPictures: this.allPictures(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount() };
+        history.replaceState(state, null, null);
+
+        history.pushState(newState, null, newUrl);
     }
 
     private initOnPopState(): void {
         window.onpopstate = (e) => {
             var state: HistoryState = e.state;
+
+            if ($('#lightgallery').data('lightGallery')) {
+                (<any>$('#lightgallery')).data('lightGallery').destroy(true);
+            }
 
             if (state) {
                 this.currentSearchQuery(state.currentSearchQuery);
