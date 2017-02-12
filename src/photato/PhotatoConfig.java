@@ -10,6 +10,7 @@ import org.ini4j.Ini;
 public class PhotatoConfig {
 
     private static final String configFile = "photato.ini";
+    public static int serverPort;
     public static boolean prefixModeOnly;
     public static boolean indexFolderName;
     public static boolean useParallelPicturesGeneration;
@@ -24,9 +25,10 @@ public class PhotatoConfig {
     static {
         try {
             Ini ini = new Ini(new File(configFile));
+            serverPort = Integer.parseInt(ini.get("global", "serverPort"));
             prefixModeOnly = Boolean.parseBoolean(ini.get("index", "prefixModeOnly"));
             indexFolderName = Boolean.parseBoolean(ini.get("index", "indexFolderName"));
-            useParallelPicturesGeneration = Boolean.parseBoolean(ini.get("global", "useParallelPicturesGeneration"));
+            useParallelPicturesGeneration = Boolean.parseBoolean(ini.get("thumbnail", "useParallelPicturesGeneration"));
             forceExifToolsDownload = Boolean.parseBoolean(ini.get("global", "forceExifToolsDownload"));
 
             try {

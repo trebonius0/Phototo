@@ -63,7 +63,7 @@ public class Photato {
                 .build();
 
         final HttpServer server = ServerBootstrap.bootstrap()
-                .setListenerPort(8186)
+                .setListenerPort(PhotatoConfig.serverPort)
                 .setServerInfo(serverName)
                 .setSocketConfig(socketConfig)
                 .setExceptionLogger(new StdErrorExceptionLogger())
