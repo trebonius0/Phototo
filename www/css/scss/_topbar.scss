@@ -27,43 +27,121 @@
 
         cursor: pointer;
     }
-
-    #searchForm {
-        border: 1px solid #AAA;
-        height: 30px;
+    /* Search container */
+    .search-field {
         margin-top: 20px;
-        margin-right: 8px;
-        line-height: 30px;
+        position: relative;
+        display: inline-block;
 
-        @media #{$small-only} {
-            margin-right: 8px;
+        /* Search input text field */
+        .search-input {
+            display: block;
+            box-sizing: border-box;
+            width: 15em; /* defines the global width */
+            height: 2em; /* defines the global height */
+            padding: 0 3.5em 0 .5em;
+            border: 1px solid #ccc;
+            font-family: inherit;
+            font-size: 15px;
+            line-height: 1;
+            transition: border-color .25s ease-in-out;
+
+            &:hover {
+                border-color: #bbb;
+            }
+
+            &:focus {
+                border-color: #888;
+                outline: none;
+            }
+
+            /* Style the placeholder text */
+            &::-webkit-input-placeholder { color: #aaa; }
+            &::-moz-placeholder { color: #aaa; }
+            &:-ms-input-placeholder { color: #aaa; }
+            &::placeholder { color: #aaa; }
+
+            /* Disable native cancel icon */
+            &::-webkit-search-cancel-button { display: none; }
+            &::-ms-clear { display: none; }
         }
 
-        input {
-            border: none !important;
-            height: 20px;
-            margin-left: 8px;
-            padding: 0;
-            color: #888;
+        /* Submit search button */
+        .search-submit {
+            position: absolute;
+            top: 1px;
+            right: 0;
+            bottom: 1px;
+            display: block;
+            box-sizing: border-box;
+            width: 2em; /* equals the global height for a square */
+            border: none;
+            border-left: 1px solid #eee;
+            background: transparent;
+            font-family: inherit;
+            font-size: inherit;
+            line-height: 1;
+            color: #777;
+            transition:
+                color .25s,
+                background .25s;
+        }
+
+        .search-input:focus ~ .search-submit,
+            .search-submit:hover,
+            .search-submit:focus {
+            background: #666;
+            color: #eee;
             outline: none;
         }
-        button {
-            background-color: #FFF;
-            border: none !important;
-            color: #999;
-            box-shadow: none !important;
-            line-height: 18px;
-            font-size: 15px;
-            height: 27px;
 
-            padding-left: 2px;
-            padding-right: 0;
-            padding-top: 0;
-            padding-bottom: 0;
-            transform: scale(-1,1);
+        /* Cancel search button */
+        .search-reset {
+            position: absolute;
+            top: 0;
+            right: 2em;
+            display: block;
+            box-sizing: border-box;
+            width: 1.5em;
+            height: 2em;
+            border: none;
+            background: none;
+            font-family: inherit;
+            font-size: inherit;
+            line-height: 1;
+            visibility: hidden;
+            opacity: 0;
+            transition:
+                opacity .25s ease-in-out 0s,
+                visibility 0s linear .25s;
+        }
 
-            cursor: pointer;       
-            outline: none;     
+        .search-input:focus:valid ~ .search-reset {
+            visibility: visible;
+            opacity: 1;
+            transition:
+                opacity .25s ease-in-out 0s,
+                visibility 0s linear 0s;
+        }
+
+        .search-reset:focus {
+            outline: none;
+        }
+
+        /* SVG style properties of the icon */
+        .search-icon {
+            width: 1em;
+            height: 1em;
+            fill: none;
+            stroke: currentColor; /* inherits the color attribute */
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 15%;
+        }
+
+        .search-icon path {
+            stroke-width: 13%;
         }
     }
+
 }

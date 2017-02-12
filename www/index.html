@@ -13,7 +13,7 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/lightgallery/1.3.9/css/lg-transitions.min.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/lightgallery/1.3.9/css/lightgallery.min.css">
         <link rel="stylesheet" type="text/css" href="/css/style.css" />
-        
+
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
         <title>Photato</title>
     </head>
@@ -23,20 +23,24 @@
             <div class="pageContainer">
                 <h1 class="left" data-bind="click: function(){moveToFolder('', true)}">Photato</h1>
 
-                <form class="right" data-bind="submit: runSearchFromForm">
-                    <div id="searchForm">
-                        <input id="searchField" type="text" autocomplete="off" placeholder="Search"  />
-                        <button type="submit">
-                            <i class="fa fa-search"></i>
+                <div class="right">
+                    <form class="search-field" id="search-form" novalidate method="get">
+                        <input class="search-input" type="search" name="search" required placeholder="Search&hellip;"/>
+                        <button class="search-reset" type="reset" tabindex="-1">&times;</button>
+                        <button class="search-submit" type="submit" aria-label="Search">
+                            <svg class="search-icon" viewBox="0 0 32 32" width="32" height="32">
+                            <path d="M3 29 L10 22"/>
+                            <circle cx="18" cy="13" r="9"/>
+                            </svg>
                         </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
 
         <div id="mainContent">
             <div class="banner error" data-bind="visible: bannerMessage, text: bannerMessage"></div>
-            
+
             <div class="pageContainer">
                 <h2 data-bind="text: currentPageTitle"></h2>
 
