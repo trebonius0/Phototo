@@ -136,6 +136,7 @@ class GalleryViewModel {
                 thumb: picture.thumbnail.url,
                 subHtml: GalleryViewModel.getLightGallerySubHtml(picture),
                 downloadUrl: picture.rawPicture.url,
+                width: picture.fullscreenPicture.width,
             }
         });
         
@@ -152,6 +153,7 @@ class GalleryViewModel {
             speed: 400,
             hideBarsDelay: 2000,
             loop: false,
+            counter: false,
             preload: 2,
         });
 
