@@ -90,6 +90,7 @@
             <fileset dir="." includes="www/**/*.js"/>
             <fileset dir="." includes="www/**/*.css"/>
             <fileset dir="." includes="start.cmd"/>
+            <fileset dir="." includes="*.ini"/>
             <fileset dir="${store.dir}" includes="${store.jar.name}.jar"/>
         </zip>
         <delete file="${store.dir}/${store.jar.name}.jar"/>
