@@ -60,6 +60,7 @@ public abstract class PhotatoHandler implements HttpRequestHandler {
                 try {
                     Response res = getResponse(path, query);
                     response.setStatusCode(res.responseCode);
+                    response.setHeaders(res.headers);
                     response.setEntity(res.entity);
                 } catch (Exception ex) {
                     response.setStatusCode(http500.responseCode);
