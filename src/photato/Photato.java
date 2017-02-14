@@ -18,7 +18,6 @@ import photato.controllers.FolderListHandler;
 import photato.controllers.ImageHandler;
 import photato.controllers.JsHandler;
 import photato.core.metadata.exif.ExifToolDownloader;
-import photato.core.metadata.gps.GpsCoordinatesDescriptionCache;
 import photato.core.metadata.gps.OSMGpsCoordinatesDescriptionGetter;
 import java.nio.file.Path;
 import org.apache.http.client.HttpClient;
@@ -51,7 +50,7 @@ public class Photato {
         ExifToolDownloader.run(httpClient, fileSystem, PhotatoConfig.forceExifToolsDownload);
 
         ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, thumbnailCacheFolder, PhotatoConfig.thumbnailHeight, PhotatoConfig.thumbnailQuality);
-        IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(new GpsCoordinatesDescriptionCache("cache/gps.cache"), httpClient);
+        IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(httpClient, PhotatoConfig.addressElementsCount);
         MetadataAggregator metadataGetter = new MetadataAggregator(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
         FullScreenImageGetter fullScreenImageGetter = new FullScreenImageGetter(fileSystem, rootFolder, fullscreenCacheFolder, PhotatoConfig.fullScreenPictureQuality, PhotatoConfig.maxFullScreenPictureWitdh, PhotatoConfig.maxFullScreenPictureHeight, PhotatoConfig.resizedPicturesCacheMaxSize);
 
