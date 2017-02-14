@@ -1,34 +1,79 @@
 package photato.core.metadata.gps;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 
 public class OSMGpsCoordinatesDescriptionGetter implements IGpsCoordinatesDescriptionGetter {
 
-    private final HttpClient httpClient;
-    private final GpsCoordinatesDescriptionCache cache;
-    private final int addressElementsCount;
+    private static class OpenStreetMapResult {
 
-    public OSMGpsCoordinatesDescriptionGetter(GpsCoordinatesDescriptionCache cache, HttpClient httpClient, int addressElementsCount) {
+        private static class Address {
+
+            public String neighbourhood;
+            public String suburb;
+            @SerializedName("city_district")
+            public String cityDistrict;
+            public String village;
+            public String town;
+            public String city;
+            public String state;
+            public String country;
+
+        }
+
+        private Address address;
+        @SerializedName("display_name")
+        private String displayName;
+
+        public String getDisplayName(int maxElementsCount) {
+            if (this.address != null) {
+                List<String> elements = new ArrayList<>();
+                elements.add(this.address.neighbourhood);
+                elements.add(this.address.suburb);
+                elements.add(this.address.cityDistrict);
+                elements.add(this.address.village);
+                elements.add(this.address.town);
+                elements.add(this.address.city);
+                elements.add(this.address.state);
+                elements.add(this.address.country);
+
+                List<String> l = elements.stream()
+                        .filter((String s) -> (s != null && !s.isEmpty()))
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                if (l.size() > maxElementsCount) {
+                    l = l.subList(l.size() - maxElementsCount, l.size());
+                }
+
+                return String.join(", ", l);
+            } else {
+                return this.displayName;
+            }
+        }
+    }
+
+    private final HttpClient httpClient;
+    private final int maxElementsCount;
+
+    public OSMGpsCoordinatesDescriptionGetter(HttpClient httpClient, int maxElementsCount) {
         this.httpClient = httpClient;
-        this.cache = cache;
-        this.addressElementsCount = addressElementsCount;
+        this.maxElementsCount = maxElementsCount;
     }
 
     @Override
     public synchronized String getCoordinatesDescription(Double latitude, Double longitude) {
         if (latitude == null || longitude == null) {
             return null;
-        }
-
-        String cachedData = this.cache.getFromCache(latitude, longitude);
-        if (cachedData != null) {
-            return cachedData;
         }
 
         try {
@@ -38,9 +83,8 @@ public class OSMGpsCoordinatesDescriptionGetter implements IGpsCoordinatesDescri
             try (BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
                 Gson gson = new Gson();
                 OpenStreetMapResult result = gson.fromJson(rd, OpenStreetMapResult.class);
-                String formattedAddress = result.getFormattedAddress(this.addressElementsCount);
-                this.cache.addToCache(latitude, longitude, formattedAddress);
-                return formattedAddress;
+
+                return result.getDisplayName(this.maxElementsCount);
             }
         } catch (IOException ex) {
             System.err.println("Cannot get data from google api " + ex);
