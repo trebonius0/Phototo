@@ -27,6 +27,12 @@ public class ExifMetadata {
     @SerializedName("ModifyDate")
     private String modifyDate;
 
+    @SerializedName("FileCreateDate")
+    private String createDate2;
+
+    @SerializedName("FileModifyDate")
+    private String modifyDate2;
+
     @SerializedName("ImageWidth")
     private String imageWidth;
 
@@ -126,18 +132,35 @@ public class ExifMetadata {
     }
 
     public long getPictureDate() {
-        try {
-            if (this.createDate != null) {
+        if (this.createDate != null) {
+            try {
                 return DATE_FORMAT.parse(this.createDate).getTime();
-            } else if (this.modifyDate != null) {
-                return DATE_FORMAT.parse(this.modifyDate).getTime();
-            } else {
-                return 0;
+            } catch (ParseException ex) {
             }
-        } catch (ParseException ex) {
-            ex.printStackTrace();
-            return 0;
         }
+
+        if (this.modifyDate != null) {
+            try {
+                return DATE_FORMAT.parse(this.modifyDate).getTime();
+            } catch (ParseException ex) {
+            }
+        }
+
+        if (this.createDate2 != null) {
+            try {
+                return DATE_FORMAT.parse(this.createDate2).getTime();
+            } catch (ParseException ex) {
+            }
+        }
+
+        if (this.modifyDate2 != null) {
+            try {
+                return DATE_FORMAT.parse(this.modifyDate2).getTime();
+            } catch (ParseException ex) {
+            }
+        }
+
+        return 0;
     }
 
     private static String[] getStringArrayFromField(Object field) {
