@@ -114,7 +114,7 @@ class GalleryViewModel {
         var queryParameter = query ? ("&query=" + encodeURIComponent(query)) : '';
 
         this.currentAjaxRequest && this.currentAjaxRequest.abort();
-        this.currentAjaxRequest = $.ajax("/api/list?folder=" + encodeURIComponent(folder) + queryParameter + "&beginIndex=0&endIndex=" + GalleryViewModel.batchSize)
+        this.currentAjaxRequest = $.ajax("/api/list?folder=" + encodeURIComponent(folder) + queryParameter)
             .success(function(res: PhotatoRequestResults) {
                 that.folders(res.folders);
                 that.allPictures(res.pictures);
