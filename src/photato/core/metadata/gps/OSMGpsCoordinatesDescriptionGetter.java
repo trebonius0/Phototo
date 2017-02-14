@@ -1,6 +1,7 @@
 package photato.core.metadata.gps;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,14 +11,18 @@ import org.apache.http.client.methods.HttpGet;
 
 public class OSMGpsCoordinatesDescriptionGetter implements IGpsCoordinatesDescriptionGetter {
 
+    private static class OpenStreetMapResult {
+
+        @SerializedName("display_name")
+        public String displayName;
+    }
+
     private final HttpClient httpClient;
     private final GpsCoordinatesDescriptionCache cache;
-    private final int addressElementsCount;
 
-    public OSMGpsCoordinatesDescriptionGetter(GpsCoordinatesDescriptionCache cache, HttpClient httpClient, int addressElementsCount) {
+    public OSMGpsCoordinatesDescriptionGetter(GpsCoordinatesDescriptionCache cache, HttpClient httpClient) {
         this.httpClient = httpClient;
         this.cache = cache;
-        this.addressElementsCount = addressElementsCount;
     }
 
     @Override
@@ -38,9 +43,8 @@ public class OSMGpsCoordinatesDescriptionGetter implements IGpsCoordinatesDescri
             try (BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
                 Gson gson = new Gson();
                 OpenStreetMapResult result = gson.fromJson(rd, OpenStreetMapResult.class);
-                String formattedAddress = result.getFormattedAddress(this.addressElementsCount);
-                this.cache.addToCache(latitude, longitude, formattedAddress);
-                return formattedAddress;
+                this.cache.addToCache(latitude, longitude, result.displayName);
+                return result.displayName;
             }
         } catch (IOException ex) {
             System.err.println("Cannot get data from google api " + ex);
