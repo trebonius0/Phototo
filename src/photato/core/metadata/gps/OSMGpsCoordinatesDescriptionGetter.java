@@ -87,7 +87,7 @@ public class OSMGpsCoordinatesDescriptionGetter implements IGpsCoordinatesDescri
                 return result.getDisplayName(this.maxElementsCount);
             }
         } catch (IOException ex) {
-            System.err.println("Cannot get data from google api " + ex);
+            System.err.println("Cannot get data from openstreetmap api " + ex);
             return null;
         }
     }
