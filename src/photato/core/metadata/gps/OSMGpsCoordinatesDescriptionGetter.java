@@ -1,6 +1,7 @@
 package photato.core.metadata.gps;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.annotations.SerializedName;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -86,7 +87,7 @@ public class OSMGpsCoordinatesDescriptionGetter implements IGpsCoordinatesDescri
 
                 return result.getDisplayName(this.maxElementsCount);
             }
-        } catch (IOException ex) {
+        } catch (IOException | JsonSyntaxException ex) {
             System.err.println("Cannot get data from openstreetmap api " + ex);
             return null;
         }
