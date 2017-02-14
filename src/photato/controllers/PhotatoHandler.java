@@ -61,6 +61,12 @@ public abstract class PhotatoHandler implements HttpRequestHandler {
                     Response res = getResponse(path, query);
                     response.setStatusCode(res.responseCode);
                     response.setHeaders(res.headers);
+                    
+                    if (res.entity instanceof StringEntity
+                            && (request.containsHeader("Accept-Encoding") && request.getLastHeader("Accept-Encoding").getValue().toLowerCase().contains("gzip"))) {
+                        ((StringEntity) res.entity).setContentEncoding("gzip");
+                        response.setHeader("Content-Encoding", "gzip");
+                    }
                     response.setEntity(res.entity);
                 } catch (Exception ex) {
                     response.setStatusCode(http500.responseCode);
@@ -80,5 +86,4 @@ public abstract class PhotatoHandler implements HttpRequestHandler {
 
     protected abstract Response getResponse(String path, Map<String, String> query) throws Exception;
 
-    
 }
