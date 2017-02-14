@@ -1,10 +1,6 @@
 package photato;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.logging.Level;
 import org.ini4j.Ini;
 
 public class PhotatoConfig {
@@ -21,6 +17,7 @@ public class PhotatoConfig {
     public static int maxFullScreenPictureHeight;
     public static int thumbnailHeight;
     public static int thumbnailQuality;
+    public static int addressElementsCount;
 
     static {
         try {
@@ -30,13 +27,14 @@ public class PhotatoConfig {
             indexFolderName = Boolean.parseBoolean(ini.get("index", "indexFolderName"));
             useParallelPicturesGeneration = Boolean.parseBoolean(ini.get("thumbnail", "useParallelPicturesGeneration"));
             forceExifToolsDownload = Boolean.parseBoolean(ini.get("global", "forceExifToolsDownload"));
+            addressElementsCount = Integer.parseInt(ini.get("global", "addressElementsCount"));
 
             try {
                 resizedPicturesCacheMaxSize = Long.parseLong(ini.get("fullscreen", "resizedPicturesCacheMaxSize"));
             } catch (NumberFormatException ex) {
                 resizedPicturesCacheMaxSize = null;
             }
-            
+
             fullScreenPictureQuality = Integer.parseInt(ini.get("fullscreen", "fullScreenPictureQuality"));
             maxFullScreenPictureWitdh = Integer.parseInt(ini.get("fullscreen", "maxFullScreenPictureWitdh"));
             maxFullScreenPictureHeight = Integer.parseInt(ini.get("fullscreen", "maxFullScreenPictureHeight"));
