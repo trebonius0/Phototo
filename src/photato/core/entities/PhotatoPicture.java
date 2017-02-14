@@ -52,7 +52,7 @@ public class PhotatoPicture extends PhotatoItem {
         this.rotationId = metadata.rotationId;
         this.rawPicture = new PictureInfos(Routes.rawPicturesRootUrl + "/" + this.path, metadata.width, metadata.height);
 
-        if (this.filename.length() > 40 || this.filename.contains("_")) {
+        if (this.filename.length() > 40 || this.filename.contains("_") || this.filename.toLowerCase().startsWith("dsc") || this.filename.toLowerCase().startsWith("img")) {
             this.pictureName = path.getParent().getFileName().toString();
         } else {
             this.pictureName = path.getParent().getFileName() + "/" + this.filename;
