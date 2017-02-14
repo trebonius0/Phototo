@@ -14,9 +14,9 @@ Give to Photato a picture folder and it will index it, using the file system hie
   * Location of the picture
 
 ## Screenshots
-![Pictures Gallery](https://i.imgur.com/U59HnpX.png)
+![Pictures Gallery](https://i.imgur.com/XCj4uYV.png)
 
-![FullScreen Picture](https://i.imgur.com/nKBk6im.png)
+![FullScreen Picture](https://i.imgur.com/LxjRbjI.png)
 
 ## Try it
 ### On Windows
@@ -40,9 +40,7 @@ Here are the features we will implement in the future (you can contribute if you
 - Authentication / Access restriction to some folders
 - Upload of pictures to the filesystem directly through the gallery
 - Edit picture metadata directly through the gallery
-- Easier download of a picture / a group of pictures
 - Auto-generated "galleries": persons / tags / locations / dates
-- Easier configuration mechanism
 - File-based Logging
 - Automated offline keywords annotations
 
