@@ -24,7 +24,7 @@
                 <h1 class="left" data-bind="click: function(){moveToFolder('', true)}">Photato</h1>
 
                 <div class="right">
-                    <form class="search-field" id="search-form" novalidate method="get">
+                    <form class="search-field" id="search-form" novalidate data-bind="submit: runSearchFromForm">
                         <input class="search-input" type="search" name="search" required placeholder="Search&hellip;" autocomplete="off"/>
                         <button class="search-reset" type="reset" tabindex="-1">&times;</button>
                         <button class="search-submit" type="submit" aria-label="Search">

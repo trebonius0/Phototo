@@ -78,7 +78,7 @@ class GalleryViewModel {
     }
 
     public runSearchFromForm(searchElement: any): void {
-        var query: string = $(searchElement).find('#searchField').val();
+        var query: string = $(searchElement).find('.search-input').val();
         this.runSearch(query, true);
     }
 
