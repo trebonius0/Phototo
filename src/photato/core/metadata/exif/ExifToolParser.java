@@ -14,14 +14,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import photato.helpers.OsHelper;
 
 public class ExifToolParser {
 
     private static final int batchSize = 50;
 
     public static Map<Path, ExifMetadata> readMetadata(List<Path> filenames) {
-        boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
-        String applicationName = isWindows ? "exiftool.exe" : "exiftool";
+        String applicationName = OsHelper.isWindows() ? "exiftool.exe" : "exiftool";
         Map<Path, ExifMetadata> result = new ConcurrentHashMap<>();
 
         Stream<List<Path>> parallelStream = IntStream.range(0, (filenames.size() + batchSize - 1) / batchSize)

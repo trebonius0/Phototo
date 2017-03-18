@@ -18,6 +18,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import photato.helpers.OsHelper;
 
 public class ExifToolDownloader {
 
@@ -27,8 +28,7 @@ public class ExifToolDownloader {
     private static final String targetFilename = "exiftool.exe";
 
     public static void run(HttpClient httpClient, FileSystem fileSystem, boolean forceExifToolsDownload) throws IOException {
-        boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
-        if (isWindows) {
+        if ( OsHelper.isWindows()) {
             if (!fileSystem.getPath(targetFilename).toFile().exists() || forceExifToolsDownload) {
                 System.out.println("Starting exifTools download");
                 downloadExifTools(getExifToolsZipUrl(httpClient), httpClient, fileSystem);

@@ -18,6 +18,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import photato.helpers.OsHelper;
 
 public class FfmpegDownloader {
 
@@ -25,8 +26,7 @@ public class FfmpegDownloader {
     private static final String targetFilename = "ffmpeg.exe";
 
     public static void run(HttpClient httpClient, FileSystem fileSystem, boolean forceFfmpegDownload) throws IOException {
-        boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
-        if (isWindows) {
+        if (OsHelper.isWindows()) {
             if (!fileSystem.getPath(targetFilename).toFile().exists() || forceFfmpegDownload) {
                 System.out.println("Starting ffmpeg download");
                 downloadFfmpegTools("https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-latest-win64-static.zip", httpClient, fileSystem);
