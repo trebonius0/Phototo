@@ -10,6 +10,7 @@ public class PhotatoConfig {
     public static boolean prefixModeOnly;
     public static boolean indexFolderName;
     public static boolean useParallelPicturesGeneration;
+    public static boolean forceFfmpegToolsDownload;
     public static boolean forceExifToolsDownload;
     public static Long resizedPicturesCacheMaxSize;
     public static int fullScreenPictureQuality;
@@ -26,6 +27,7 @@ public class PhotatoConfig {
             prefixModeOnly = Boolean.parseBoolean(ini.get("index", "prefixModeOnly"));
             indexFolderName = Boolean.parseBoolean(ini.get("index", "indexFolderName"));
             useParallelPicturesGeneration = Boolean.parseBoolean(ini.get("thumbnail", "useParallelPicturesGeneration"));
+            forceExifToolsDownload = Boolean.parseBoolean(ini.get("global", "forceExifToolsDownload"));
             forceExifToolsDownload = Boolean.parseBoolean(ini.get("global", "forceExifToolsDownload"));
             addressElementsCount = Integer.parseInt(ini.get("global", "addressElementsCount"));
 

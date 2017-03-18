@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import photato.controllers.FullScreenImageHandler;
+import photato.core.resize.ffmpeg.FfmpegDownloader;
 
 public class Photato {
 
@@ -47,7 +48,8 @@ public class Photato {
 
         HttpClient httpClient = HttpClientBuilder.create().setUserAgent(serverName).build();
 
-        ExifToolDownloader.run(httpClient, fileSystem, PhotatoConfig.forceExifToolsDownload);
+        ExifToolDownloader.run(httpClient, fileSystem, PhotatoConfig.forceFfmpegToolsDownload);
+        FfmpegDownloader.run(httpClient, fileSystem, PhotatoConfig.forceExifToolsDownload);
 
         ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, thumbnailCacheFolder, PhotatoConfig.thumbnailHeight, PhotatoConfig.thumbnailQuality);
         IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(httpClient, PhotatoConfig.addressElementsCount);
