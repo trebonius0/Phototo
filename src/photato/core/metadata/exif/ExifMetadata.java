@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import photato.helpers.SafeSimpleDateFormat;
 import java.text.ParseException;
 import java.util.List;
+import photato.helpers.ArrayHelper;
 
 public class ExifMetadata {
 
@@ -14,6 +15,9 @@ public class ExifMetadata {
 
     @SerializedName("RegionPersonDisplayName")
     private Object regionPersonDisplayName;
+
+    @SerializedName("PersonInImage")
+    private Object personInImage;
 
     @SerializedName("Title")
     private String title;
@@ -59,7 +63,10 @@ public class ExifMetadata {
     }
 
     public String[] getPersons() {
-        return getStringArrayFromField(this.regionPersonDisplayName);
+        String[] p1 = getStringArrayFromField(this.regionPersonDisplayName);
+        String[] p2 = getStringArrayFromField(this.personInImage);
+
+        return ArrayHelper.concatenate(p1, p2);
     }
 
     public String[] getTags() {
