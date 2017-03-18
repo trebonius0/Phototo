@@ -8,5 +8,5 @@
 /logs/
 /www/js/app.js
 /www/css/style.css
-tmp.zip
-exiftool.exe
+*.tmp
+*.exe

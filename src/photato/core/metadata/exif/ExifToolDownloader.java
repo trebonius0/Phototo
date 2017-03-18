@@ -23,7 +23,7 @@ public class ExifToolDownloader {
 
     private static final Pattern namePattern = Pattern.compile("http://owl\\.phy\\.queensu\\.ca/~phil/exiftool/exiftool-[0-9]+\\.[0-9]+\\.zip");
     private static final String exifToolRslUrl = "http://owl.phy.queensu.ca/~phil/exiftool/rss.xml";
-    private static final String tmpFilename = "tmp.zip";
+    private static final String tmpFilename = "exiftool.exe.tmp";
     private static final String targetFilename = "exiftool.exe";
 
     public static void run(HttpClient httpClient, FileSystem fileSystem, boolean forceExifToolsDownload) throws IOException {
