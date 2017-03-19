@@ -44,6 +44,7 @@ class PhotatoPicture extends PhotatoMedia {
 class PhotatoVideo extends PhotatoMedia {
     public videoType: string;
     public videoPath: string;
+    public filesize: number;
 }
 
 class PhotatoFolder extends PhotatoItem {

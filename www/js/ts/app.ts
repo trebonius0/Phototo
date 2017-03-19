@@ -257,14 +257,18 @@ class GalleryViewModel {
         }
     }
 
-    private static getLightGallerySubHtml(picture: PhotatoMedia): string {
-        var dateStr = (new Date(picture.timestamp).toLocaleDateString());
-        var title = (picture.title || picture.name);
-        var positionStr = (picture.position.hardcodedPosition || (picture.position.coordinatesDescription && picture.position.coordinatesDescription.length && picture.position.coordinatesDescription) || '')
-        var personsStr = (picture.persons && picture.persons.sort().join(', '));
-        var tagsStr = (picture.tags && picture.tags.sort().join(', '));
+    private static getLightGallerySubHtml(media: PhotatoMedia): string {
+        var dateStr = (new Date(media.timestamp).toLocaleDateString());
+        var title = (media.title || media.name);
+        var positionStr = (media.position.hardcodedPosition || (media.position.coordinatesDescription && media.position.coordinatesDescription.length && media.position.coordinatesDescription) || '')
+        var personsStr = (media.persons && media.persons.sort().join(', '));
+        var tagsStr = (media.tags && media.tags.sort().join(', '));
 
-        var firstRow = '<div class="dateTitle">' + dateStr + '<span class="separator">·</span>' + title + '</div>';
+        var firstRow = '<div class="dateTitle">' + dateStr + '<span class="separator">·</span>' + title;
+        if (media.mediaType == 'video') {
+            firstRow += '<span class="separator">·</span><span class="filesize">' + this.formatBytes((<PhotatoVideo>media).filesize) + '</span>';
+        }
+        firstRow += '</div>';
 
         var secondRowValues: string[] = [];
         if (positionStr) {
@@ -279,6 +283,15 @@ class GalleryViewModel {
         var secondRow = '<div class="subtitle">' + secondRowValues.join('<span class="separator">·</span>') + '</div>';
         return firstRow + (secondRowValues.length ? secondRow : '');
     }
+
+    private static formatBytes(bytes: number) {
+        if (bytes < 1024) return bytes + "B";
+        else if (bytes < 1048576) return (bytes / 1024).toFixed(0) + " KB";
+        else if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + " MB";
+        else return (bytes / 1073741824).toFixed(1) + " GB";
+    };
+
+
 }
 
 function isMobileOrTablet() {
