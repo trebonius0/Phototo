@@ -1,5 +1,6 @@
 .lg-outer .lg-video-object {
     max-width: 100%;
+    min-width: 250px;
     max-height: 100%;
     left: 0;
     right: 0;
@@ -9,9 +10,14 @@
 
 .lg-outer .lg-video .lg-object {
     max-width: 100%;
+    min-width: 250px;
     max-height: 100%;
     left: 0;
     right: 0;
     margin: 0 auto;
     width: auto !important;
+}
+
+.lg-video {
+    min-height: 400px;
 }

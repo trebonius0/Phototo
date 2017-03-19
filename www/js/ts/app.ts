@@ -154,7 +154,8 @@ class GalleryViewModel {
             } else {
                 var video: PhotatoVideo = <PhotatoVideo>media;
                 return {
-                    html: '<video class="lg-video-object lg-html5 video-js vjs-default-skin" controls preload="none"><source src="' + video.videoPath + '" type="' + video.videoType + '">' + Messages.videosNotSupported + '</video>',
+                    html: '<video class="lg-video-object lg-html5 video-js vjs-default-skin" preload="none" controls><source src="' + video.videoPath + '" type="' + video.videoType + '">' + Messages.videosNotSupported + '</video>',
+                    subHtml: GalleryViewModel.getLightGallerySubHtml(video),
                     downloadUrl: video.videoPath,
                     poster: video.fullscreenPicture.url,
                 }
@@ -255,7 +256,7 @@ class GalleryViewModel {
         }
     }
 
-    private static getLightGallerySubHtml(picture: PhotatoPicture): string {
+    private static getLightGallerySubHtml(picture: PhotatoMedia): string {
         var dateStr = (new Date(picture.timestamp).toLocaleDateString());
         var title = (picture.title || picture.name);
         var positionStr = (picture.position.hardcodedPosition || (picture.position.coordinatesDescription && picture.position.coordinatesDescription.length && picture.position.coordinatesDescription) || '')
