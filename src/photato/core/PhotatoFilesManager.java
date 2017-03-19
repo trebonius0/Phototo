@@ -267,7 +267,7 @@ public class PhotatoFilesManager implements Closeable {
                                             } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
                                                 this.manageDirectoryDeletion(filename);
                                             }
-                                        } else if (MediaHelper.isPictureFile(filename)) {
+                                        } else if (MediaHelper.isPictureFile(filename) || MediaHelper.isVideoFile(filename)) {
                                             if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
                                                 this.manageFileCreation(filename);
                                             } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
