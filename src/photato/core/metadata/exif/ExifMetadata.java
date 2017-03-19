@@ -59,7 +59,7 @@ public class ExifMetadata {
     private String orientation;
 
     @SerializedName("Rotation")
-    private Integer rotation;
+    private String rotation;
 
     public String getSourceFile() {
         return sourceFile;
@@ -141,14 +141,20 @@ public class ExifMetadata {
                     return 1;
             }
         } else {
-            switch (Math.abs(this.rotation)) {
-                case 0:
+                
+            switch (this.rotation) {
+                case "0":
+                case "Horizontal":
                     return 1;
-                case 180:
+                case "180":
+                case "-180":
                     return 3;
-                case 90:
+                case "90":
+                case "-90":
+                case "Vertical":
                     return 6;
-                case 270:
+                case "270":
+                case "-270":
                     return 8;
                 default:
                     return 1;
