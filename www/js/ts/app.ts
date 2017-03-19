@@ -9,7 +9,7 @@
 class GalleryViewModel {
     private static batchSize: number = 50;
     public bannerMessage: KnockoutObservable<string>;
-    public pictures: KnockoutComputed<PhotatoPicture[]>;
+    public medias: KnockoutComputed<PhotatoMedia[]>;
     public folders: KnockoutObservableArray<PhotatoFolder>;
     public currentFolder: KnockoutObservable<string>;
     public currentFolderName: KnockoutComputed<string>;
@@ -18,7 +18,7 @@ class GalleryViewModel {
     public breadcrumbs: KnockoutComputed<Breadcrumb[]>;
     private layoutManager: LayoutManager;
     private currentAjaxRequest: any;
-    private allPictures: KnockoutObservableArray<PhotatoPicture>;
+    private allMedias: KnockoutObservableArray<PhotatoMedia>;
     private displayedPicturesCount: KnockoutObservable<number>;
 
     constructor() {
@@ -31,13 +31,13 @@ class GalleryViewModel {
         this.displayedPicturesCount = ko.observable<number>(GalleryViewModel.batchSize);
 
         this.folders = ko.observableArray<PhotatoFolder>();
-        this.allPictures = ko.observableArray<PhotatoPicture>();
+        this.allMedias = ko.observableArray<PhotatoMedia>();
 
-        this.pictures = ko.computed<PhotatoPicture[]>(() => {
-            if (this.allPictures().length > this.displayedPicturesCount()) {
-                return this.allPictures().slice(0, this.displayedPicturesCount());
+        this.medias = ko.computed<PhotatoMedia[]>(() => {
+            if (this.allMedias().length > this.displayedPicturesCount()) {
+                return this.allMedias().slice(0, this.displayedPicturesCount());
             } else {
-                return this.allPictures();
+                return this.allMedias();
             }
         });
 
@@ -103,7 +103,7 @@ class GalleryViewModel {
 
         window.scroll(0, 0); // Reset scroll to prevent OnScroll events from being sent
         this.folders([]);
-        this.allPictures([]);
+        this.allMedias([]);
         this.bannerMessage("");
         this.displayedPicturesCount(GalleryViewModel.batchSize);
         this.currentSearchQuery(query);
@@ -117,16 +117,16 @@ class GalleryViewModel {
         this.currentAjaxRequest = $.ajax("/api/list?folder=" + encodeURIComponent(folder) + queryParameter)
             .success(function(res: PhotatoRequestResults) {
                 that.folders(res.folders);
-                that.allPictures(res.pictures);
+                that.allMedias(res.medias);
 
-                if (res.folders.length == 0 && res.pictures.length == 0) {
+                if (res.folders.length == 0 && res.medias.length == 0) {
                     that.bannerMessage(Messages.noResult);
                 }
 
                 var state = <HistoryState>history.state;
                 if (state) {
                     state.folders = that.folders();
-                    state.allPictures = that.allPictures();
+                    state.allMedias = that.allMedias();
                     state.bannerMessage = that.bannerMessage();
                     state.displayedPicturesCount = that.displayedPicturesCount();
                     history.replaceState(state, null, null);
@@ -141,12 +141,12 @@ class GalleryViewModel {
 
     public openLightGallery(pictureIndex: number): void {
         this.pushState(this.currentFolder(), this.currentSearchQuery(), true);
-        var dynamicEl: any[] = this.allPictures().map((picture: PhotatoPicture) => {
+        var dynamicEl: any[] = this.allMedias().map((picture: PhotatoPicture) => {
             return {
                 src: picture.fullscreenPicture.url,
                 thumb: picture.thumbnail.url,
                 subHtml: GalleryViewModel.getLightGallerySubHtml(picture),
-                downloadUrl: picture.rawPicture.url,
+                downloadUrl: picture.rawPicture && picture.rawPicture.url,
                 width: picture.fullscreenPicture.width,
             }
         });
@@ -198,8 +198,8 @@ class GalleryViewModel {
             newFullScreenOpened = false;
         }
 
-        var state: HistoryState = <HistoryState>{ currentSearchQuery: this.currentSearchQuery(), currentFolder: this.currentFolder(), allPictures: this.allPictures(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount(), bannerMessage: this.bannerMessage() };
-        var newState = { currentSearchQuery: newSearchQuery, currentFolder: newFolder, fullScreenOpened: newFullScreenOpened, allPictures: this.allPictures(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount(), bannerMessage: this.bannerMessage() };
+        var state: HistoryState = <HistoryState>{ currentSearchQuery: this.currentSearchQuery(), currentFolder: this.currentFolder(), allMedias: this.allMedias(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount(), bannerMessage: this.bannerMessage() };
+        var newState = { currentSearchQuery: newSearchQuery, currentFolder: newFolder, fullScreenOpened: newFullScreenOpened, allPictures: this.allMedias(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount(), bannerMessage: this.bannerMessage() };
         history.replaceState(state, null, null);
 
         history.pushState(newState, null, newUrl);
@@ -217,7 +217,7 @@ class GalleryViewModel {
                 this.currentSearchQuery(state.currentSearchQuery);
                 this.currentFolder(state.currentFolder);
                 this.folders(state.folders);
-                this.allPictures(state.allPictures);
+                this.allMedias(state.allMedias);
                 this.bannerMessage(state.bannerMessage);
                 this.displayedPicturesCount(state.displayedPicturesCount);
             }
@@ -230,7 +230,7 @@ class GalleryViewModel {
     private registerOnScrollEvents(): void {
         window.onscroll = (e) => {
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-                if (this.displayedPicturesCount() < this.allPictures().length) {
+                if (this.displayedPicturesCount() < this.allMedias().length) {
                     this.displayedPicturesCount(this.displayedPicturesCount() + GalleryViewModel.batchSize);
 
                     var state = <HistoryState>history.state;
@@ -245,8 +245,8 @@ class GalleryViewModel {
     }
 
     private static getLightGallerySubHtml(picture: PhotatoPicture): string {
-        var dateStr = (new Date(picture.pictureDate).toLocaleDateString());
-        var title = (picture.title || picture.pictureName);
+        var dateStr = (new Date(picture.timestamp).toLocaleDateString());
+        var title = (picture.title || picture.name);
         var positionStr = (picture.position.hardcodedPosition || (picture.position.coordinatesDescription && picture.position.coordinatesDescription.length && picture.position.coordinatesDescription) || '')
         var personsStr = (picture.persons && picture.persons.sort().join(', '));
         var tagsStr = (picture.tags && picture.tags.sort().join(', '));

@@ -6,9 +6,7 @@ import photato.helpers.Md5;
 
 public class PhotatoVideo extends PhotatoMedia {
 
-    public final Path extractedPicturePath;
-
-    public PhotatoVideo(Path rootFolder, Path path, Metadata metadata, PictureInfos thumbnailInfos, PictureInfos fullScreenInfos, long lastModificationTimestamp, Path extractedVideoPicturesFolders) {
+    public PhotatoVideo(Path rootFolder, Path path, Metadata metadata, PictureInfos thumbnailInfos, PictureInfos fullScreenInfos, long lastModificationTimestamp) {
         super("video", rootFolder, path, metadata, thumbnailInfos, fullScreenInfos, lastModificationTimestamp);
 
         if (this.filename.length() > 40 || this.filename.contains("_") || this.filename.toLowerCase().startsWith("vid")) {
@@ -16,8 +14,6 @@ public class PhotatoVideo extends PhotatoMedia {
         } else {
             this.name = path.getParent().getFileName() + "/" + this.filename;
         }
-
-        this.extractedPicturePath = getExtractedPicturePath(extractedVideoPicturesFolders, this.fsPath, this.lastModificationTimestamp);
     }
 
     public static Path getExtractedPicturePath(Path extractedVideoPicturesFolders, Path videoFsPath, long videoLastModificationTimestamp) {

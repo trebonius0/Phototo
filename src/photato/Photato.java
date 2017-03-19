@@ -32,6 +32,7 @@ public class Photato {
     private static final String serverName = "Photato/1.0";
     private static final String thumbnailCacheFolder = "cache/thumbnails";
     private static final String fullscreenCacheFolder = "cache/fullscreen";
+    private static final String extractedPicturesCacheFolder = "cache/extracted";
 
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
@@ -52,10 +53,10 @@ public class Photato {
         ExifToolDownloader.run(httpClient, fileSystem, PhotatoConfig.forceFfmpegToolsDownload);
         FfmpegDownloader.run(httpClient, fileSystem, PhotatoConfig.forceExifToolsDownload);
 
-        ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, thumbnailCacheFolder, PhotatoConfig.thumbnailHeight, PhotatoConfig.thumbnailQuality);
+        ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, thumbnailCacheFolder, extractedPicturesCacheFolder, PhotatoConfig.thumbnailHeight, PhotatoConfig.thumbnailQuality);
         IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(httpClient, PhotatoConfig.addressElementsCount);
         MetadataAggregator metadataGetter = new MetadataAggregator(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
-        FullScreenImageGetter fullScreenImageGetter = new FullScreenImageGetter(fileSystem, rootFolder, fullscreenCacheFolder, PhotatoConfig.fullScreenPictureQuality, PhotatoConfig.maxFullScreenPictureWitdh, PhotatoConfig.maxFullScreenPictureHeight);
+        FullScreenImageGetter fullScreenImageGetter = new FullScreenImageGetter(fileSystem, rootFolder, fullscreenCacheFolder, extractedPicturesCacheFolder, PhotatoConfig.fullScreenPictureQuality, PhotatoConfig.maxFullScreenPictureWitdh, PhotatoConfig.maxFullScreenPictureHeight);
 
         PhotatoFilesManager photatoFilesManager = new PhotatoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, fullScreenImageGetter, PhotatoConfig.prefixModeOnly, PhotatoConfig.indexFolderName, PhotatoConfig.useParallelPicturesGeneration);
 

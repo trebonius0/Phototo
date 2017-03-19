@@ -4,15 +4,16 @@ import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import photato.Routes;
-import photato.core.metadata.Metadata;
+import photato.core.entities.PhotatoMedia;
+import photato.core.entities.PhotatoPicture;
 import photato.core.resize.ResizedImageGenerator;
 
 public class ThumbnailGenerator extends ResizedImageGenerator implements IThumbnailGenerator {
 
     private final int thumbailHeight;
 
-    public ThumbnailGenerator(FileSystem fileSystem, Path rootFolder, String thumbnailsFolderName, int thumbnailHeight, int thumbnailQuality) throws IOException {
-        super(fileSystem, rootFolder, thumbnailsFolderName, thumbnailQuality, true);
+    public ThumbnailGenerator(FileSystem fileSystem, Path rootFolder, String thumbnailsFolderName, String extractedPicturesFolderName, int thumbnailHeight, int thumbnailQuality) throws IOException {
+        super(fileSystem, rootFolder, thumbnailsFolderName, extractedPicturesFolderName, thumbnailQuality, true);
         this.thumbailHeight = thumbnailHeight;
     }
 
@@ -32,8 +33,8 @@ public class ThumbnailGenerator extends ResizedImageGenerator implements IThumbn
     }
 
     @Override
-    public void generateThumbnail(Path originalFilename, long lastModifiedTimestamp, Metadata metadata) throws IOException {
-       this.generateResizedPicture(originalFilename, lastModifiedTimestamp, metadata.rotationId);
+    public void generateThumbnail(PhotatoMedia media) throws IOException {
+        this.generateResizedPicture(media.fsPath, media.lastModificationTimestamp, media instanceof PhotatoPicture ? ((PhotatoPicture) media).rotationId : 1);
     }
 
     @Override

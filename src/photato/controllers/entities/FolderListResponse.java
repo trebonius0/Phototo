@@ -11,11 +11,11 @@ public class FolderListResponse {
     public final Collection<PhotatoFolder> folders;
 
     @Expose
-    public final Collection<PhotatoMedia> pictures;
+    public final Collection<PhotatoMedia> medias;
 
-    public FolderListResponse(Collection<PhotatoFolder> folders, Collection<PhotatoMedia> pictures) {
+    public FolderListResponse(Collection<PhotatoFolder> folders, Collection<PhotatoMedia> medias) {
         this.folders = folders;
-        this.pictures = pictures;
+        this.medias = medias;
     }
 
 }

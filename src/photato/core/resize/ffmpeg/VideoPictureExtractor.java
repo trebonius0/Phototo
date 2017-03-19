@@ -1,7 +1,10 @@
 package photato.core.resize.ffmpeg;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import photato.helpers.OsHelper;
+import photato.helpers.RandomManager;
 
 public class VideoPictureExtractor {
 
@@ -14,5 +17,18 @@ public class VideoPictureExtractor {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    public static Path extractPictureFromVideoWithRandomPath(Path videoPath, Path cacheFolder) {
+        if (!Files.exists(cacheFolder)) {
+            try {
+                Files.createDirectories(cacheFolder);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        Path outputPicturePath = cacheFolder.resolve("tmp_" + RandomManager.nextInt() + ".jpg");
+        extractPictureFromVideo(videoPath, outputPicturePath);
+        return outputPicturePath;
     }
 }

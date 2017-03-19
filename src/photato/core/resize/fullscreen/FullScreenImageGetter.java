@@ -7,6 +7,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
 import photato.Routes;
 import photato.core.entities.PhotatoMedia;
+import photato.core.entities.PhotatoPicture;
 import photato.core.resize.ResizedImageGenerator;
 
 public class FullScreenImageGetter extends ResizedImageGenerator implements IFullScreenImageGetter {
@@ -14,15 +15,15 @@ public class FullScreenImageGetter extends ResizedImageGenerator implements IFul
     private final int maxPictureWidth;
     private final int maxPictureHeight;
 
-    public FullScreenImageGetter(FileSystem fileSystem, Path rootFolder, String cacheFolderName, int wantedQuality, int maxPictureWidth, int maxPictureHeight) throws IOException {
-        super(fileSystem, rootFolder, cacheFolderName, wantedQuality, false);
+    public FullScreenImageGetter(FileSystem fileSystem, Path rootFolder, String fullScreenCacheFolderName, String extractedPicturesFolderName, int wantedQuality, int maxPictureWidth, int maxPictureHeight) throws IOException {
+        super(fileSystem, rootFolder, fullScreenCacheFolderName, extractedPicturesFolderName, wantedQuality, false);
         this.maxPictureHeight = maxPictureHeight;
         this.maxPictureWidth = maxPictureWidth;
     }
 
     @Override
     public void generateImage(PhotatoMedia media) throws IOException {
-        this.generateResizedPicture(media.fsPath, media.lastModificationTimestamp, media.rotationId);
+        this.generateResizedPicture(media.fsPath, media.lastModificationTimestamp, media instanceof PhotatoPicture ? ((PhotatoPicture) media).rotationId : 1);
     }
 
     @Override

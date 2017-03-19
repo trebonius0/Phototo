@@ -1,7 +1,7 @@
 class HistoryState {
     public currentSearchQuery: string;
     public currentFolder: string;
-    public allPictures: PhotatoPicture[];
+    public allMedias: PhotatoMedia[];
     public folders: PhotatoFolder[];
     public displayedPicturesCount: number;
     public bannerMessage: string;

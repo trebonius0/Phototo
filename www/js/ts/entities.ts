@@ -1,6 +1,6 @@
 class PhotatoRequestResults {
     public folders: PhotatoFolder[];
-    public pictures: PhotatoPicture[];
+    public medias: PhotatoMedia[];
 }
 
 class PictureInfos {
@@ -19,10 +19,12 @@ abstract class PhotatoItem {
     public thumbnail: PictureInfos;
 }
 
-class PhotatoPicture extends PhotatoItem {
+class PhotatoMedia extends PhotatoItem {
+    public mediaType: string;
+    
     public title: string;
 
-    public pictureName: string;
+    public name: string;
 
     public tags: string[];
 
@@ -31,10 +33,12 @@ class PhotatoPicture extends PhotatoItem {
     public position: PhotatoPicturePosition;
 
     public fullscreenPicture: PictureInfos;
-    
-    public rawPicture: PictureInfos;
 
-    public pictureDate: number;
+    public timestamp: number;
+}
+
+class PhotatoPicture extends PhotatoMedia {    
+    public rawPicture: PictureInfos;
 
 }
 

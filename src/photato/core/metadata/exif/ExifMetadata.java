@@ -58,6 +58,9 @@ public class ExifMetadata {
     @SerializedName("Orientation")
     private String orientation;
 
+    @SerializedName("Rotation")
+    private Integer rotation;
+
     public String getSourceFile() {
         return sourceFile;
     }
@@ -112,29 +115,44 @@ public class ExifMetadata {
     }
 
     public int getRotationId() {
-        if (this.orientation == null) {
-            return 1;
-        }
+        if (this.rotation == null) {
+            if (this.orientation == null) {
+                return 1;
+            }
 
-        switch (this.orientation) {
-            case "Horizontal (normal)":
-                return 1;
-            case "Mirror horizontal":
-                return 2;
-            case "Rotate 180":
-                return 3;
-            case "Mirror vertical":
-                return 4;
-            case "Mirror horizontal and rotate 270 CW":
-                return 5;
-            case "Rotate 90 CW":
-                return 6;
-            case "Mirror horizontal and rotate 90 CW":
-                return 7;
-            case "Rotate 270 CW":
-                return 8;
-            default:
-                return 1;
+            switch (this.orientation) {
+                case "Horizontal (normal)":
+                    return 1;
+                case "Mirror horizontal":
+                    return 2;
+                case "Rotate 180":
+                    return 3;
+                case "Mirror vertical":
+                    return 4;
+                case "Mirror horizontal and rotate 270 CW":
+                    return 5;
+                case "Rotate 90 CW":
+                    return 6;
+                case "Mirror horizontal and rotate 90 CW":
+                    return 7;
+                case "Rotate 270 CW":
+                    return 8;
+                default:
+                    return 1;
+            }
+        } else {
+            switch (Math.abs(this.rotation)) {
+                case 0:
+                    return 1;
+                case 180:
+                    return 3;
+                case 90:
+                    return 6;
+                case 270:
+                    return 8;
+                default:
+                    return 1;
+            }
         }
     }
 

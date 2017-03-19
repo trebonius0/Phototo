@@ -14,10 +14,12 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
+import photato.core.resize.ffmpeg.VideoPictureExtractor;
 import photato.helpers.FileHelper;
 import photato.helpers.ImageHelper;
 import photato.helpers.JpegEncoder;
 import photato.helpers.Md5;
+import photato.helpers.MediaHelper;
 
 public abstract class ResizedImageGenerator {
 
@@ -25,13 +27,15 @@ public abstract class ResizedImageGenerator {
     private final boolean forceResize;
     protected final FileSystem fileSystem;
     protected final Path resizedPicturesFolder;
+    private final Path extractedPicturesFolder;
     private final Path rootFolder;
     private final Set<Path> resizedPicturesSet;
     private final Object lock = new Object();
 
-    public ResizedImageGenerator(FileSystem fileSystem, Path rootFolder, String resizedPicturesFolderName, int resizedPictureQuality, boolean forceResize) throws IOException {
+    public ResizedImageGenerator(FileSystem fileSystem, Path rootFolder, String resizedPicturesFolderName, String extractedPicturesFolderName, int resizedPictureQuality, boolean forceResize) throws IOException {
         this.fileSystem = fileSystem;
         this.resizedPicturesFolder = this.fileSystem.getPath(resizedPicturesFolderName);
+        this.extractedPicturesFolder = this.fileSystem.getPath(extractedPicturesFolderName);
         this.resizedPicturesSet = new HashSet<>();
         this.forceResize = forceResize;
 
@@ -50,19 +54,29 @@ public abstract class ResizedImageGenerator {
      * regenerated, false if it already existed
      */
     protected final void generateResizedPicture(Path originalFilename, long lastModifiedTimestamp, int rotationId) throws IOException {
-        Path path = this.getResizedPicturePath(originalFilename, lastModifiedTimestamp);
+        Path resizedPicturePath = this.getResizedPicturePath(originalFilename, lastModifiedTimestamp);
 
         synchronized (this.lock) {
-            if (resizedPicturesSet.contains(path)) {
+            if (resizedPicturesSet.contains(resizedPicturePath)) {
                 return;
             }
 
-            this.resizedPicturesSet.add(path);
+            this.resizedPicturesSet.add(resizedPicturePath);
         }
 
-        BufferedImage originalImage = ImageHelper.readImage(originalFilename, rotationId);
-        int newWidth = getResizedPictureWidth(originalImage.getWidth(), originalImage.getHeight());
-        int newHeight = getResizedPictureHeight(originalImage.getWidth(), originalImage.getHeight());
+        BufferedImage originalImage;
+
+        if (MediaHelper.isVideoFile(originalFilename)) {
+            Path tmpPicturePath = VideoPictureExtractor.extractPictureFromVideoWithRandomPath(originalFilename, extractedPicturesFolder);
+            originalImage = ImageHelper.readImage(tmpPicturePath, 1);
+            Files.delete(tmpPicturePath);
+        } else if (MediaHelper.isPictureFile(originalFilename)) {
+            originalImage = ImageHelper.readImage(originalFilename, rotationId);
+        } else {
+            throw new IllegalArgumentException();
+        }
+        int newWidth = this.getResizedPictureWidth(originalImage.getWidth(), originalImage.getHeight());
+        int newHeight = this.getResizedPictureHeight(originalImage.getWidth(), originalImage.getHeight());
 
         BufferedImage image;
         if (this.forceResize || (newWidth <= originalImage.getWidth() && newHeight <= originalImage.getHeight())) {
@@ -71,7 +85,7 @@ public abstract class ResizedImageGenerator {
             image = originalImage;
         }
 
-        try (OutputStream out = new BufferedOutputStream(new FileOutputStream(path.toFile()))) {
+        try (OutputStream out = new BufferedOutputStream(new FileOutputStream(resizedPicturePath.toFile()))) {
             new JpegEncoder(image, this.resizedPictureQuality, out).Compress();
         }
     }

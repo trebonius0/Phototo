@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 import photato.core.entities.PhotatoMedia;
 import photato.core.resize.fullscreen.IFullScreenImageGetter;
 import photato.core.resize.thumbnails.IThumbnailGenerator;
+import photato.helpers.MediaHelper;
 
 public class PhotatoFilesManager implements Closeable {
 
@@ -173,27 +174,27 @@ public class PhotatoFilesManager implements Closeable {
                 // Extraction of pictures metadata
                 Map<Path, Metadata> metadatas = this.metadataAggregator.getMetadatas(
                         Files.list(currentFolder.fsPath).parallel()
-                                .filter((Path path) -> isPictureFile(path) || isVideoFile(path))
+                                .filter((Path path) -> MediaHelper.isPictureFile(path) || MediaHelper.isVideoFile(path))
                                 .map((path) -> new Tuple<>(path, tryGetLastModifiedTimestamp(path)))
                                 .collect(Collectors.toList()));
 
-                List<PhotatoMedia> pictures = metadatas.entrySet().parallelStream()
-                        .map((Map.Entry<Path, Metadata> entry) -> new PhotatoPicture(this.rootFolder.fsPath, entry.getKey(), entry.getValue(),
+                List<PhotatoMedia> medias = metadatas.entrySet().parallelStream()
+                        .map((Map.Entry<Path, Metadata> entry) -> PhotatoMedia.createMedia(this.rootFolder.fsPath, entry.getKey(), entry.getValue(),
                         new PictureInfos(this.thumbnailGenerator.getThumbnailUrl(entry.getKey(), tryGetLastModifiedTimestamp(entry.getKey())), this.thumbnailGenerator.getThumbnailWidth(entry.getValue().width, entry.getValue().height), this.thumbnailGenerator.getThumbnailHeight(entry.getValue().width, entry.getValue().height)),
                         new PictureInfos(this.fullScreenImageGetter.getImageUrl(entry.getKey(), tryGetLastModifiedTimestamp(entry.getKey())), this.fullScreenImageGetter.getImageWidth(entry.getValue().width, entry.getValue().height), this.fullScreenImageGetter.getImageHeight(entry.getValue().width, entry.getValue().height)),
                         tryGetLastModifiedTimestamp(entry.getKey())))
                         .collect(Collectors.toList());
 
-                pictures.forEach((PhotatoMedia media) -> {
+                medias.forEach((PhotatoMedia media) -> {
                     currentFolder.medias.add(media);
                     searchManager.addMedia(rootFolder, media);
                     mediaHashUrlToMediaMap.put(Paths.get(media.fullscreenPicture.url).getFileName().toString(), media);
                 });
 
-                Stream<PhotatoMedia> thumbnailStream = this.useParallelPicturesGeneration ? pictures.parallelStream() : pictures.stream(); // This could be a parallel stream. However, since thumbnail generation takes a lot of RAM, having it parallel would take too much ram (bad on small machines)
+                Stream<PhotatoMedia> thumbnailStream = this.useParallelPicturesGeneration ? medias.parallelStream() : medias.stream(); // This could be a parallel stream. However, since thumbnail generation takes a lot of RAM, having it parallel would take too much ram (bad on small machines)
                 thumbnailStream.forEach((PhotatoMedia media) -> {
                     try {
-                        thumbnailGenerator.generateThumbnail(media.fsPath, media.lastModificationTimestamp, metadatas.get(media.fsPath));
+                        thumbnailGenerator.generateThumbnail(media);
                         fullScreenImageGetter.generateImage(media);
                     } catch (IOException ex) {
                         ex.printStackTrace();
@@ -223,30 +224,6 @@ public class PhotatoFilesManager implements Closeable {
 
             return currentFolder;
         }
-    }
-
-    private static boolean isPictureFile(Path path) {
-        String pathStr = path.toString().toLowerCase();
-        String extension = FileHelper.getExtension(pathStr);
-        for (String supportedExtension : Photato.supportedPictureExtensions) {
-            if (supportedExtension.equalsIgnoreCase(extension)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private static boolean isVideoFile(Path path) {
-        String pathStr = path.toString().toLowerCase();
-        String extension = FileHelper.getExtension(pathStr);
-        for (String supportedExtension : Photato.supportedVideoExtensions) {
-            if (supportedExtension.equalsIgnoreCase(extension)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private class WatchServiceThread extends Thread {
@@ -290,7 +267,7 @@ public class PhotatoFilesManager implements Closeable {
                                             } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
                                                 this.manageDirectoryDeletion(filename);
                                             }
-                                        } else if (isPictureFile(filename)) {
+                                        } else if (MediaHelper.isPictureFile(filename)) {
                                             if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
                                                 this.manageFileCreation(filename);
                                             } else if (kind == StandardWatchEventKinds.ENTRY_DELETE) {
@@ -329,12 +306,12 @@ public class PhotatoFilesManager implements Closeable {
                 Metadata metadata = metadataAggregator.getMetadata(filename, lastModificationTimestamp);
                 PictureInfos thumbnailInfos = new PictureInfos(thumbnailGenerator.getThumbnailUrl(filename, lastModificationTimestamp), thumbnailGenerator.getThumbnailWidth(metadata.width, metadata.height), thumbnailGenerator.getThumbnailHeight(metadata.width, metadata.height));
                 PictureInfos fullScreenInfos = new PictureInfos(fullScreenImageGetter.getImageUrl(filename, lastModificationTimestamp), fullScreenImageGetter.getImageWidth(metadata.width, metadata.height), fullScreenImageGetter.getImageHeight(metadata.width, metadata.height));
-                PhotatoMedia picture = new PhotatoMedia(rootFolder.fsPath, filename, metadataAggregator.getMetadata(filename, lastModificationTimestamp), thumbnailInfos, fullScreenInfos, lastModificationTimestamp);
-                folder.medias.add(picture);
-                searchManager.addMedia(rootFolder, picture);
-                mediaHashUrlToMediaMap.put(Paths.get(picture.fullscreenPicture.url).getFileName().toString(), picture);
-                thumbnailGenerator.generateThumbnail(picture.fsPath, picture.lastModificationTimestamp, metadata);
-                fullScreenImageGetter.generateImage(picture);
+                PhotatoMedia media = PhotatoMedia.createMedia(rootFolder.fsPath, filename, metadataAggregator.getMetadata(filename, lastModificationTimestamp), thumbnailInfos, fullScreenInfos, lastModificationTimestamp);
+                folder.medias.add(media);
+                searchManager.addMedia(rootFolder, media);
+                mediaHashUrlToMediaMap.put(Paths.get(media.fullscreenPicture.url).getFileName().toString(), media);
+                thumbnailGenerator.generateThumbnail(media);
+                fullScreenImageGetter.generateImage(media);
             }
         }
 

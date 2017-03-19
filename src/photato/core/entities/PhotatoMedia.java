@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import java.nio.file.Path;
 import photato.core.metadata.Metadata;
 import photato.core.metadata.gps.Position;
+import photato.helpers.MediaHelper;
 
 public abstract class PhotatoMedia extends PhotatoItem {
 
@@ -47,6 +48,16 @@ public abstract class PhotatoMedia extends PhotatoItem {
         this.lastModificationTimestamp = lastModificationTimestamp;
         this.timestamp = metadata.pictureDate;
         this.fullscreenPicture = fullScreenInfos;
+    }
+
+    public static PhotatoMedia createMedia(Path rootFolder, Path path, Metadata metadata, PictureInfos thumbnailInfos, PictureInfos fullScreenInfos, long lastModificationTimestamp) {
+        if (MediaHelper.isPictureFile(path)) {
+            return new PhotatoPicture(rootFolder, path, metadata, thumbnailInfos, fullScreenInfos, lastModificationTimestamp);
+        } else if (MediaHelper.isVideoFile(path)) {
+            return new PhotatoVideo(rootFolder, path, metadata, thumbnailInfos, fullScreenInfos, lastModificationTimestamp);
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
 }
