@@ -41,7 +41,7 @@ public class FolderListHandler extends PhotatoHandler {
 
             folders.sort((PhotatoFolder f1, PhotatoFolder f2) -> f1.filename.compareTo(f2.filename));
             pictures.sort((PhotatoPicture p1, PhotatoPicture p2) -> {
-                int c = Long.compare(p1.pictureDate, p2.pictureDate);
+                int c = Long.compare(p1.timestamp, p2.timestamp);
                 if (c == 0) {
                     return p1.filename.compareTo(p2.filename);
                 } else {
