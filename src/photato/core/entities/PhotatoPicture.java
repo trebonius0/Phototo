@@ -13,7 +13,7 @@ public class PhotatoPicture extends PhotatoMedia {
     public final int rotationId;
 
     public PhotatoPicture(Path rootFolder, Path path, Metadata metadata, PictureInfos thumbnailInfos, PictureInfos fullScreenInfos, long lastModificationTimestamp) {
-        super(rootFolder, path, metadata, thumbnailInfos, fullScreenInfos, lastModificationTimestamp);
+        super("picture", rootFolder, path, metadata, thumbnailInfos, fullScreenInfos, lastModificationTimestamp);
         this.rotationId = metadata.rotationId;
         this.rawPicture = new PictureInfos(Routes.rawPicturesRootUrl + "/" + this.path, metadata.width, metadata.height);
 

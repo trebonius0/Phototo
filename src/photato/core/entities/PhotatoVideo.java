@@ -9,7 +9,7 @@ public class PhotatoVideo extends PhotatoMedia {
     public final Path extractedPicturePath;
 
     public PhotatoVideo(Path rootFolder, Path path, Metadata metadata, PictureInfos thumbnailInfos, PictureInfos fullScreenInfos, long lastModificationTimestamp, Path extractedVideoPicturesFolders) {
-        super(rootFolder, path, metadata, thumbnailInfos, fullScreenInfos, lastModificationTimestamp);
+        super("video", rootFolder, path, metadata, thumbnailInfos, fullScreenInfos, lastModificationTimestamp);
 
         if (this.filename.length() > 40 || this.filename.contains("_") || this.filename.toLowerCase().startsWith("vid")) {
             this.name = path.getParent().getFileName().toString();

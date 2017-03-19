@@ -4,15 +4,15 @@ import java.io.IOException;
 import java.nio.file.Path;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
-import photato.core.entities.PhotatoPicture;
+import photato.core.entities.PhotatoMedia;
 
 public interface IFullScreenImageGetter {
 
-    void generateImage(PhotatoPicture picture) throws IOException;
+    void generateImage(PhotatoMedia media) throws IOException;
 
-    void deleteImage(PhotatoPicture picture) throws IOException;
+    void deleteImage(PhotatoMedia media) throws IOException;
 
-    FileEntity getImage(PhotatoPicture picture, ContentType contentType) throws IOException;
+    FileEntity getImage(PhotatoMedia media, ContentType contentType) throws IOException;
 
     String getImageUrl(Path originalFilename, long lastModifiedTimestamp);
 

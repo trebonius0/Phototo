@@ -8,10 +8,13 @@ import photato.core.metadata.gps.Position;
 public abstract class PhotatoMedia extends PhotatoItem {
 
     @Expose
+    public final String mediaType;
+
+    @Expose
     public final String title;
 
     @Expose
-    public  String name;
+    public String name;
 
     @Expose
     public final String[] tags;
@@ -33,8 +36,9 @@ public abstract class PhotatoMedia extends PhotatoItem {
     @Expose
     public final long timestamp;
 
-    public PhotatoMedia(Path rootFolder, Path path, Metadata metadata, PictureInfos thumbnailInfos, PictureInfos fullScreenInfos, long lastModificationTimestamp) {
+    public PhotatoMedia(String mediaType, Path rootFolder, Path path, Metadata metadata, PictureInfos thumbnailInfos, PictureInfos fullScreenInfos, long lastModificationTimestamp) {
         super(rootFolder, path);
+        this.mediaType = mediaType;
         this.title = metadata.title;
         this.tags = metadata.tags == null ? new String[]{} : metadata.tags;
         this.persons = metadata.persons == null ? new String[]{} : metadata.persons;

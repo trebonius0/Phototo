@@ -9,7 +9,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
 import photato.core.PhotatoFilesManager;
-import photato.core.entities.PhotatoPicture;
+import photato.core.entities.PhotatoMedia;
 import photato.core.resize.fullscreen.IFullScreenImageGetter;
 import photato.helpers.FileHelper;
 
@@ -46,7 +46,7 @@ public class FullScreenImageHandler extends ImageHandler {
         String extension = FileHelper.getExtension(path);
         ContentType contentType = ContentType.create(getContentType(extension.toLowerCase()));
 
-        PhotatoPicture picture = this.photatoFilesManager.getPictureFromHashUrl(path);
+        PhotatoMedia picture = this.photatoFilesManager.getMediaFromHashUrl(path);
 
         return this.fullScreenImageEntityGetter.getImage(picture, contentType);
 

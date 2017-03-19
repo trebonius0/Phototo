@@ -28,6 +28,7 @@ import photato.core.resize.ffmpeg.FfmpegDownloader;
 public class Photato {
 
     public static final String[] supportedPictureExtensions = new String[]{"jpg", "jpeg", "png", "bmp"};
+    public static final String[] supportedVideoExtensions = new String[]{"mp4", "webm"};
     private static final String serverName = "Photato/1.0";
     private static final String thumbnailCacheFolder = "cache/thumbnails";
     private static final String fullscreenCacheFolder = "cache/fullscreen";

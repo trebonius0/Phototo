@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
 import photato.Routes;
-import photato.core.entities.PhotatoPicture;
+import photato.core.entities.PhotatoMedia;
 import photato.core.resize.ResizedImageGenerator;
 import photato.helpers.LRUSet;
 
@@ -43,13 +43,13 @@ public class FullScreenImageGetter extends ResizedImageGenerator implements IFul
     }
 
     @Override
-    public void generateImage(PhotatoPicture picture) throws IOException {
+    public void generateImage(PhotatoMedia media) throws IOException {
         this.cleanLRUCache();
 
-        boolean hasGeneratedNewPicture = this.generateResizedPicture(picture.fsPath, picture.lastModificationTimestamp, picture.rotationId);
+        boolean hasGeneratedNewPicture = this.generateResizedPicture(media.fsPath, media.lastModificationTimestamp, media.rotationId);
 
         if (this.picturesLRUSet != null) {
-            Path resizedPicturePath = this.getResizedPicturePath(picture.fsPath, picture.lastModificationTimestamp);
+            Path resizedPicturePath = this.getResizedPicturePath(media.fsPath, media.lastModificationTimestamp);
             if (hasGeneratedNewPicture) {
                 this.picturesLRUSet.add(resizedPicturePath, Files.size(resizedPicturePath));
             } else {
@@ -60,15 +60,15 @@ public class FullScreenImageGetter extends ResizedImageGenerator implements IFul
     }
 
     @Override
-    public void deleteImage(PhotatoPicture picture) throws IOException {
+    public void deleteImage(PhotatoMedia media) throws IOException {
         if (this.picturesLRUSet != null) {
-            this.picturesLRUSet.remove(picture.fsPath);
+            this.picturesLRUSet.remove(media.fsPath);
         }
-        this.deleteResizedPicture(picture.fsPath, picture.lastModificationTimestamp);
+        this.deleteResizedPicture(media.fsPath, media.lastModificationTimestamp);
     }
 
     @Override
-    public FileEntity getImage(PhotatoPicture picture, ContentType contentType) throws IOException {
+    public FileEntity getImage(PhotatoMedia picture, ContentType contentType) throws IOException {
         this.generateImage(picture);
         return new FileEntity(this.fileSystem.getPath(this.resizedPicturesFolder.toString(), this.getResizedPictureFilename(picture.fsPath, picture.lastModificationTimestamp)).toFile(), contentType);
     }

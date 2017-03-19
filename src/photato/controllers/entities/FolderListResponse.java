@@ -3,7 +3,7 @@ package photato.controllers.entities;
 import com.google.gson.annotations.Expose;
 import java.util.Collection;
 import photato.core.entities.PhotatoFolder;
-import photato.core.entities.PhotatoPicture;
+import photato.core.entities.PhotatoMedia;
 
 public class FolderListResponse {
 
@@ -11,9 +11,9 @@ public class FolderListResponse {
     public final Collection<PhotatoFolder> folders;
 
     @Expose
-    public final Collection<PhotatoPicture> pictures;
+    public final Collection<PhotatoMedia> pictures;
 
-    public FolderListResponse(Collection<PhotatoFolder> folders, Collection<PhotatoPicture> pictures) {
+    public FolderListResponse(Collection<PhotatoFolder> folders, Collection<PhotatoMedia> pictures) {
         this.folders = folders;
         this.pictures = pictures;
     }
