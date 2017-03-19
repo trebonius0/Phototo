@@ -85,15 +85,33 @@
     #pictures-gallery {
         font-size: 0;
 
-        img {
-            z-index: 0;
-            padding: 0;
-            margin: 0;
-            background-position: center center; 
-            background-repeat: none;
-            background-size: cover;
-
+        .img-container {
+            display: inline-block; 
+            position: relative;
             cursor: pointer;
+            margin: 0;
+            padding: 0;
+
+            img {
+                z-index: 0;
+                padding: 0;
+                margin: 0;
+                background-position: center center; 
+                background-repeat: none;
+                background-size: cover;
+            }
+
+            .video-button {
+                background-image: url('https://cdn.jsdelivr.net/lightgallery/1.3.9/img/video-play.png');
+                background-size: cover;
+                position: absolute;
+                width: 48px;
+                height: 48px;
+                top: 61px;
+                left: 0;
+                right: 0;
+                margin: 0 auto;
+            }
         }
     }
 }

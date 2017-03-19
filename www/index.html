@@ -64,7 +64,11 @@
                 </div>
 
                 <div id="pictures-gallery" data-bind="foreach: medias">
-                    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-bind=" style: {'background-image':'url(\''+thumbnail.url+'\')'} , attr: { 'data-width': thumbnail.width, width: thumbnail.width, height: thumbnail.height }, click: () => $parent.openLightGallery($index())" />
+                    <div class="img-container">
+                        <img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" data-bind=" style: {'background-image':'url(\''+thumbnail.url+'\')'} , attr: { 'data-width': thumbnail.width, width: thumbnail.width, height: thumbnail.height }, click: () => $parent.openLightGallery($index())" />
+                    
+                        <i class="video-button" data-bind="visible: $data.mediaType=='video', click: () => $parent.openLightGallery($index())"></i>
+                    </div>
                 </div>
             </div>
         </div>
