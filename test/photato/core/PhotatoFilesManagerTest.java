@@ -23,6 +23,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
 import org.junit.Assert;
 import org.junit.Test;
+import photato.core.entities.PhotatoMedia;
 import photato.core.resize.fullscreen.IFullScreenImageGetter;
 import photato.core.resize.thumbnails.IThumbnailGenerator;
 
@@ -33,8 +34,8 @@ public class PhotatoFilesManagerTest {
         private static final Set<String> thumbnails = new HashSet<>();
 
         @Override
-        public void generateThumbnail(Path originalFilename, long lastModifiedTimestamp, Metadata metadata) {
-            thumbnails.add(originalFilename.toString());
+        public void generateThumbnail(PhotatoMedia media) {
+            thumbnails.add(media.fsPath.toString());
         }
 
         @Override
@@ -103,15 +104,15 @@ public class PhotatoFilesManagerTest {
     private static class FullScreenGetterMock implements IFullScreenImageGetter {
 
         @Override
-        public void generateImage(PhotatoPicture picture) throws IOException {
+        public void generateImage(PhotatoMedia media) throws IOException {
         }
 
         @Override
-        public void deleteImage(PhotatoPicture picture) throws IOException {
+        public void deleteImage(PhotatoMedia media) throws IOException {
         }
 
         @Override
-        public FileEntity getImage(PhotatoPicture picture, ContentType contentType) throws IOException {
+        public FileEntity getImage(PhotatoMedia media, ContentType contentType) throws IOException {
             return null;
         }
 
@@ -129,16 +130,11 @@ public class PhotatoFilesManagerTest {
         public int getImageHeight(int originalWidth, int originalHeight) {
             return 10;
         }
-
-        @Override
-        public boolean precomputationsEnabled() {
-            return true;
-        }
-
     }
 
     @Test
     public void test() throws Exception {
+        
         String rootFolder = "/home/myself/images";
         int sleepDelayForWaitingWatcherThread = 5000;
 
@@ -178,7 +174,7 @@ public class PhotatoFilesManagerTest {
 
             try (PhotatoFilesManager photatoFilesManager = new PhotatoFilesManager(fileSystem.getPath(rootFolder), fileSystem, metadataGetterMock, thumbnailsGeneratorMock, fullScreenGetterMock, true, true, false)) {
                 // TEST SEARCH
-                List<PhotatoPicture> res = photatoFilesManager.searchMediasInFolder("/home/myself/images", "pierre-arthur");
+                List<PhotatoMedia> res = photatoFilesManager.searchMediasInFolder("/home/myself/images", "pierre-arthur");
                 Assert.assertEquals(2, res.size());
                 res = photatoFilesManager.searchMediasInFolder("/home/myself/images/cacadada/titi", "pierre-arthur");
                 Assert.assertEquals(1, res.size());
@@ -198,7 +194,7 @@ public class PhotatoFilesManagerTest {
                 Assert.assertEquals(0, foldersInFolder.size());
                 foldersInFolder = photatoFilesManager.getFoldersInFolder("/home/myself/images/cacadada");
                 Assert.assertEquals(1, foldersInFolder.size());
-                List<PhotatoPicture> picturesInFolder = photatoFilesManager.getMediasInFolder("/home/myself/images/cacadada/titi");
+                List<PhotatoMedia> picturesInFolder = photatoFilesManager.getMediasInFolder("/home/myself/images/cacadada/titi");
                 Assert.assertEquals(1, picturesInFolder.size());
 
                 // TEST THUMBNAIL GENERATION
