@@ -194,10 +194,7 @@ public class PhotatoFilesManager implements Closeable {
                 thumbnailStream.forEach((PhotatoMedia media) -> {
                     try {
                         thumbnailGenerator.generateThumbnail(media.fsPath, media.lastModificationTimestamp, metadatas.get(media.fsPath));
-
-                        if (fullScreenImageGetter.precomputationsEnabled()) {
-                            fullScreenImageGetter.generateImage(media);
-                        }
+                        fullScreenImageGetter.generateImage(media);
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -337,10 +334,7 @@ public class PhotatoFilesManager implements Closeable {
                 searchManager.addMedia(rootFolder, picture);
                 mediaHashUrlToMediaMap.put(Paths.get(picture.fullscreenPicture.url).getFileName().toString(), picture);
                 thumbnailGenerator.generateThumbnail(picture.fsPath, picture.lastModificationTimestamp, metadata);
-
-                if (fullScreenImageGetter.precomputationsEnabled()) {
-                    fullScreenImageGetter.generateImage(picture);
-                }
+                fullScreenImageGetter.generateImage(picture);
             }
         }
 

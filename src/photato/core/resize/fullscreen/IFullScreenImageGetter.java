@@ -19,6 +19,4 @@ public interface IFullScreenImageGetter {
     int getImageWidth(int originalWidth, int originalHeight);
 
     int getImageHeight(int originalWidth, int originalHeight);
-
-    boolean precomputationsEnabled();
 }

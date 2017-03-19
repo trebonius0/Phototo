@@ -49,12 +49,12 @@ public abstract class ResizedImageGenerator {
      * Generate a resizedPicture return true if the picture has been properly
      * regenerated, false if it already existed
      */
-    protected final boolean generateResizedPicture(Path originalFilename, long lastModifiedTimestamp, int rotationId) throws IOException {
+    protected final void generateResizedPicture(Path originalFilename, long lastModifiedTimestamp, int rotationId) throws IOException {
         Path path = this.getResizedPicturePath(originalFilename, lastModifiedTimestamp);
 
         synchronized (this.lock) {
             if (resizedPicturesSet.contains(path)) {
-                return false;
+                return;
             }
 
             this.resizedPicturesSet.add(path);
@@ -74,8 +74,6 @@ public abstract class ResizedImageGenerator {
         try (OutputStream out = new BufferedOutputStream(new FileOutputStream(path.toFile()))) {
             new JpegEncoder(image, this.resizedPictureQuality, out).Compress();
         }
-
-        return true;
     }
 
     protected final void deleteResizedPicture(Path originalFilename, long lastModifiedTimestamp) throws IOException {

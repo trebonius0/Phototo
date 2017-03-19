@@ -12,7 +12,6 @@ public class PhotatoConfig {
     public static boolean useParallelPicturesGeneration;
     public static boolean forceFfmpegToolsDownload;
     public static boolean forceExifToolsDownload;
-    public static Long resizedPicturesCacheMaxSize;
     public static int fullScreenPictureQuality;
     public static int maxFullScreenPictureWitdh;
     public static int maxFullScreenPictureHeight;
@@ -30,12 +29,6 @@ public class PhotatoConfig {
             forceExifToolsDownload = Boolean.parseBoolean(ini.get("global", "forceExifToolsDownload"));
             forceExifToolsDownload = Boolean.parseBoolean(ini.get("global", "forceExifToolsDownload"));
             addressElementsCount = Integer.parseInt(ini.get("global", "addressElementsCount"));
-
-            try {
-                resizedPicturesCacheMaxSize = Long.parseLong(ini.get("fullscreen", "resizedPicturesCacheMaxSize"));
-            } catch (NumberFormatException ex) {
-                resizedPicturesCacheMaxSize = null;
-            }
 
             fullScreenPictureQuality = Integer.parseInt(ini.get("fullscreen", "fullScreenPictureQuality"));
             maxFullScreenPictureWitdh = Integer.parseInt(ini.get("fullscreen", "maxFullScreenPictureWitdh"));
