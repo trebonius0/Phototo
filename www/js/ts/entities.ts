@@ -15,13 +15,12 @@ class PhotatoPicturePosition {
 }
 
 abstract class PhotatoItem {
-    public path: string;
     public thumbnail: PictureInfos;
 }
 
 class PhotatoMedia extends PhotatoItem {
     public mediaType: string;
-    
+
     public title: string;
 
     public name: string;
@@ -37,9 +36,14 @@ class PhotatoMedia extends PhotatoItem {
     public timestamp: number;
 }
 
-class PhotatoPicture extends PhotatoMedia {    
+class PhotatoPicture extends PhotatoMedia {
     public rawPicture: PictureInfos;
 
+}
+
+class PhotatoVideo extends PhotatoMedia {
+    public videoType: string;
+    public videoPath: string;
 }
 
 class PhotatoFolder extends PhotatoItem {

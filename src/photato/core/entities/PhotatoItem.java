@@ -8,7 +8,6 @@ public abstract class PhotatoItem {
 
     public final Path fsPath;
     
-    @Expose
     public final String path;
     
     @Expose

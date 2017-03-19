@@ -141,13 +141,23 @@ class GalleryViewModel {
 
     public openLightGallery(pictureIndex: number): void {
         this.pushState(this.currentFolder(), this.currentSearchQuery(), true);
-        var dynamicEl: any[] = this.allMedias().map((picture: PhotatoPicture) => {
-            return {
-                src: picture.fullscreenPicture.url,
-                thumb: picture.thumbnail.url,
-                subHtml: GalleryViewModel.getLightGallerySubHtml(picture),
-                downloadUrl: picture.rawPicture && picture.rawPicture.url,
-                width: picture.fullscreenPicture.width,
+        var dynamicEl: any[] = this.allMedias().map((media: PhotatoMedia) => {
+            if (media.mediaType === "picture") {
+                var picture: PhotatoPicture = <PhotatoPicture>media;
+                return {
+                    src: picture.fullscreenPicture.url,
+                    thumb: picture.thumbnail.url,
+                    subHtml: GalleryViewModel.getLightGallerySubHtml(picture),
+                    downloadUrl: picture.rawPicture.url,
+                    width: picture.fullscreenPicture.width,
+                }
+            } else {
+                var video: PhotatoVideo = <PhotatoVideo>media;
+                return {
+                    html: '<video class="lg-video-object lg-html5 video-js vjs-default-skin" controls preload="none"><source src="' + video.videoPath + '" type="' + video.videoType + '">' + Messages.videosNotSupported + '</video>',
+                    downloadUrl: video.videoPath,
+                    poster: video.fullscreenPicture.url,
+                }
             }
         });
         
