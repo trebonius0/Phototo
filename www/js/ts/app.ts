@@ -176,7 +176,8 @@ class GalleryViewModel {
             loop: false,
             counter: false,
             preload: 2,
-            startClass: 'lg-fade'
+            startClass: 'lg-fade',
+            videoMaxWidth: '1200px'
         });
 
         lg.on('onCloseAfter.lg', (e) => {
