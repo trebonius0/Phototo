@@ -202,6 +202,8 @@ public class PhotatoFilesManager implements Closeable {
                 });
             }
         }
+        
+        System.gc();
     }
 
     private PhotatoFolder getCurrentFolder(Path path) {
