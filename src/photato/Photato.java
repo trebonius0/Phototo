@@ -1,5 +1,6 @@
 package photato;
 
+import java.net.InetAddress;
 import java.nio.file.FileSystem;
 import photato.core.PhotatoFilesManager;
 import photato.core.metadata.MetadataAggregator;
@@ -82,7 +83,7 @@ public class Photato {
                 .registerHandler("*", new DefaultHandler(fileSystem.getPath("www")))
                 .create();
         server.start();
-        System.out.println("Server started on port " + server.getLocalPort());
+        System.out.println("Server started on port " + server.getLocalPort() + " (http://" + InetAddress.getLocalHost().getHostAddress() + ":" + server.getLocalPort() + ")");
         server.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
