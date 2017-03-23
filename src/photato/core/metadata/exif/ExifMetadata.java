@@ -61,9 +61,6 @@ public class ExifMetadata {
     @SerializedName("Rotation")
     private String rotation;
 
-    @SerializedName("AutoRotate")
-    private String autorotate;
-
     public String getSourceFile() {
         return sourceFile;
     }
@@ -118,99 +115,51 @@ public class ExifMetadata {
     }
 
     public int getRotationId() {
-        int rotationId = 1;
-        int orientationId = 1;
-        int autoRotateId = 1;
-
-        if (this.autorotate != null) {
-            switch (this.autorotate) {
-                case "Horizontal (normal)":
-                    autoRotateId = 1;
-                    break;
-                case "Mirror horizontal":
-                    autoRotateId = 2;
-                    break;
-                case "Rotate 180":
-                    autoRotateId = 3;
-                    break;
-                case "Mirror vertical":
-                    autoRotateId = 4;
-                    break;
-                case "Mirror horizontal and rotate 270 CW":
-                    autoRotateId = 5;
-                    break;
-                case "Rotate 90 CW":
-                    autoRotateId = 6;
-                    break;
-                case "Mirror horizontal and rotate 90 CW":
-                    autoRotateId = 7;
-                    break;
-                case "Rotate 270 CW":
-                    autoRotateId = 8;
-                    break;
-                default:
-                    autoRotateId = 1;
-                    break;
+        if (this.rotation == null) {
+            if (this.orientation == null) {
+                return 1;
             }
-        }
 
-        if (this.orientation != null) {
             switch (this.orientation) {
                 case "Horizontal (normal)":
-                    orientationId = 1;
-                    break;
+                    return 1;
                 case "Mirror horizontal":
-                    orientationId = 2;
-                    break;
+                    return 2;
                 case "Rotate 180":
-                    orientationId = 3;
-                    break;
+                    return 3;
                 case "Mirror vertical":
-                    orientationId = 4;
-                    break;
+                    return 4;
                 case "Mirror horizontal and rotate 270 CW":
-                    orientationId = 5;
-                    break;
+                    return 5;
                 case "Rotate 90 CW":
-                    orientationId = 6;
-                    break;
+                    return 6;
                 case "Mirror horizontal and rotate 90 CW":
-                    orientationId = 7;
-                    break;
+                    return 7;
                 case "Rotate 270 CW":
-                    orientationId = 8;
-                    break;
+                    return 8;
                 default:
-                    orientationId = 1;
-                    break;
+                    return 1;
             }
-        }
-
-        if (this.rotation != null) {
+        } else {
+                
             switch (this.rotation) {
                 case "0":
                 case "Horizontal":
-                    autoRotateId = 1;
-                    break;
+                    return 1;
                 case "180":
                 case "-180":
-                    autoRotateId = 3;
-                    break;
+                    return 3;
                 case "90":
                 case "-90":
                 case "Vertical":
-                    autoRotateId = 6;
-                    break;
+                    return 6;
                 case "270":
                 case "-270":
                     return 8;
                 default:
-                    autoRotateId = 1;
-                    break;
+                    return 1;
             }
         }
-
-        return Math.max(Math.max(rotationId, orientationId), autoRotateId);
     }
 
     public long getPictureDate() {
