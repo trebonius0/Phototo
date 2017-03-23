@@ -10,6 +10,9 @@ public class ExifMetadata {
 
     private static final SafeSimpleDateFormat DATE_FORMAT = new SafeSimpleDateFormat("yyyy:MM:dd HH:mm:ss");
 
+    @SerializedName("MIMEType")
+    private String mimeType;
+
     @SerializedName("SourceFile")
     private String sourceFile;
 
@@ -115,51 +118,67 @@ public class ExifMetadata {
     }
 
     public int getRotationId() {
-        if (this.rotation == null) {
-            if (this.orientation == null) {
-                return 1;
-            }
+        int rotationId = 1;
+        int orientationId = 1;
 
-            switch (this.orientation) {
-                case "Horizontal (normal)":
-                    return 1;
-                case "Mirror horizontal":
-                    return 2;
-                case "Rotate 180":
-                    return 3;
-                case "Mirror vertical":
-                    return 4;
-                case "Mirror horizontal and rotate 270 CW":
-                    return 5;
-                case "Rotate 90 CW":
-                    return 6;
-                case "Mirror horizontal and rotate 90 CW":
-                    return 7;
-                case "Rotate 270 CW":
-                    return 8;
-                default:
-                    return 1;
-            }
-        } else {
-                
+        if (this.rotation != null) {
             switch (this.rotation) {
                 case "0":
                 case "Horizontal":
-                    return 1;
+                    rotationId = 1;
+                    break;
                 case "180":
                 case "-180":
-                    return 3;
+                    rotationId = 3;
+                    break;
                 case "90":
                 case "-90":
                 case "Vertical":
-                    return 6;
+                    rotationId = 6;
+                    break;
                 case "270":
                 case "-270":
-                    return 8;
+                    rotationId = 8;
+                    break;
                 default:
-                    return 1;
+                    rotationId = 1;
+                    break;
             }
         }
+
+        if (this.orientation != null) {
+            switch (this.orientation) {
+                case "Horizontal (normal)":
+                    orientationId = 1;
+                    break;
+                case "Mirror horizontal":
+                    orientationId = 2;
+                    break;
+                case "Rotate 180":
+                    orientationId = 3;
+                    break;
+                case "Mirror vertical":
+                    orientationId = 4;
+                    break;
+                case "Mirror horizontal and rotate 270 CW":
+                    orientationId = 5;
+                    break;
+                case "Rotate 90 CW":
+                    orientationId = 6;
+                    break;
+                case "Mirror horizontal and rotate 90 CW":
+                    orientationId = 7;
+                    break;
+                case "Rotate 270 CW":
+                    orientationId = 8;
+                    break;
+                default:
+                    orientationId = 1;
+                    break;
+            }
+        }
+
+        return this.isVideo() ? Math.max(rotationId, orientationId) : orientationId;
     }
 
     public long getPictureDate() {
@@ -206,6 +225,10 @@ public class ExifMetadata {
         } else {
             throw new IllegalArgumentException();
         }
+    }
+
+    private boolean isVideo() {
+        return this.mimeType != null && this.mimeType.toLowerCase().startsWith("video/");
     }
 
 }
