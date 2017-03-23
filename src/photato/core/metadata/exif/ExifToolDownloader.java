@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.file.FileSystem;
+import java.nio.file.Files;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -26,10 +27,13 @@ public class ExifToolDownloader {
     private static final String exifToolRslUrl = "http://owl.phy.queensu.ca/~phil/exiftool/rss.xml";
     private static final String tmpFilename = "exiftool.exe.tmp";
     private static final String targetFilename = "exiftool.exe";
+    private static final long maxDelayBeforeRedownload = 30 * 86400 * 1000L;
 
     public static void run(HttpClient httpClient, FileSystem fileSystem, boolean forceExifToolsDownload) throws IOException {
-        if ( OsHelper.isWindows()) {
-            if (!fileSystem.getPath(targetFilename).toFile().exists() || forceExifToolsDownload) {
+        if (OsHelper.isWindows()) {
+            if (!fileSystem.getPath(targetFilename).toFile().exists()
+                    || forceExifToolsDownload
+                    || Files.getLastModifiedTime(fileSystem.getPath(targetFilename)).toMillis() + maxDelayBeforeRedownload < System.currentTimeMillis()) {
                 System.out.println("Starting exifTools download");
                 downloadExifTools(getExifToolsZipUrl(httpClient), httpClient, fileSystem);
                 System.out.println("End of exifTools download");

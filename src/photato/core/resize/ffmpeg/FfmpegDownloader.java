@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.file.FileSystem;
+import java.nio.file.Files;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -24,10 +25,13 @@ public class FfmpegDownloader {
 
     private static final String tmpFilename = "ffmpeg.exe.tmp";
     private static final String targetFilename = "ffmpeg.exe";
+    private static final long maxDelayBeforeRedownload = 30 * 86400 * 1000L;
 
     public static void run(HttpClient httpClient, FileSystem fileSystem, boolean forceFfmpegDownload) throws IOException {
         if (OsHelper.isWindows()) {
-            if (!fileSystem.getPath(targetFilename).toFile().exists() || forceFfmpegDownload) {
+            if (!fileSystem.getPath(targetFilename).toFile().exists()
+                    || forceFfmpegDownload
+                    || Files.getLastModifiedTime(fileSystem.getPath(targetFilename)).toMillis() + maxDelayBeforeRedownload < System.currentTimeMillis()) {
                 System.out.println("Starting ffmpeg download");
                 downloadFfmpegTools("https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-latest-win64-static.zip", httpClient, fileSystem);
                 System.out.println("End of ffmpeg download");
