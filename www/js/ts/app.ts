@@ -26,7 +26,6 @@ class GalleryViewModel {
         this.currentFolder = ko.observable<string>("");
         this.currentFolderName = ko.computed<string>(() => this.currentFolder().substring(this.currentFolder().lastIndexOf("/") + 1) || "Photato gallery");
 
-        this.currentFolder = ko.observable<string>("");
         this.currentSearchQuery = ko.observable<string>(null);
         this.displayedPicturesCount = ko.observable<number>(GalleryViewModel.batchSize);
 
