@@ -46,7 +46,6 @@ public class PhotatoFilesManager implements Closeable {
     private final WatchServiceThread watchServiceThread;
     private final Map<Path, WatchKey> watchedDirectoriesKeys;
     private final Map<WatchKey, Path> watchedDirectoriesPaths;
-    private final Map<String, PhotatoMedia> mediaHashUrlToMediaMap;
     private final boolean prefixOnlyMode;
     private final boolean useParallelPicturesGeneration;
 
@@ -59,7 +58,6 @@ public class PhotatoFilesManager implements Closeable {
         this.searchManager = new SearchManager(prefixOnlyMode, indexFolderName);
         this.prefixOnlyMode = prefixOnlyMode;
         this.useParallelPicturesGeneration = useParallelPicturesGeneration;
-        this.mediaHashUrlToMediaMap = new HashMap<>();
 
         WatchService watcher = this.fileSystem.newWatchService();
         this.watchedDirectoriesKeys = new HashMap<>();
@@ -87,10 +85,6 @@ public class PhotatoFilesManager implements Closeable {
         } else {
             return new ArrayList<>();
         }
-    }
-
-    public PhotatoMedia getMediaFromHashUrl(String hashUrl) {
-        return this.mediaHashUrlToMediaMap.get(hashUrl);
     }
 
     public List<PhotatoMedia> searchMediasInFolder(String folder, String searchQuery) {
@@ -188,7 +182,6 @@ public class PhotatoFilesManager implements Closeable {
                 medias.forEach((PhotatoMedia media) -> {
                     currentFolder.medias.add(media);
                     searchManager.addMedia(rootFolder, media);
-                    mediaHashUrlToMediaMap.put(Paths.get(media.fullscreenPicture.url).getFileName().toString(), media);
                 });
 
                 Stream<PhotatoMedia> thumbnailStream = this.useParallelPicturesGeneration ? medias.parallelStream() : medias.stream(); // This could be a parallel stream. However, since thumbnail generation takes a lot of RAM, having it parallel would take too much ram (bad on small machines)
@@ -311,7 +304,6 @@ public class PhotatoFilesManager implements Closeable {
                 PhotatoMedia media = PhotatoMedia.createMedia(rootFolder.fsPath, filename, metadataAggregator.getMetadata(filename, lastModificationTimestamp), thumbnailInfos, fullScreenInfos, lastModificationTimestamp);
                 folder.medias.add(media);
                 searchManager.addMedia(rootFolder, media);
-                mediaHashUrlToMediaMap.put(Paths.get(media.fullscreenPicture.url).getFileName().toString(), media);
                 thumbnailGenerator.generateThumbnail(media);
                 fullScreenImageGetter.generateImage(media);
             }
@@ -336,7 +328,6 @@ public class PhotatoFilesManager implements Closeable {
             if (findAny.isPresent()) {
                 PhotatoMedia picture = findAny.get();
                 folder.medias.remove(picture);
-                mediaHashUrlToMediaMap.remove(Paths.get(picture.fullscreenPicture.url).getFileName().toString());
                 searchManager.removeMedia(picture);
                 thumbnailGenerator.deleteThumbnail(picture.fsPath, picture.lastModificationTimestamp);
                 fullScreenImageGetter.deleteImage(picture);
@@ -355,8 +346,6 @@ public class PhotatoFilesManager implements Closeable {
             PhotatoFolder currentFolder = getCurrentFolder(filename);
             if (currentFolder.medias != null) {
                 for (PhotatoMedia media : currentFolder.medias) {
-                    mediaHashUrlToMediaMap.remove(Paths.get(media.fullscreenPicture.url).getFileName().toString());
-
                     try {
                         searchManager.removeMedia(media);
                         thumbnailGenerator.deleteThumbnail(media.fsPath, media.lastModificationTimestamp);

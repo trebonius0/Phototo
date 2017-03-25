@@ -23,7 +23,6 @@ import photato.core.metadata.gps.OSMGpsCoordinatesDescriptionGetter;
 import java.nio.file.Path;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import photato.controllers.FullScreenImageHandler;
 import photato.controllers.VideoHandler;
 import photato.core.resize.ffmpeg.FfmpegDownloader;
 
@@ -74,7 +73,7 @@ public class Photato {
                 .setExceptionLogger(new StdErrorExceptionLogger())
                 .registerHandler(Routes.rawVideosRootUrl + "/*", new VideoHandler(rootFolder, Routes.rawVideosRootUrl))
                 .registerHandler(Routes.rawPicturesRootUrl + "/*", new ImageHandler(rootFolder, Routes.rawPicturesRootUrl))
-                .registerHandler(Routes.fullScreenPicturesRootUrl + "/*", new FullScreenImageHandler(fileSystem.getPath(fullscreenCacheFolder), Routes.fullScreenPicturesRootUrl, fullScreenImageGetter, photatoFilesManager))
+                .registerHandler(Routes.fullScreenPicturesRootUrl + "/*", new ImageHandler(fileSystem.getPath(fullscreenCacheFolder), Routes.fullScreenPicturesRootUrl))
                 .registerHandler(Routes.thumbnailRootUrl + "/*", new ImageHandler(fileSystem.getPath(thumbnailCacheFolder), Routes.thumbnailRootUrl))
                 .registerHandler(Routes.listItemsApiUrl, new FolderListHandler(Routes.listItemsApiUrl, rootFolder, photatoFilesManager))
                 .registerHandler("/img/*", new ImageHandler(fileSystem.getPath("www/img"), "/img"))
