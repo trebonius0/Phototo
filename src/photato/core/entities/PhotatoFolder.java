@@ -1,5 +1,6 @@
 package photato.core.entities;
 
+import com.google.gson.annotations.Expose;
 import io.gsonfire.annotations.ExposeMethodResult;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -7,6 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import photato.helpers.PathHelper;
 
 public class PhotatoFolder extends PhotatoItem {
 
@@ -15,12 +17,16 @@ public class PhotatoFolder extends PhotatoItem {
     public final Set<PhotatoMedia> medias;
 
     public final Set<PhotatoVideo> videos;
+    
+    @Expose
+    public final String path;
 
     public PhotatoFolder(Path rootFolder, Path path) {
         super(rootFolder, path);
         this.subFolders = new HashMap<>();
         this.medias = new HashSet<>();
         this.videos = new HashSet<>();
+        this.path = PathHelper.getPathString(rootFolder, path);
     }
 
     @ExposeMethodResult("isEmpty")

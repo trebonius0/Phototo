@@ -9,14 +9,10 @@ public abstract class PhotatoItem {
     public final Path fsPath;
     
     @Expose
-    public final String path;
-    
-    @Expose
     public final String filename;
 
     public PhotatoItem(Path rootFolder, Path path) {
         this.fsPath = path;
-        this.path = rootFolder.relativize(path).toString().replace("\\", "/");
         this.filename = path.getFileName().toString();
     }
 

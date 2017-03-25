@@ -10,6 +10,7 @@ import photato.Routes;
 import photato.core.metadata.Metadata;
 import photato.helpers.FileHelper;
 import photato.helpers.Md5;
+import photato.helpers.PathHelper;
 
 public class PhotatoVideo extends PhotatoMedia {
 
@@ -32,7 +33,7 @@ public class PhotatoVideo extends PhotatoMedia {
         }
 
         this.videoType = "video/" + FileHelper.getExtension(path.toString()).toLowerCase();
-        this.videoPath = Routes.rawVideosRootUrl + "/" + this.path;
+        this.videoPath = Routes.rawVideosRootUrl + "/" + PathHelper.getPathString(rootFolder, path);
 
         long tmpFilesize;
         try {

@@ -2,6 +2,7 @@ package photato.helpers;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,5 +43,9 @@ public class PathHelper {
             }
             return map;
         }
+    }
+    
+    public static String getPathString(Path rootFolder, Path path){
+        return rootFolder.relativize(path).toString().replace("\\", "/");
     }
 }
