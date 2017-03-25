@@ -259,7 +259,7 @@ class GalleryViewModel {
     private static getLightGallerySubHtml(media: PhotatoMedia): string {
         var dateStr = (new Date(media.timestamp).toLocaleDateString());
         var title = (media.title || media.name);
-        var positionStr = (media.position.hardcodedPosition || (media.position.coordinatesDescription && media.position.coordinatesDescription.length && media.position.coordinatesDescription) || '')
+        var positionStr = media.position.coordinatesDescription || '';
         var personsStr = (media.persons && media.persons.sort().join(', '));
         var tagsStr = (media.tags && media.tags.sort().join(', '));
 

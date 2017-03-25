@@ -10,7 +10,6 @@ class PictureInfos {
 }
 
 class PhotatoPicturePosition {
-    public hardcodedPosition: string;
     public coordinatesDescription: string;
 }
 

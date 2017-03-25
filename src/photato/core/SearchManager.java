@@ -64,12 +64,8 @@ public class SearchManager {
         }
         all.add(pictureName);
 
-        if (media.position != null) {
-            if (media.position.hardcodedPosition != null) {
-                all.add(media.position.hardcodedPosition);
-            } else if (media.position.coordinatesDescription != null) {
-                all.addAll(SearchQueryHelper.getSplittedTerms(media.position.coordinatesDescription));
-            }
+        if (media.position != null && media.position.coordinatesDescription != null) {
+            all.addAll(SearchQueryHelper.getSplittedTerms(media.position.coordinatesDescription));
         }
 
         for (String word : all) {
