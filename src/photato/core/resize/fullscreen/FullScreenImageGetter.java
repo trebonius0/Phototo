@@ -33,7 +33,6 @@ public class FullScreenImageGetter extends ResizedImageGenerator implements IFul
 
     @Override
     public FileEntity getImage(PhotatoMedia picture, ContentType contentType) throws IOException {
-        this.generateImage(picture);
         return new FileEntity(this.fileSystem.getPath(this.resizedPicturesFolder.toString(), this.getResizedPictureFilename(picture.fsPath, picture.lastModificationTimestamp)).toFile(), contentType);
     }
 
