@@ -2,6 +2,10 @@ package photato.core.entities;
 
 import com.google.gson.annotations.Expose;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
+import photato.core.AlbumsManager;
 import photato.core.metadata.Metadata;
 import photato.core.metadata.gps.Position;
 import photato.helpers.MediaHelper;
@@ -37,6 +41,8 @@ public abstract class PhotatoMedia extends PhotatoItem {
     @Expose
     public final long timestamp;
 
+    public final Set<Path> virtualPaths;
+
     public PhotatoMedia(String mediaType, Path rootFolder, Path path, Metadata metadata, PictureInfos thumbnailInfos, PictureInfos fullScreenInfos, long lastModificationTimestamp) {
         super(rootFolder, path);
         this.mediaType = mediaType;
@@ -48,6 +54,8 @@ public abstract class PhotatoMedia extends PhotatoItem {
         this.lastModificationTimestamp = lastModificationTimestamp;
         this.timestamp = metadata.pictureDate;
         this.fullscreenPicture = fullScreenInfos;
+
+        this.virtualPaths = this.getMediaVirtualPaths();
     }
 
     public static PhotatoMedia createMedia(Path rootFolder, Path path, Metadata metadata, PictureInfos thumbnailInfos, PictureInfos fullScreenInfos, long lastModificationTimestamp) {
@@ -58,6 +66,18 @@ public abstract class PhotatoMedia extends PhotatoItem {
         } else {
             throw new IllegalArgumentException();
         }
+    }
+
+    private Set<Path> getMediaVirtualPaths() {
+        Set<Path> result = new HashSet<>();
+
+        if (this.persons != null) {
+            for (String person : this.persons) {
+                result.add(Paths.get(AlbumsManager.albumsVirtualRootFolderName, AlbumsManager.personsFolderName, person));
+            }
+        }
+
+        return result;
     }
 
 }

@@ -15,10 +15,13 @@ public class SearchQueryHelper {
      */
     public static List<String> getSplittedTerms(String s) {
         return Arrays.asList(s.split("[ '\\,\\.-]")).parallelStream()
-                .map((String str) -> Normalizer.normalize(str.toLowerCase(), Normalizer.Form.NFD).replaceAll("\\p{M}", "").trim())
-                .map((String str) -> str.replaceAll("[^a-z0-9]+", ""))
+                .map((String str) -> normalizeString(str))
                 .filter((String str) -> str.length() >= 3)
                 .distinct()
                 .collect(Collectors.toList());
+    }
+    
+    public static String normalizeString(String str){
+        return Normalizer.normalize(str.toLowerCase(), Normalizer.Form.NFD).replaceAll("\\p{M}", "").replaceAll("[^a-z0-9]+", "").trim();
     }
 }

@@ -43,6 +43,7 @@ public class PhotatoFilesManager implements Closeable {
     private final IFullScreenImageGetter fullScreenImageGetter;
     private final PhotatoFolder rootFolder;
     private final SearchManager searchManager;
+    private final AlbumsManager albumsManager;
     private final WatchServiceThread watchServiceThread;
     private final Map<Path, WatchKey> watchedDirectoriesKeys;
     private final Map<WatchKey, Path> watchedDirectoriesPaths;
@@ -56,6 +57,7 @@ public class PhotatoFilesManager implements Closeable {
         this.fullScreenImageGetter = fullScreenImageGetter;
         this.rootFolder = new PhotatoFolder(rootFolder, rootFolder);
         this.searchManager = new SearchManager(prefixOnlyMode, indexFolderName);
+        this.albumsManager = new AlbumsManager();
         this.prefixOnlyMode = prefixOnlyMode;
         this.useParallelPicturesGeneration = useParallelPicturesGeneration;
 
@@ -182,6 +184,7 @@ public class PhotatoFilesManager implements Closeable {
                 medias.forEach((PhotatoMedia media) -> {
                     currentFolder.medias.add(media);
                     searchManager.addMedia(rootFolder, media);
+                    albumsManager.addMedia(media);
                 });
 
                 Stream<PhotatoMedia> thumbnailStream = this.useParallelPicturesGeneration ? medias.parallelStream() : medias.stream(); // This could be a parallel stream. However, since thumbnail generation takes a lot of RAM, having it parallel would take too much ram (bad on small machines)
@@ -195,7 +198,7 @@ public class PhotatoFilesManager implements Closeable {
                 });
             }
         }
-        
+
         System.gc();
     }
 
@@ -304,6 +307,7 @@ public class PhotatoFilesManager implements Closeable {
                 PhotatoMedia media = PhotatoMedia.createMedia(rootFolder.fsPath, filename, metadataAggregator.getMetadata(filename, lastModificationTimestamp), thumbnailInfos, fullScreenInfos, lastModificationTimestamp);
                 folder.medias.add(media);
                 searchManager.addMedia(rootFolder, media);
+                albumsManager.addMedia(media);
                 thumbnailGenerator.generateThumbnail(media);
                 fullScreenImageGetter.generateImage(media);
             }
@@ -329,6 +333,7 @@ public class PhotatoFilesManager implements Closeable {
                 PhotatoMedia picture = findAny.get();
                 folder.medias.remove(picture);
                 searchManager.removeMedia(picture);
+                albumsManager.removeMedia(picture);
                 thumbnailGenerator.deleteThumbnail(picture.fsPath, picture.lastModificationTimestamp);
                 fullScreenImageGetter.deleteImage(picture);
             }
@@ -348,6 +353,7 @@ public class PhotatoFilesManager implements Closeable {
                 for (PhotatoMedia media : currentFolder.medias) {
                     try {
                         searchManager.removeMedia(media);
+                        albumsManager.removeMedia(media);
                         thumbnailGenerator.deleteThumbnail(media.fsPath, media.lastModificationTimestamp);
                         fullScreenImageGetter.deleteImage(media);
                     } catch (IOException ex) {

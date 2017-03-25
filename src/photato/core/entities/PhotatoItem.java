@@ -7,13 +7,21 @@ import java.util.Objects;
 public abstract class PhotatoItem {
 
     public final Path fsPath;
-    
+
     @Expose
     public final String filename;
 
     public PhotatoItem(Path rootFolder, Path path) {
         this.fsPath = path;
-        this.filename = path.getFileName().toString();
+
+        String tmpFilename;
+        if (path.getFileName() == null) {
+            tmpFilename = "";
+        } else {
+            tmpFilename = path.getFileName().toString();
+        }
+        
+        this.filename = tmpFilename;
     }
 
     @Override
