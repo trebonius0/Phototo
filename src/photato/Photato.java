@@ -30,7 +30,7 @@ public class Photato {
 
     public static final String[] supportedPictureExtensions = new String[]{"jpg", "jpeg", "png", "bmp"};
     public static final String[] supportedVideoExtensions = new String[]{"mp4", "webm"};
-    private static final String serverName = "Photato/1.0";
+    private static final String serverName = "Photato";
     private static final String thumbnailCacheFolder = "cache/thumbnails";
     private static final String fullscreenCacheFolder = "cache/fullscreen";
     private static final String extractedPicturesCacheFolder = "cache/extracted";
