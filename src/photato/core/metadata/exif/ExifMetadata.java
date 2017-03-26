@@ -111,7 +111,7 @@ public class ExifMetadata {
         if (this.locationCreatedCity != null && !this.locationCreatedCity.trim().isEmpty()
                 && this.locationCreatedProvinceState != null && !this.locationCreatedProvinceState.trim().isEmpty()
                 && this.locationCreatedCountryName != null && !this.locationCreatedCountryName.trim().isEmpty()) {
-            return this.locationCreatedCity + " " + this.locationCreatedProvinceState + " " + this.locationCreatedCountryName;
+            return this.locationCreatedCity + ", " + this.locationCreatedProvinceState + ", " + this.locationCreatedCountryName;
         } else {
             return null;
         }

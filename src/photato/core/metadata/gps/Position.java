@@ -22,8 +22,7 @@ public class Position {
         if (this.coordinatesDescription == null) {
             return new ArrayList<>();
         } else {
-            String splitChar = this.coordinatesDescription.contains(",") ? "," : " ";
-            String[] splitted = this.coordinatesDescription.split(splitChar);
+            String[] splitted = this.coordinatesDescription.split(",");
 
             List<String> result = new ArrayList<>();
             for (int i = splitted.length - 1; i >= Math.max(0, splitted.length - 3); i--) {
