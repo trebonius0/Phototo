@@ -73,7 +73,7 @@ public abstract class PhotatoMedia extends PhotatoItem {
 
         if (this.persons != null) {
             for (String person : this.persons) {
-                result.add(Paths.get(AlbumsManager.albumsVirtualRootFolderName, AlbumsManager.personsFolderName, person));
+                result.add(Paths.get("/" + AlbumsManager.albumsVirtualRootFolderName, AlbumsManager.personsFolderName, person));
             }
         }
 

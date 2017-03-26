@@ -10,8 +10,8 @@ import photato.helpers.SearchQueryHelper;
 
 public class AlbumsManager {
 
-    public static final String albumsVirtualRootFolderName = "/albums";
-    public static final String personsFolderName = "persons";
+    public static final String albumsVirtualRootFolderName = "Albums";
+    public static final String personsFolderName = "Persons";
     private static final Path virtualRootPath = Paths.get("/");
 
     private final PhotatoFolder virtualRootFolder;
@@ -26,11 +26,12 @@ public class AlbumsManager {
 
             for (int i = 0; i < virtualPath.getNameCount(); i++) {
                 String folderName = virtualPath.getName(i).toString();
+                String normalizedFolderName = SearchQueryHelper.normalizeString(folderName);
 
-                PhotatoFolder folder = currentFolder.subFolders.get(folderName);
+                PhotatoFolder folder = currentFolder.subFolders.get(normalizedFolderName);
                 if (folder == null) {
                     folder = new PhotatoFolder(virtualRootPath, currentFolder.fsPath.resolve(folderName));
-                    currentFolder.subFolders.put(SearchQueryHelper.normalizeString(folder.filename), folder);
+                    currentFolder.subFolders.put(normalizedFolderName, folder);
                 }
 
                 currentFolder = folder;
@@ -70,8 +71,11 @@ public class AlbumsManager {
         }
     }
 
-    public synchronized PhotatoFolder getCurrentFolder(Path path) {
-        Path relativePath = this.virtualRootFolder.fsPath.relativize(path);
+    public synchronized PhotatoFolder getCurrentFolder(String path) {
+        if (!path.startsWith("/")) {
+            path = "/" + path;
+        }
+        Path relativePath = this.virtualRootFolder.fsPath.relativize(Paths.get(path));
         String[] elmnts = relativePath.toString().replace("\\", "/").split("/");
 
         if (elmnts.length == 1 && elmnts[0].isEmpty()) {
@@ -80,7 +84,7 @@ public class AlbumsManager {
 
         PhotatoFolder currentFolder = this.virtualRootFolder;
         for (int i = 0; i < elmnts.length; i++) {
-            currentFolder = currentFolder.subFolders.get(elmnts[i]);
+            currentFolder = currentFolder.subFolders.get(SearchQueryHelper.normalizeString(elmnts[i]));
 
             if (currentFolder == null) {
                 return null;

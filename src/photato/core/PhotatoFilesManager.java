@@ -70,7 +70,12 @@ public class PhotatoFilesManager implements Closeable {
     }
 
     public List<PhotatoFolder> getFoldersInFolder(String folder) {
-        PhotatoFolder currentFolder = this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
+        PhotatoFolder currentFolder;
+        if (folder.startsWith(AlbumsManager.albumsVirtualRootFolderName + "/")) {
+            currentFolder = this.albumsManager.getCurrentFolder(folder);
+        } else {
+            currentFolder = this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
+        }
 
         if (currentFolder != null) {
             return currentFolder.subFolders.values().stream().filter((PhotatoFolder f) -> !f.isEmpty()).collect(Collectors.toList());
@@ -80,7 +85,12 @@ public class PhotatoFilesManager implements Closeable {
     }
 
     public List<PhotatoMedia> getMediasInFolder(String folder) {
-        PhotatoFolder currentFolder = this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
+        PhotatoFolder currentFolder;
+        if (folder.startsWith(AlbumsManager.albumsVirtualRootFolderName + "/")) {
+            currentFolder = this.albumsManager.getCurrentFolder(folder);
+        } else {
+            currentFolder = this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
+        }
 
         if (currentFolder != null) {
             return new ArrayList<>(currentFolder.medias);
