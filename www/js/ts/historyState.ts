@@ -5,4 +5,5 @@ class HistoryState {
     public folders: PhotatoFolder[];
     public displayedPicturesCount: number;
     public bannerMessage: string;
+    public compressedAllMedias: string;
 }

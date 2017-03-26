@@ -6,6 +6,8 @@
 /// <reference path="historyState.ts" />
 /// <reference path="messages.ts" />
 
+declare var pako: any;
+
 class GalleryViewModel {
     private static batchSize: number = 50;
     public bannerMessage: KnockoutObservable<string>;
@@ -127,7 +129,7 @@ class GalleryViewModel {
                 state.allMedias = that.allMedias();
                 state.bannerMessage = that.bannerMessage();
                 state.displayedPicturesCount = that.displayedPicturesCount();
-                history.replaceState(state, null, null);
+                GalleryViewModel.historyReplaceState(state);
 
                 that.layoutManager.run();
             }).error(function() {
@@ -222,10 +224,10 @@ class GalleryViewModel {
         }
 
         var state: HistoryState = <HistoryState>{ currentSearchQuery: this.currentSearchQuery(), currentFolder: this.currentFolder(), allMedias: this.allMedias(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount(), bannerMessage: this.bannerMessage() };
-        var newState = { currentSearchQuery: newSearchQuery, currentFolder: newFolder, fullScreenOpened: newFullScreenOpened, allPictures: this.allMedias(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount(), bannerMessage: this.bannerMessage() };
-        history.replaceState(state, null, null);
+        var newState: HistoryState = <HistoryState>{ currentSearchQuery: newSearchQuery, currentFolder: newFolder, fullScreenOpened: newFullScreenOpened, allMedias: this.allMedias(), folders: this.folders(), displayedPicturesCount: this.displayedPicturesCount(), bannerMessage: this.bannerMessage(), compressedAllMedias: null };
+        GalleryViewModel.historyReplaceState(state);
 
-        history.pushState(newState, null, newUrl);
+        GalleryViewModel.historyPushState(newState, newUrl);
     }
 
     private initOnPopState(): void {
@@ -240,9 +242,15 @@ class GalleryViewModel {
                 this.currentSearchQuery(state.currentSearchQuery);
                 this.currentFolder(state.currentFolder);
                 this.folders(state.folders);
-                this.allMedias(state.allMedias);
                 this.bannerMessage(state.bannerMessage);
                 this.displayedPicturesCount(state.displayedPicturesCount);
+
+                if (state.compressedAllMedias) {
+                    console.log("PopState had compressed data");
+                    this.allMedias(JSON.parse(pako.inflate(state.compressedAllMedias, { to: 'string' })));
+                } else {
+                    this.allMedias(state.allMedias);
+                }
             }
 
             this.layoutManager.run();
@@ -258,7 +266,7 @@ class GalleryViewModel {
 
                     var state = <HistoryState>history.state;
                     state.displayedPicturesCount = this.displayedPicturesCount();
-                    history.replaceState(state, null, null);
+                    GalleryViewModel.historyReplaceState(state);
 
                     this.layoutManager.run();
                 }
@@ -301,6 +309,27 @@ class GalleryViewModel {
         else return (bytes / 1073741824).toFixed(1) + " GB";
     };
 
+    private static historyReplaceState(state: HistoryState): void {
+        try {
+            history.replaceState(state, null, null);
+        } catch (e) {
+            console.log("error while replacing state: going compressed");
+            state.compressedAllMedias = pako.deflate(JSON.stringify(state.allMedias), { to: 'string' })
+            state.allMedias = null;
+            history.replaceState(state, null, null);
+        }
+    }
+
+    private static historyPushState(newState: HistoryState, newUrl: string): void {
+        try {
+            history.pushState(newState, null, newUrl);
+        } catch (e) {
+            console.log("error while pushing state: going compressed");
+            newState.compressedAllMedias = pako.deflate(JSON.stringify(newState.allMedias), { to: 'string' })
+            newState.allMedias = null;
+            history.pushState(newState, null, newUrl);
+        }
+    }
 
 }
 
