@@ -3,6 +3,10 @@ package photato.core.entities;
 import com.google.gson.annotations.Expose;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import photato.core.AlbumsManager;
@@ -85,6 +89,19 @@ public abstract class PhotatoMedia extends PhotatoItem {
 
         for (String placeUrl : this.position.getCoordinatesDescriptionTags()) {
             result.add(Paths.get("/" + AlbumsManager.albumsVirtualRootFolderName, AlbumsManager.placesFolderName, placeUrl));
+        }
+
+        if (this.timestamp > 0) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date(this.timestamp));
+            int year = cal.get(Calendar.YEAR);
+            int month = cal.get(Calendar.MONTH) + 1;
+
+            String yearStr = String.valueOf(year);
+            String monthStr = month < 10 ? ("0" + month) : String.valueOf(month);
+
+            result.add(Paths.get("/" + AlbumsManager.albumsVirtualRootFolderName, AlbumsManager.calendarFolderName, yearStr));
+            result.add(Paths.get("/" + AlbumsManager.albumsVirtualRootFolderName, AlbumsManager.calendarFolderName, yearStr + "/" + yearStr + "-" + monthStr));
         }
 
         return result;

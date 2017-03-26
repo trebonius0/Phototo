@@ -14,6 +14,7 @@ public class AlbumsManager {
     public static final String personsFolderName = "Persons";
     public static final String tagsFolderName = "Tags";
     public static final String placesFolderName = "Places";
+    public static final String calendarFolderName = "Calendar";
     private static final Path virtualRootPath = Paths.get("/");
 
     private final PhotatoFolder virtualRootFolder;
