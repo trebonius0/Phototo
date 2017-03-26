@@ -47,36 +47,36 @@ public class SearchManagerTest {
         searchManager.addMedia(rootFolder, photatoPicture3);
 
         // Search by folder name
-        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "canada").size());
-        Assert.assertEquals(photatoPicture2, searchManager.searchMediasInFolder(rootFolder.fsPath, "canada").get(0));
-        Assert.assertEquals(1, searchManager.searchMediasInFolder(canadaFolder.fsPath, "canada").size());
-        Assert.assertEquals(photatoPicture2, searchManager.searchMediasInFolder(canadaFolder.fsPath, "canada").get(0));
+        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "canada", false).size());
+        Assert.assertEquals(photatoPicture2, searchManager.searchMediasInFolder(rootFolder.fsPath, "canada", false).get(0));
+        Assert.assertEquals(1, searchManager.searchMediasInFolder(canadaFolder.fsPath, "canada", false).size());
+        Assert.assertEquals(photatoPicture2, searchManager.searchMediasInFolder(canadaFolder.fsPath, "canada", false).get(0));
 
         // Search by file name        
-        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "awesome").size());
-        Assert.assertEquals(photatoPicture1, searchManager.searchMediasInFolder(rootFolder.fsPath, "awesome").get(0));
-        Assert.assertEquals(0, searchManager.searchMediasInFolder(rootFolder.fsPath, "jpg").size()); // Checking extension not in index
-        Assert.assertEquals(0, searchManager.searchMediasInFolder(rootFolder.fsPath, "images").size()); // Checking root folder not in index
-        Assert.assertEquals(0, searchManager.searchMediasInFolder(rootFolder.fsPath, "me").size()); // Checking too <3 chars words not in index
+        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "awesome", false).size());
+        Assert.assertEquals(photatoPicture1, searchManager.searchMediasInFolder(rootFolder.fsPath, "awesome", false).get(0));
+        Assert.assertEquals(0, searchManager.searchMediasInFolder(rootFolder.fsPath, "jpg", false).size()); // Checking extension not in index
+        Assert.assertEquals(0, searchManager.searchMediasInFolder(rootFolder.fsPath, "images", false).size()); // Checking root folder not in index
+        Assert.assertEquals(0, searchManager.searchMediasInFolder(rootFolder.fsPath, "me", false).size()); // Checking too <3 chars words not in index
 
         // Search by person name
-        Assert.assertEquals(2, searchManager.searchMediasInFolder(rootFolder.fsPath, "Pierre-Arthur").size());
-        Assert.assertEquals(2, searchManager.searchMediasInFolder(rootFolder.fsPath, "pierre-ar").size());
-        Assert.assertEquals(2, searchManager.searchMediasInFolder(rootFolder.fsPath, "Antoine").size());
-        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "Antoine wololo").size());
-        Assert.assertEquals(1, searchManager.searchMediasInFolder(canadaFolder.fsPath, "Antoine").size());
-        Assert.assertEquals(0, searchManager.searchMediasInFolder(canadaFolder.fsPath, "Antoine wololo").size());
-        Assert.assertEquals(2, searchManager.searchMediasInFolder(rootFolder.fsPath, "Edouard").size());
-        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "wololo").size());
+        Assert.assertEquals(2, searchManager.searchMediasInFolder(rootFolder.fsPath, "Pierre-Arthur", false).size());
+        Assert.assertEquals(2, searchManager.searchMediasInFolder(rootFolder.fsPath, "pierre-ar", false).size());
+        Assert.assertEquals(2, searchManager.searchMediasInFolder(rootFolder.fsPath, "Antoine", false).size());
+        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "Antoine wololo", false).size());
+        Assert.assertEquals(1, searchManager.searchMediasInFolder(canadaFolder.fsPath, "Antoine", false).size());
+        Assert.assertEquals(0, searchManager.searchMediasInFolder(canadaFolder.fsPath, "Antoine wololo", false).size());
+        Assert.assertEquals(2, searchManager.searchMediasInFolder(rootFolder.fsPath, "Edouard", false).size());
+        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "wololo", false).size());
 
         // Test AND
-        Assert.assertEquals(2, searchManager.searchMediasInFolder(rootFolder.fsPath, "Pierre-Arthur").size());
-        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "canada").size());
-        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "Pierre-Arthur canada").size());
+        Assert.assertEquals(2, searchManager.searchMediasInFolder(rootFolder.fsPath, "Pierre-Arthur", false).size());
+        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "canada", false).size());
+        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "Pierre-Arthur canada", false).size());
 
         // Search by POSITION
-        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "Québec").size());
-        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "Waldos").size());
+        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "Québec", false).size());
+        Assert.assertEquals(1, searchManager.searchMediasInFolder(rootFolder.fsPath, "Waldos", false).size());
 
     }
 

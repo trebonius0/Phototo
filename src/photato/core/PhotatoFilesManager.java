@@ -70,12 +70,7 @@ public class PhotatoFilesManager implements Closeable {
     }
 
     public List<PhotatoFolder> getFoldersInFolder(String folder) {
-        PhotatoFolder currentFolder;
-        if (folder.startsWith(AlbumsManager.albumsVirtualRootFolderName + "/")) {
-            currentFolder = this.albumsManager.getCurrentFolder(folder);
-        } else {
-            currentFolder = this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
-        }
+        PhotatoFolder currentFolder = isVirtualFolder(folder) ? this.albumsManager.getCurrentFolder(folder) : this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
 
         if (currentFolder != null) {
             return currentFolder.subFolders.values().stream().filter((PhotatoFolder f) -> !f.isEmpty()).collect(Collectors.toList());
@@ -85,12 +80,7 @@ public class PhotatoFilesManager implements Closeable {
     }
 
     public List<PhotatoMedia> getMediasInFolder(String folder) {
-        PhotatoFolder currentFolder;
-        if (folder.startsWith(AlbumsManager.albumsVirtualRootFolderName + "/")) {
-            currentFolder = this.albumsManager.getCurrentFolder(folder);
-        } else {
-            currentFolder = this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
-        }
+        PhotatoFolder currentFolder = isVirtualFolder(folder) ? this.albumsManager.getCurrentFolder(folder) : this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
 
         if (currentFolder != null) {
             return new ArrayList<>(currentFolder.medias);
@@ -100,8 +90,9 @@ public class PhotatoFilesManager implements Closeable {
     }
 
     public List<PhotatoMedia> searchMediasInFolder(String folder, String searchQuery) {
-        PhotatoFolder currentFolder = this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
-        return this.searchManager.searchMediasInFolder(currentFolder.fsPath, searchQuery);
+        PhotatoFolder currentFolder = isVirtualFolder(folder) ? this.albumsManager.getCurrentFolder(folder) : this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
+
+        return this.searchManager.searchMediasInFolder(currentFolder.fsPath, searchQuery, isVirtualFolder(folder));
     }
 
     public List<PhotatoFolder> searchFoldersInFolder(String folder, String searchQuery) {
@@ -110,7 +101,7 @@ public class PhotatoFilesManager implements Closeable {
         List<PhotatoFolder> result = new ArrayList<>();
 
         if (!searchQuerySplit.isEmpty()) {
-            PhotatoFolder currentFolder = this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
+            PhotatoFolder currentFolder = isVirtualFolder(folder) ? this.albumsManager.getCurrentFolder(folder) : this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
 
             Queue<PhotatoFolder> queue = new LinkedList<>();
             queue.add(currentFolder);
@@ -382,5 +373,9 @@ public class PhotatoFilesManager implements Closeable {
             ex.printStackTrace();
             return 0;
         }
+    }
+
+    private static boolean isVirtualFolder(String folder) {
+        return folder.startsWith(AlbumsManager.albumsVirtualRootFolderName + "/");
     }
 }

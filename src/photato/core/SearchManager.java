@@ -22,7 +22,7 @@ public class SearchManager {
         this.indexFolderName = indexFolderName;
     }
 
-    public List<PhotatoMedia> searchMediasInFolder(Path folder, String searchQuery) {
+    public List<PhotatoMedia> searchMediasInFolder(Path folder, String searchQuery, boolean isVirtualFolder) {
         List<String> searched = SearchQueryHelper.getSplittedTerms(searchQuery);
 
         if (searched.isEmpty()) {
@@ -31,8 +31,7 @@ public class SearchManager {
 
         List<Set<PhotatoMedia>> resultsTmp = searched.parallelStream()
                 .map((String searchedTerm) -> this.mediasIndex.findContains(searchedTerm))
-                .map((Collection<PhotatoMedia> medias) -> medias.stream().filter((PhotatoMedia media) -> media.fsPath.startsWith(folder)).collect(Collectors.toSet()))
-                .collect(Collectors.toList());
+                .map((Collection<PhotatoMedia> medias) -> medias.stream().filter((PhotatoMedia media) -> isVirtualFolder ? media.virtualPaths.stream().anyMatch((Path virtualPath) -> virtualPath.startsWith(folder)) : media.fsPath.startsWith(folder)).collect(Collectors.toSet())).collect(Collectors.toList());
 
         Set<PhotatoMedia> result = resultsTmp.get(0);
         for (int i = 1; i < resultsTmp.size(); i++) {
