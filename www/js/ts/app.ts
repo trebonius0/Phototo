@@ -186,6 +186,19 @@ class GalleryViewModel {
         });
     }
 
+    public static getFolderIcon(path: string): string {
+        if (path.indexOf("Albums/Persons") === 0) {
+            return "fa fa-user";
+        } else if (path.indexOf("Albums/Tags") === 0) {
+            return "fa fa-tag";
+        } else if (path.indexOf("Albums/Places") === 0) {
+            return "fa fa-globe";
+        } else if (path.indexOf("Albums/Calendar") === 0) {
+            return "fa fa-calendar";
+        } else {
+            return "fa fa-folder";
+        }
+    }
 
     private static getUrlParameter(wantedParameter: string): string {
         var sPageURL: string = decodeURIComponent(window.location.search.substring(1));

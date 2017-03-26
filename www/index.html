@@ -71,7 +71,7 @@
                 <div id="folders-gallery" data-bind="foreach: folders, style: {'margin':folders().length?'':'20px'}">
                     <div class="folder" data-bind="click: () => $parent.moveToFolder(path, true), style: {'background-image':'url(\''+thumbnail.url+'\')', width: thumbnail.height+'px', height: thumbnail.height+'px'}">
                         <div class="legend">
-                            <i class="fa fa-folder"></i>
+                            <i data-bind="css: GalleryViewModel.getFolderIcon(path)"></i>
                             <span data-bind="text: filename"></span>
                         </div>
                     </div>
