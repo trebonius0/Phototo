@@ -29,10 +29,11 @@
     }
 
     #albums-links {
-        margin-left: 8px;
+        margin-left: 20px;
 
         .albums-link {
-            margin-left: 20px;
+            padding-left: 10px;
+            padding-right: 10px;
             display: inline-block;
             cursor: pointer;
             height: 70px;
