@@ -376,6 +376,6 @@ public class PhotatoFilesManager implements Closeable {
     }
 
     private static boolean isVirtualFolder(String folder) {
-        return folder.startsWith(AlbumsManager.albumsVirtualRootFolderName + "/");
+        return folder.startsWith(AlbumsManager.albumsVirtualRootFolderName + "/") || folder.equalsIgnoreCase(AlbumsManager.albumsVirtualRootFolderName);
     }
 }

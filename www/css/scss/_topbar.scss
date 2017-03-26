@@ -27,6 +27,22 @@
 
         cursor: pointer;
     }
+
+    #albums-links {
+        margin-left: 8px;
+
+        .albums-link {
+            margin-left: 20px;
+            display: inline-block;
+            cursor: pointer;
+            height: 70px;
+            line-height: 70px;
+            text-align: center;       
+            font-size: 20px;
+            color: #0f70e8;
+        }
+    }
+
     /* Search container */
     .search-field {
         margin-top: 20px;
