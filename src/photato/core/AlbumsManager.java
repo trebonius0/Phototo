@@ -13,6 +13,7 @@ public class AlbumsManager {
     public static final String albumsVirtualRootFolderName = "Albums";
     public static final String personsFolderName = "Persons";
     public static final String tagsFolderName = "Tags";
+    public static final String placesFolderName = "Places";
     private static final Path virtualRootPath = Paths.get("/");
 
     private final PhotatoFolder virtualRootFolder;

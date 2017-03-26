@@ -76,11 +76,15 @@ public abstract class PhotatoMedia extends PhotatoItem {
                 result.add(Paths.get("/" + AlbumsManager.albumsVirtualRootFolderName, AlbumsManager.personsFolderName, person));
             }
         }
-        
+
         if (this.tags != null) {
             for (String tag : this.tags) {
                 result.add(Paths.get("/" + AlbumsManager.albumsVirtualRootFolderName, AlbumsManager.tagsFolderName, tag));
             }
+        }
+
+        for (String placeUrl : this.position.getCoordinatesDescriptionTags()) {
+            result.add(Paths.get("/" + AlbumsManager.albumsVirtualRootFolderName, AlbumsManager.placesFolderName, placeUrl));
         }
 
         return result;
