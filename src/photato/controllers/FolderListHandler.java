@@ -2,7 +2,6 @@ package photato.controllers;
 
 import photato.controllers.entities.FolderListResponse;
 import photato.helpers.SerialisationGsonBuilder;
-import java.nio.file.Path;
 import java.util.List;
 import org.apache.http.HttpStatus;
 import org.apache.http.entity.ContentType;
@@ -10,29 +9,24 @@ import org.apache.http.entity.StringEntity;
 import photato.core.PhotatoFilesManager;
 import photato.core.entities.PhotatoFolder;
 import photato.core.entities.PhotatoMedia;
-import java.util.Arrays;
 import java.util.Map;
 
 public class FolderListHandler extends PhotatoHandler {
 
-    private final Path rootFolder;
     private final PhotatoFilesManager photatoFilesManager;
 
-    public FolderListHandler(String prefix, Path rootFolder, PhotatoFilesManager photatoFilesManager) {
+    public FolderListHandler(String prefix, PhotatoFilesManager photatoFilesManager) {
         super(prefix, new String[]{"GET"});
-        this.rootFolder = rootFolder;
         this.photatoFilesManager = photatoFilesManager;
     }
 
     @Override
     protected Response getResponse(String path, Map<String, String> queryStringMap) throws Exception {
         if (queryStringMap.containsKey("folder")) {
-            String folderTmp = queryStringMap.get("folder");
-            while (!folderTmp.isEmpty() && folderTmp.startsWith("/")) { // Remove the leading slashes if needed
-                folderTmp = folderTmp.substring(1);
+            String folder = queryStringMap.get("folder");
+            while (!folder.isEmpty() && folder.startsWith("/")) { // Remove the leading slashes if needed
+                folder = folder.substring(1);
             }
-
-            String folder = this.rootFolder.resolve(folderTmp).toString();
 
             String query = queryStringMap.get("query"); // Can be null
 
@@ -47,8 +41,7 @@ public class FolderListHandler extends PhotatoHandler {
                 } else {
                     return c;
                 }
-            }
-            );
+            });
 
             FolderListResponse result = new FolderListResponse(folders, medias);
 

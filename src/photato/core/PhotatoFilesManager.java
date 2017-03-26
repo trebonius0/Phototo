@@ -70,7 +70,7 @@ public class PhotatoFilesManager implements Closeable {
     }
 
     public List<PhotatoFolder> getFoldersInFolder(String folder) {
-        PhotatoFolder currentFolder = this.getCurrentFolder(this.fileSystem.getPath(folder));
+        PhotatoFolder currentFolder = this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
 
         if (currentFolder != null) {
             return currentFolder.subFolders.values().stream().filter((PhotatoFolder f) -> !f.isEmpty()).collect(Collectors.toList());
@@ -80,7 +80,7 @@ public class PhotatoFilesManager implements Closeable {
     }
 
     public List<PhotatoMedia> getMediasInFolder(String folder) {
-        PhotatoFolder currentFolder = this.getCurrentFolder(this.fileSystem.getPath(folder));
+        PhotatoFolder currentFolder = this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
 
         if (currentFolder != null) {
             return new ArrayList<>(currentFolder.medias);
@@ -90,7 +90,8 @@ public class PhotatoFilesManager implements Closeable {
     }
 
     public List<PhotatoMedia> searchMediasInFolder(String folder, String searchQuery) {
-        return this.searchManager.searchMediasInFolder(this.fileSystem.getPath(folder), searchQuery);
+        PhotatoFolder currentFolder = this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
+        return this.searchManager.searchMediasInFolder(currentFolder.fsPath, searchQuery);
     }
 
     public List<PhotatoFolder> searchFoldersInFolder(String folder, String searchQuery) {
@@ -99,7 +100,7 @@ public class PhotatoFilesManager implements Closeable {
         List<PhotatoFolder> result = new ArrayList<>();
 
         if (!searchQuerySplit.isEmpty()) {
-            PhotatoFolder currentFolder = this.getCurrentFolder(this.fileSystem.getPath(folder));
+            PhotatoFolder currentFolder = this.getCurrentFolder(this.rootFolder.fsPath.resolve(folder));
 
             Queue<PhotatoFolder> queue = new LinkedList<>();
             queue.add(currentFolder);
