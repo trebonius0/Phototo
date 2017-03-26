@@ -122,14 +122,12 @@ class GalleryViewModel {
                     that.bannerMessage(Messages.noResult);
                 }
 
-                var state = <HistoryState>history.state;
-                if (state) {
-                    state.folders = that.folders();
-                    state.allMedias = that.allMedias();
-                    state.bannerMessage = that.bannerMessage();
-                    state.displayedPicturesCount = that.displayedPicturesCount();
-                    history.replaceState(state, null, null);
-                }
+                var state = <HistoryState>history.state || <HistoryState>{};
+                state.folders = that.folders();
+                state.allMedias = that.allMedias();
+                state.bannerMessage = that.bannerMessage();
+                state.displayedPicturesCount = that.displayedPicturesCount();
+                history.replaceState(state, null, null);
 
                 that.layoutManager.run();
             }).error(function() {
