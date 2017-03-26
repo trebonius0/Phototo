@@ -1,6 +1,8 @@
 package photato;
 
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.UnknownHostException;
 import java.nio.file.FileSystem;
 import photato.core.PhotatoFilesManager;
 import photato.core.metadata.MetadataAggregator;
@@ -21,6 +23,7 @@ import photato.controllers.JsHandler;
 import photato.core.metadata.exif.ExifToolDownloader;
 import photato.core.metadata.gps.OSMGpsCoordinatesDescriptionGetter;
 import java.nio.file.Path;
+import java.util.Enumeration;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import photato.controllers.VideoHandler;
@@ -82,7 +85,7 @@ public class Photato {
                 .registerHandler("*", new DefaultHandler(fileSystem.getPath("www")))
                 .create();
         server.start();
-        System.out.println("Server started on port " + server.getLocalPort() + " (http://" + InetAddress.getLocalHost().getHostAddress() + ":" + server.getLocalPort() + ")");
+        System.out.println("Server started on port " + server.getLocalPort() + " (http://" + getLocalIp() + ":" + server.getLocalPort() + ")");
         server.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -98,6 +101,22 @@ public class Photato {
             args0 += "/";
         }
         return fileSystem.getPath(args0);
+    }
+
+    private static String getLocalIp() {
+        try {
+            InetAddress inet = InetAddress.getLocalHost();
+            InetAddress[] ips = InetAddress.getAllByName(inet.getCanonicalHostName());
+            for (InetAddress ip : ips) {
+                String ipStr = ip.getHostAddress();
+                if (ipStr.startsWith("192.168.")) {
+                    return ipStr;
+                }
+            }
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
