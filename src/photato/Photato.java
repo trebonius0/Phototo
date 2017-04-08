@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.util.Enumeration;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import photato.controllers.LoadingHandler;
 import photato.controllers.VideoHandler;
 import photato.core.resize.ffmpeg.FfmpegDownloader;
 
@@ -46,6 +47,10 @@ public class Photato {
 
         FileSystem fileSystem = FileSystems.getDefault();
         Path rootFolder = getRootFolder(fileSystem, args[0]);
+
+        HttpServer server = getDefaultServer(fileSystem.getPath("www"));
+        server.start();
+
         System.out.println("Starting exploration of folder " + rootFolder + "...");
 
         if (!Files.exists(fileSystem.getPath("cache"))) {
@@ -64,15 +69,13 @@ public class Photato {
 
         PhotatoFilesManager photatoFilesManager = new PhotatoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, fullScreenImageGetter, PhotatoConfig.prefixModeOnly, PhotatoConfig.indexFolderName, PhotatoConfig.useParallelPicturesGeneration);
 
-        SocketConfig socketConfig = SocketConfig.custom()
-                .setSoTimeout(60000)
-                .setTcpNoDelay(true)
-                .build();
+        // Closing tmp server
+        server.shutdown(5, TimeUnit.SECONDS);
 
-        final HttpServer server = ServerBootstrap.bootstrap()
+        server = ServerBootstrap.bootstrap()
                 .setListenerPort(PhotatoConfig.serverPort)
                 .setServerInfo(serverName)
-                .setSocketConfig(socketConfig)
+                .setSocketConfig(getSocketConfig())
                 .setExceptionLogger(new StdErrorExceptionLogger())
                 .registerHandler(Routes.rawVideosRootUrl + "/*", new VideoHandler(rootFolder, Routes.rawVideosRootUrl))
                 .registerHandler(Routes.rawPicturesRootUrl + "/*", new ImageHandler(rootFolder, Routes.rawPicturesRootUrl))
@@ -87,13 +90,6 @@ public class Photato {
         server.start();
         System.out.println("Server started on port " + server.getLocalPort() + " (http://" + getLocalIp() + ":" + server.getLocalPort() + ")");
         server.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                server.shutdown(5, TimeUnit.SECONDS);
-            }
-        });
     }
 
     private static Path getRootFolder(FileSystem fileSystem, String args0) {
@@ -117,6 +113,23 @@ public class Photato {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private static HttpServer getDefaultServer(Path folderRoot) {
+        return ServerBootstrap.bootstrap()
+                .setListenerPort(PhotatoConfig.serverPort)
+                .setServerInfo(serverName)
+                .setSocketConfig(getSocketConfig())
+                .setExceptionLogger(new StdErrorExceptionLogger())
+                .registerHandler("*", new LoadingHandler(folderRoot))
+                .create();
+    }
+
+    private static SocketConfig getSocketConfig() {
+        return SocketConfig.custom()
+                .setSoTimeout(60000)
+                .setTcpNoDelay(true)
+                .build();
     }
 
 }
