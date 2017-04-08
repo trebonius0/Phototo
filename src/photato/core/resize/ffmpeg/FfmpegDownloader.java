@@ -29,11 +29,12 @@ public class FfmpegDownloader {
 
     public static void run(HttpClient httpClient, FileSystem fileSystem, boolean forceFfmpegDownload) throws IOException {
         if (OsHelper.isWindows()) {
+            String v = System.getProperty("sun.arch.data.model"); // 32 or 64 bits
             if (!fileSystem.getPath(targetFilename).toFile().exists()
                     || forceFfmpegDownload
                     || Files.getLastModifiedTime(fileSystem.getPath(targetFilename)).toMillis() + maxDelayBeforeRedownload < System.currentTimeMillis()) {
                 System.out.println("Starting ffmpeg download");
-                downloadFfmpegTools("https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-latest-win64-static.zip", httpClient, fileSystem);
+                downloadFfmpegTools("https://ffmpeg.zeranoe.com/builds/win" + v + "/static/ffmpeg-latest-win" + v + "-static.zip", httpClient, fileSystem);
                 System.out.println("End of ffmpeg download");
             }
         }
