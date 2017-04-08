@@ -33,11 +33,11 @@ public class FolderListHandler extends PhotatoHandler {
             List<PhotatoFolder> folders = query == null ? this.photatoFilesManager.getFoldersInFolder(folder) : this.photatoFilesManager.searchFoldersInFolder(folder, query);
             List<PhotatoMedia> medias = query == null ? this.photatoFilesManager.getMediasInFolder(folder) : this.photatoFilesManager.searchMediasInFolder(folder, query);
 
-            folders.sort((PhotatoFolder f1, PhotatoFolder f2) -> f1.filename.compareTo(f2.filename));
+            folders.sort((PhotatoFolder f1, PhotatoFolder f2) -> f1.filename.toLowerCase().compareTo(f2.filename.toLowerCase()));
             medias.sort((PhotatoMedia m1, PhotatoMedia m2) -> {
                 int c = Long.compare(m1.timestamp, m2.timestamp);
                 if (c == 0) {
-                    return m1.filename.compareTo(m2.filename);
+                    return m1.filename.toLowerCase().compareTo(m2.filename.toLowerCase());
                 } else {
                     return c;
                 }
