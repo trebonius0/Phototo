@@ -3,7 +3,9 @@ package photato.core.metadata.exif;
 import com.google.gson.annotations.SerializedName;
 import photato.helpers.SafeSimpleDateFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import photato.helpers.ArrayHelper;
 
 public class ExifMetadata {
@@ -108,12 +110,16 @@ public class ExifMetadata {
     }
 
     public String getHardcodedPosition() {
-        if (this.locationCreatedCity != null && !this.locationCreatedCity.trim().isEmpty()
-                && this.locationCreatedProvinceState != null && !this.locationCreatedProvinceState.trim().isEmpty()
-                && this.locationCreatedCountryName != null && !this.locationCreatedCountryName.trim().isEmpty()) {
-            return this.locationCreatedCity + ", " + this.locationCreatedProvinceState + ", " + this.locationCreatedCountryName;
-        } else {
+        List<String> elmts = new ArrayList<>();
+        elmts.add(this.locationCreatedCity);
+        elmts.add(this.locationCreatedProvinceState);
+        elmts.add(this.locationCreatedCountryName);
+
+        String res = elmts.stream().filter(e -> e != null).map(e -> e.trim()).collect(Collectors.joining(", "));
+        if (res == null || res.trim().isEmpty()) {
             return null;
+        } else {
+            return res;
         }
     }
 
