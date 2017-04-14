@@ -25,7 +25,11 @@ public class GpsCoordinatesHelper {
                     longitude *= -1;
                 }
 
-                return new Tuple<>(latitude, longitude);
+                if (Math.abs(latitude) < 0.0001 && Math.abs(longitude) < 0.0001) {
+                    return new Tuple<>(null, null);
+                } else {
+                    return new Tuple<>(latitude, longitude);
+                }
             } else {
                 throw new IllegalArgumentException("Argument \"" + coordinates + "\" does not have the expected format");
             }
