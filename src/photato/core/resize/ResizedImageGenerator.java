@@ -64,6 +64,7 @@ public abstract class ResizedImageGenerator {
             this.resizedPicturesSet.add(resizedPicturePath);
         }
 
+        System.out.println("- Generating resizedPicture for " + originalFilename + " (last modified: " + lastModifiedTimestamp + ")");
         BufferedImage originalImage;
 
         if (MediaHelper.isVideoFile(originalFilename)) {
