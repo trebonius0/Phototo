@@ -48,12 +48,17 @@ public class Photato {
         String thumbnailCacheFolder = cacheRootFolder + "/thumbnails";
         String fullscreenCacheFolder = cacheRootFolder + "/fullscreen";
         String extractedPicturesCacheFolder = cacheRootFolder + "/extracted";
-        PhotatoConfig.init(args.length >= 3 ? args[2] : ".");
+        String configFile = (args.length >= 3 ? args[2] : ".") + "/photato.ini";
+
+        PhotatoConfig.init(configFile);
+
+        System.out.println("Starting photato");
+        System.out.println("-- Config file: " + configFile);
+        System.out.println("-- Cache folder: " + cacheRootFolder);
+        System.out.println("-- Pictures folder: " + rootFolder);
 
         HttpServer server = getDefaultServer(fileSystem.getPath("www"));
         server.start();
-
-        System.out.println("Starting exploration of folder " + rootFolder + "...");
 
         if (!Files.exists(fileSystem.getPath("cache"))) {
             Files.createDirectory(fileSystem.getPath("cache"));

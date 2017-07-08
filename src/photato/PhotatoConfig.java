@@ -5,7 +5,6 @@ import org.ini4j.Ini;
 
 public class PhotatoConfig {
 
-    private static final String configFileName = "photato.ini";
     public static int serverPort;
     public static boolean prefixModeOnly;
     public static boolean indexFolderName;
@@ -19,10 +18,9 @@ public class PhotatoConfig {
     public static int thumbnailQuality;
     public static int addressElementsCount;
 
-    public static void init(String configFolder) {
-        File configFile = new File(configFolder + "/" + configFileName);
+    public static void init(String configFile) {
         try {
-            Ini ini = new Ini(configFile);
+            Ini ini = new Ini(new File(configFile));
             serverPort = Integer.parseInt(ini.get("global", "serverPort"));
             prefixModeOnly = Boolean.parseBoolean(ini.get("index", "prefixModeOnly"));
             indexFolderName = Boolean.parseBoolean(ini.get("index", "indexFolderName"));
