@@ -37,7 +37,7 @@ public class ExifToolParser {
                         .collect(Collectors.joining(" "));
 
                 String commandLine = applicationName + " " + filenamesCommandLineParameter + " -charset utf-8 -charset filename=Latin -j -c \"%.8f\"";
-                Process p = Runtime.getRuntime().exec(commandLine);
+                Process p = runCommandLine(commandLine);
 
                 BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream(), "UTF-8"));
                 String line;
@@ -67,5 +67,16 @@ public class ExifToolParser {
         });
 
         return result;
+    }
+
+    private static Process runCommandLine(String commandLine) throws IOException, InterruptedException {
+        Process p;
+        if (OsHelper.isWindows()) {
+            p = Runtime.getRuntime().exec(commandLine);
+        } else {
+            ProcessBuilder pb = new ProcessBuilder("/bin/sh", "-c", commandLine);
+            p = pb.start();
+        }
+        return p;
     }
 }
