@@ -35,18 +35,20 @@ public class Photato {
     public static final String[] supportedPictureExtensions = new String[]{"jpg", "jpeg", "png", "bmp"};
     public static final String[] supportedVideoExtensions = new String[]{"mp4", "webm"};
     private static final String serverName = "Photato";
-    private static final String thumbnailCacheFolder = "cache/thumbnails";
-    private static final String fullscreenCacheFolder = "cache/fullscreen";
-    private static final String extractedPicturesCacheFolder = "cache/extracted";
 
     public static void main(String[] args) throws Exception {
         if (args.length < 1) {
-            System.err.println("Usage: <picturesRootFolder>");
+            System.err.println("Usage: <picturesRootFolder> [cacheFolder] [configFolder]");
             System.exit(-1);
         }
 
         FileSystem fileSystem = FileSystems.getDefault();
         Path rootFolder = getRootFolder(fileSystem, args[0]);
+        String cacheRootFolder = (args.length >= 2 ? args[1] : "cache");
+        String thumbnailCacheFolder = cacheRootFolder + "/thumbnails";
+        String fullscreenCacheFolder = cacheRootFolder + "/fullscreen";
+        String extractedPicturesCacheFolder = cacheRootFolder + "/extracted";
+        PhotatoConfig.init(args.length >= 3 ? args[2] : ".");
 
         HttpServer server = getDefaultServer(fileSystem.getPath("www"));
         server.start();
