@@ -34,13 +34,21 @@ Give to Photato a picture folder and it will index it, using the file system hie
   * At the first start, Photato will start by indexing the picture folder and generate thumbnails (which can take ~20min for 7000 pictures)
   * When it will have finished, you can access it on [http://127.0.0.1:8186](http://127.0.0.1:8186)
 
+### With docker
+```
+docker run \
+    -v /host/configfolder:/config \
+    -v /host/cachefolder:/cache \
+    -v /host/picturesfolder:/pictures \
+    -p 8186:8186 -d trebonius0/photato
+```
+
 ## Roadmap
 Here are the features we will implement in the future (you can contribute if you want to implement one yourself)
 - XMP file support
 - Authentication / Access restriction to some folders
 - Upload of pictures to the filesystem directly through the gallery
 - Edit picture metadata directly through the gallery
-- Auto-generated "galleries": persons / tags / locations / dates
 - File-based Logging
 - Automated offline keywords annotations
 
