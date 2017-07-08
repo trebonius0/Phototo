@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import photato.helpers.SerialisationGsonBuilder;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
@@ -14,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import photato.helpers.FileHelper;
 import photato.helpers.OsHelper;
 
 public class ExifToolParser {
@@ -43,9 +45,20 @@ public class ExifToolParser {
                 while ((line = input.readLine()) != null) {
                     builder.append(line).append("\n");
                 }
+
+                BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream(), "UTF-8"));
+                StringBuilder errBuilder = new StringBuilder();
+                while ((line = err.readLine()) != null) {
+                    errBuilder.append(line).append("\n");
+                }
                 p.waitFor();
 
-                List<ExifMetadata> metadataList = new Gson().fromJson(builder.toString(), new TypeToken<List<ExifMetadata>>() {
+                String resultString = builder.toString();
+                if (resultString == null || resultString.isEmpty()) {
+                    throw new Exception("Empty exiftool result. Error for commandline: '" + commandLine + "': " + errBuilder.toString());
+                }
+
+                List<ExifMetadata> metadataList = new Gson().fromJson(resultString, new TypeToken<List<ExifMetadata>>() {
                 }.getType());
                 result.putAll(metadataList.stream().collect(Collectors.toMap(x -> Paths.get(x.getSourceFile()), x -> x)));
             } catch (Exception ex) {
