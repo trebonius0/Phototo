@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import photato.helpers.CommandLineHelper;
 import photato.helpers.OsHelper;
 import photato.helpers.RandomManager;
 
@@ -15,22 +16,11 @@ public class VideoPictureExtractor {
         String applicationName = OsHelper.isWindows() ? "ffmpeg.exe" : "ffmpeg";
         try {
             String commandLine = applicationName + " -y -ss 0 -i \"" + videoPath + "\" -qscale:v 2 -vframes 1 \"" + outputPicturePath + "\"";
-            Process p = Runtime.getRuntime().exec(commandLine);
 
-            String errMessage;
-            try (BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream(), "UTF-8"))) {
-                String line;
-                StringBuilder errBuilder = new StringBuilder();
-                while ((line = err.readLine()) != null) {
-                    errBuilder.append(line).append("\n");
-                }
-                errMessage = errBuilder.toString();
-            }
-
-            p.waitFor();
+            CommandLineHelper.CommandLineResult commandLineResult = CommandLineHelper.runCommandLine(commandLine);
 
             if (!outputPicturePath.toFile().exists()) {
-                throw new IOException("Error while executing: '" + commandLine + "': " + errMessage);
+                throw new IOException("Error while executing:\n'" + commandLine + "': " + commandLineResult.errlog);
             }
         } catch (Exception ex) {
             ex.printStackTrace();

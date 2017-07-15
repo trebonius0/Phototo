@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import photato.helpers.CommandLineHelper;
 import photato.helpers.FileHelper;
 import photato.helpers.OsHelper;
 
@@ -37,25 +38,12 @@ public class ExifToolParser {
                         .collect(Collectors.joining(" "));
 
                 String commandLine = applicationName + " " + filenamesCommandLineParameter + " -charset utf-8 " + (OsHelper.isWindows() ? "-charset filename=Latin" : "") + " -j -c \"%.8f\"";
-                Process p = runCommandLine(commandLine);
 
-                BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream(), "UTF-8"));
-                String line;
-                StringBuilder builder = new StringBuilder();
-                while ((line = input.readLine()) != null) {
-                    builder.append(line).append("\n");
-                }
+                CommandLineHelper.CommandLineResult commandLineResult = CommandLineHelper.runCommandLine(commandLine);
 
-                BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream(), "UTF-8"));
-                StringBuilder errBuilder = new StringBuilder();
-                while ((line = err.readLine()) != null) {
-                    errBuilder.append(line).append("\n");
-                }
-                p.waitFor();
-
-                String resultString = builder.toString();
+                String resultString = commandLineResult.outlog;
                 if (resultString == null || resultString.isEmpty()) {
-                    throw new Exception("Empty exiftool result. Error for commandline: '" + commandLine + "': " + errBuilder.toString());
+                    throw new Exception("Empty exiftool result. Error for commandline: '" + commandLine + "': " + commandLineResult.errlog);
                 }
 
                 List<ExifMetadata> metadataList = new Gson().fromJson(resultString, new TypeToken<List<ExifMetadata>>() {
