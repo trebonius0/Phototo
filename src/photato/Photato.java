@@ -1,5 +1,6 @@
 package photato;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
@@ -79,24 +80,32 @@ public class Photato {
         // Closing tmp server
         server.shutdown(5, TimeUnit.SECONDS);
 
-        server = ServerBootstrap.bootstrap()
-                .setListenerPort(PhotatoConfig.serverPort)
-                .setServerInfo(serverName)
-                .setSocketConfig(getSocketConfig())
-                .setExceptionLogger(new StdErrorExceptionLogger())
-                .registerHandler(Routes.rawVideosRootUrl + "/*", new VideoHandler(rootFolder, Routes.rawVideosRootUrl))
-                .registerHandler(Routes.rawPicturesRootUrl + "/*", new ImageHandler(rootFolder, Routes.rawPicturesRootUrl))
-                .registerHandler(Routes.fullScreenPicturesRootUrl + "/*", new ImageHandler(fileSystem.getPath(fullscreenCacheFolder), Routes.fullScreenPicturesRootUrl))
-                .registerHandler(Routes.thumbnailRootUrl + "/*", new ImageHandler(fileSystem.getPath(thumbnailCacheFolder), Routes.thumbnailRootUrl))
-                .registerHandler(Routes.listItemsApiUrl, new FolderListHandler(Routes.listItemsApiUrl, photatoFilesManager))
-                .registerHandler("/img/*", new ImageHandler(fileSystem.getPath("www/img"), "/img"))
-                .registerHandler("/js/*", new JsHandler(fileSystem.getPath("www/js"), "/js"))
-                .registerHandler("/css/*", new CssHandler(fileSystem.getPath("www/css"), "/css"))
-                .registerHandler("*", new DefaultHandler(fileSystem.getPath("www")))
-                .create();
-        server.start();
-        System.out.println("Server started on port " + server.getLocalPort() + " (http://" + getLocalIp() + ":" + server.getLocalPort() + ")");
-        server.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+        while (true) {
+            try {
+                server = ServerBootstrap.bootstrap()
+                        .setListenerPort(PhotatoConfig.serverPort)
+                        .setServerInfo(serverName)
+                        .setSocketConfig(getSocketConfig())
+                        .setExceptionLogger(new StdErrorExceptionLogger())
+                        .registerHandler(Routes.rawVideosRootUrl + "/*", new VideoHandler(rootFolder, Routes.rawVideosRootUrl))
+                        .registerHandler(Routes.rawPicturesRootUrl + "/*", new ImageHandler(rootFolder, Routes.rawPicturesRootUrl))
+                        .registerHandler(Routes.fullScreenPicturesRootUrl + "/*", new ImageHandler(fileSystem.getPath(fullscreenCacheFolder), Routes.fullScreenPicturesRootUrl))
+                        .registerHandler(Routes.thumbnailRootUrl + "/*", new ImageHandler(fileSystem.getPath(thumbnailCacheFolder), Routes.thumbnailRootUrl))
+                        .registerHandler(Routes.listItemsApiUrl, new FolderListHandler(Routes.listItemsApiUrl, photatoFilesManager))
+                        .registerHandler("/img/*", new ImageHandler(fileSystem.getPath("www/img"), "/img"))
+                        .registerHandler("/js/*", new JsHandler(fileSystem.getPath("www/js"), "/js"))
+                        .registerHandler("/css/*", new CssHandler(fileSystem.getPath("www/css"), "/css"))
+                        .registerHandler("*", new DefaultHandler(fileSystem.getPath("www")))
+                        .create();
+                server.start();
+                System.out.println("Server started on port " + server.getLocalPort() + " (http://" + getLocalIp() + ":" + server.getLocalPort() + ")");
+                server.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+            } catch (IOException | InterruptedException ex) {
+                // In case of port already binded
+                System.err.println("Could not start the server ...");
+                Thread.sleep(1000);
+            }
+        }
     }
 
     private static Path getRootFolder(FileSystem fileSystem, String args0) {
