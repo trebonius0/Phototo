@@ -36,7 +36,7 @@ public class ExifToolParser {
                         .map((Path filename) -> "\"" + filename.toString() + "\"")
                         .collect(Collectors.joining(" "));
 
-                String commandLine = applicationName + " " + filenamesCommandLineParameter + " -charset utf-8 -charset filename=Latin -j -c \"%.8f\"";
+                String commandLine = applicationName + " " + filenamesCommandLineParameter + " -charset utf-8 " + (OsHelper.isWindows() ? "-charset filename=Latin" : "") + " -j -c \"%.8f\"";
                 Process p = runCommandLine(commandLine);
 
                 BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream(), "UTF-8"));
