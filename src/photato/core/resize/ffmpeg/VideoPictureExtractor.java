@@ -1,7 +1,9 @@
 package photato.core.resize.ffmpeg;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import photato.helpers.OsHelper;
@@ -14,10 +16,21 @@ public class VideoPictureExtractor {
         try {
             String commandLine = applicationName + " -y -ss 0 -i \"" + videoPath + "\" -qscale:v 2 -vframes 1 \"" + outputPicturePath + "\"";
             Process p = Runtime.getRuntime().exec(commandLine);
+
+            String errMessage;
+            try (BufferedReader err = new BufferedReader(new InputStreamReader(p.getErrorStream(), "UTF-8"))) {
+                String line;
+                StringBuilder errBuilder = new StringBuilder();
+                while ((line = err.readLine()) != null) {
+                    errBuilder.append(line).append("\n");
+                }
+                errMessage = errBuilder.toString();
+            }
+
             p.waitFor();
 
             if (!outputPicturePath.toFile().exists()) {
-                throw new IOException("Error while executing: '" + commandLine + "' -- Output file does not exist");
+                throw new IOException("Error while executing: '" + commandLine + "': " + errMessage);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
