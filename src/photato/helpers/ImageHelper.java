@@ -41,54 +41,58 @@ public class ImageHelper {
     }
 
     public static BufferedImage readImage(Path file, int orientation) throws IOException {
-        BufferedImage image = ImageIO.read(file.toFile());
-        int width = image.getWidth();
-        int height = image.getHeight();
+        try {
+            BufferedImage image = ImageIO.read(file.toFile());
+            int width = image.getWidth();
+            int height = image.getHeight();
 
-        AffineTransform t = new AffineTransform();
+            AffineTransform t = new AffineTransform();
 
-        switch (orientation) {
-            case 2: // Flip X
-                t.scale(-1.0, 1.0);
-                t.translate(-width, 0);
-                break;
-            case 3: // PI rotation 
-                t.translate(width, height);
-                t.rotate(Math.PI);
-                break;
-            case 4: // Flip Y
-                t.scale(1.0, -1.0);
-                t.translate(0, -height);
-                break;
-            case 5: // - PI/2 and Flip X
-                t.rotate(-Math.PI / 2);
-                t.scale(-1.0, 1.0);
-                break;
-            case 6: // -PI/2 and -width
-                t.translate(height, 0);
-                t.rotate(Math.PI / 2);
-                break;
-            case 7: // PI/2 and Flip
-                t.scale(-1.0, 1.0);
-                t.translate(-height, 0);
-                t.translate(0, width);
-                t.rotate(3 * Math.PI / 2);
-                break;
-            case 8: // PI / 2
-                t.translate(0, width);
-                t.rotate(3 * Math.PI / 2);
-                break;
-            default:
-                return image;
+            switch (orientation) {
+                case 2: // Flip X
+                    t.scale(-1.0, 1.0);
+                    t.translate(-width, 0);
+                    break;
+                case 3: // PI rotation 
+                    t.translate(width, height);
+                    t.rotate(Math.PI);
+                    break;
+                case 4: // Flip Y
+                    t.scale(1.0, -1.0);
+                    t.translate(0, -height);
+                    break;
+                case 5: // - PI/2 and Flip X
+                    t.rotate(-Math.PI / 2);
+                    t.scale(-1.0, 1.0);
+                    break;
+                case 6: // -PI/2 and -width
+                    t.translate(height, 0);
+                    t.rotate(Math.PI / 2);
+                    break;
+                case 7: // PI/2 and Flip
+                    t.scale(-1.0, 1.0);
+                    t.translate(-height, 0);
+                    t.translate(0, width);
+                    t.rotate(3 * Math.PI / 2);
+                    break;
+                case 8: // PI / 2
+                    t.translate(0, width);
+                    t.rotate(3 * Math.PI / 2);
+                    break;
+                default:
+                    return image;
+            }
+
+            AffineTransformOp op = new AffineTransformOp(t, AffineTransformOp.TYPE_BICUBIC);
+
+            BufferedImage destinationImage = op.createCompatibleDestImage(image, (image.getType() == BufferedImage.TYPE_BYTE_GRAY) ? image.getColorModel() : null);
+            Graphics2D g = destinationImage.createGraphics();
+            g.setBackground(Color.WHITE);
+            g.clearRect(0, 0, destinationImage.getWidth(), destinationImage.getHeight());
+            destinationImage = op.filter(image, destinationImage);
+            return destinationImage;
+        } catch (IOException ex) {
+            throw new IOException(file.toString() + ": " + ex.getMessage(), ex);
         }
-
-        AffineTransformOp op = new AffineTransformOp(t, AffineTransformOp.TYPE_BICUBIC);
-
-        BufferedImage destinationImage = op.createCompatibleDestImage(image, (image.getType() == BufferedImage.TYPE_BYTE_GRAY) ? image.getColorModel() : null);
-        Graphics2D g = destinationImage.createGraphics();
-        g.setBackground(Color.WHITE);
-        g.clearRect(0, 0, destinationImage.getWidth(), destinationImage.getHeight());
-        destinationImage = op.filter(image, destinationImage);
-        return destinationImage;
     }
 }
