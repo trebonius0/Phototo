@@ -28,7 +28,7 @@ public class Position {
             for (int i = splitted.length - 1; i >= Math.max(0, splitted.length - 3); i--) {
                 List<String> elmts = new ArrayList<>();
                 for (int j = splitted.length - 1; j >= i; j--) {
-                    elmts.add(splitted[j].trim());
+                    elmts.add(splitted[j].trim().replace("/", "-"));
                 }
                 result.add(String.join("/", elmts).trim());
             }
