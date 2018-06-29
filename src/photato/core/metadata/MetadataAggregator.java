@@ -73,26 +73,30 @@ public class MetadataAggregator implements IMetadataAggregator, Closeable {
         Map<Path, ExifMetadata> exifToolParserResults = ExifToolParser.readMetadata(paths.stream().map((Tuple<Path, Long> t) -> t.o1).collect(Collectors.toList()));
 
         for (Tuple<Path, Long> pathTuple : paths) {
-            ExifMetadata exifMetadata = exifToolParserResults.get(pathTuple.o1);
+            try {
+                ExifMetadata exifMetadata = exifToolParserResults.get(pathTuple.o1);
 
-            if (exifMetadata != null) {
-                Position position;
-                Tuple<Double, Double> coordinates = GpsCoordinatesHelper.getCoordinates(exifMetadata.getGPSPositionString());
-                String hardcodedPosition = exifMetadata.getHardcodedPosition();
+                if (exifMetadata != null) {
+                    Position position;
+                    Tuple<Double, Double> coordinates = GpsCoordinatesHelper.getCoordinates(exifMetadata.getGPSPositionString());
+                    String hardcodedPosition = exifMetadata.getHardcodedPosition();
 
-                if (this.coordinatesDescriptionGetter != null) {
-                    position = new Position(coordinates.o1, coordinates.o2, hardcodedPosition, this.coordinatesDescriptionGetter.getCoordinatesDescription(coordinates.o1, coordinates.o2));
-                } else {
-                    position = new Position(coordinates.o1, coordinates.o2, hardcodedPosition, null);
+                    if (this.coordinatesDescriptionGetter != null) {
+                        position = new Position(coordinates.o1, coordinates.o2, hardcodedPosition, this.coordinatesDescriptionGetter.getCoordinatesDescription(coordinates.o1, coordinates.o2));
+                    } else {
+                        position = new Position(coordinates.o1, coordinates.o2, hardcodedPosition, null);
+                    }
+
+                    Metadata metadata = new Metadata(exifMetadata, position);
+                    result.put(pathTuple.o1, metadata);
+
+                    synchronized (lock) {
+                        this.metadatas.put(getKey(pathTuple.o1, pathTuple.o2), metadata);
+                        this.hasNewInfos = true;
+                    }
                 }
-
-                Metadata metadata = new Metadata(exifMetadata, position);
-                result.put(pathTuple.o1, metadata);
-
-                synchronized (lock) {
-                    this.metadatas.put(getKey(pathTuple.o1, pathTuple.o2), metadata);
-                    this.hasNewInfos = true;
-                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
 
