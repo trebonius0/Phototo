@@ -1,5 +1,7 @@
 package photato.core.resize.ffmpeg;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,7 +24,7 @@ import org.apache.http.client.methods.HttpGet;
 import photato.helpers.OsHelper;
 
 public class FfmpegDownloader {
-
+    private static final Logger LOGGER = Logger.getLogger(FfmpegDownloader.class.getName() );
     private static final String tmpFilename = "ffmpeg.exe.tmp";
     private static final String targetFilename = "ffmpeg.exe";
     private static final long maxDelayBeforeRedownload = 30 * 86400 * 1000L;
@@ -33,9 +35,9 @@ public class FfmpegDownloader {
             if (!fileSystem.getPath(targetFilename).toFile().exists()
                     || forceFfmpegDownload
                     || Files.getLastModifiedTime(fileSystem.getPath(targetFilename)).toMillis() + maxDelayBeforeRedownload < System.currentTimeMillis()) {
-                System.out.println("Starting ffmpeg download");
+                LOGGER.log(Level.INFO, "Starting ffmpeg download");
                 downloadFfmpegTools("https://ffmpeg.zeranoe.com/builds/win" + v + "/static/ffmpeg-latest-win" + v + "-static.zip", httpClient, fileSystem);
-                System.out.println("End of ffmpeg download");
+                LOGGER.log(Level.INFO, "End of ffmpeg download");
             }
         }
     }
