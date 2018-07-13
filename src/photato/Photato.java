@@ -48,6 +48,7 @@ public class Photato {
         String cacheRootFolder = (args.length >= 2 ? args[1] : "cache");
         String thumbnailCacheFolder = cacheRootFolder + "/thumbnails";
         String fullscreenCacheFolder = cacheRootFolder + "/fullscreen";
+        String metadataCacheLocation = cacheRootFolder + "/metadata.cache";
         String extractedPicturesCacheFolder = cacheRootFolder + "/extracted";
         String configFile = (args.length >= 3 ? args[2] : ".") + "/photato.ini";
 
@@ -61,8 +62,9 @@ public class Photato {
         HttpServer server = getDefaultServer(fileSystem.getPath("www"));
         server.start();
 
-        if (!Files.exists(fileSystem.getPath("cache"))) {
-            Files.createDirectory(fileSystem.getPath("cache"));
+        if (!Files.exists(fileSystem.getPath(cacheRootFolder))) {
+            System.out.println("Creating cache folder");
+            Files.createDirectory(fileSystem.getPath(cacheRootFolder));
         }
 
         HttpClient httpClient = HttpClientBuilder.create().setUserAgent(serverName).build();
@@ -72,7 +74,7 @@ public class Photato {
 
         ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, thumbnailCacheFolder, extractedPicturesCacheFolder, PhotatoConfig.thumbnailHeight, PhotatoConfig.thumbnailQuality);
         IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(httpClient, PhotatoConfig.addressElementsCount);
-        MetadataAggregator metadataGetter = new MetadataAggregator(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
+        MetadataAggregator metadataGetter = new MetadataAggregator(fileSystem, metadataCacheLocation, gpsCoordinatesDescriptionGetter);
         FullScreenImageGetter fullScreenImageGetter = new FullScreenImageGetter(fileSystem, rootFolder, fullscreenCacheFolder, extractedPicturesCacheFolder, PhotatoConfig.fullScreenPictureQuality, PhotatoConfig.maxFullScreenPictureWitdh, PhotatoConfig.maxFullScreenPictureHeight);
 
         PhotatoFilesManager photatoFilesManager = new PhotatoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, fullScreenImageGetter, PhotatoConfig.prefixModeOnly, PhotatoConfig.indexFolderName, PhotatoConfig.useParallelPicturesGeneration);
