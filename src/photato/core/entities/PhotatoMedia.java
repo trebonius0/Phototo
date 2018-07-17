@@ -87,6 +87,7 @@ public abstract class PhotatoMedia extends PhotatoItem {
             }
         }
 
+        
         for (String placeUrl : this.position.getCoordinatesDescriptionTags()) {
             result.add(Paths.get("/" + AlbumsManager.albumsVirtualRootFolderName, AlbumsManager.placesFolderName, placeUrl.trim()));
         }

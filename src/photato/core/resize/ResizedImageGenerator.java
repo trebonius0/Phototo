@@ -1,5 +1,7 @@
 package photato.core.resize;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -22,7 +24,7 @@ import photato.helpers.Md5;
 import photato.helpers.MediaHelper;
 
 public abstract class ResizedImageGenerator {
-
+    private static final Logger LOGGER = Logger.getLogger(ResizedImageGenerator.class.getName() );
     private final int resizedPictureQuality;
     private final boolean forceResize;
     protected final FileSystem fileSystem;
@@ -64,7 +66,7 @@ public abstract class ResizedImageGenerator {
             this.resizedPicturesSet.add(resizedPicturePath);
         }
 
-        System.out.println("- Generating resizedPicture for " + originalFilename + " (last modified: " + lastModifiedTimestamp + ")");
+        LOGGER.log(Level.INFO, "Generating resizedPicture for: {0} lastModified: {1}", new Object[] {originalFilename, lastModifiedTimestamp});
         BufferedImage originalImage;
 
         if (MediaHelper.isVideoFile(originalFilename)) {

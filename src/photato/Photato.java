@@ -1,5 +1,7 @@
 package photato;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -32,14 +34,21 @@ import photato.controllers.VideoHandler;
 import photato.core.resize.ffmpeg.FfmpegDownloader;
 
 public class Photato {
+    private static Logger LOGGER;
 
     public static final String[] supportedPictureExtensions = new String[]{"jpg", "jpeg", "png", "bmp"};
     public static final String[] supportedVideoExtensions = new String[]{"mp4", "webm"};
     private static final String serverName = "Photato";
 
     public static void main(String[] args) throws Exception {
+        //Set up this way so we can change default formatter for everyone
+        System.setProperty("java.util.logging.SimpleFormatter.format", 
+            "%1$tF %1$tT %4$s %2$s %5$s%6$s%n");
+
+        LOGGER = Logger.getLogger( Photato.class.getName() );
+        
         if (args.length < 1) {
-            System.err.println("Usage: <picturesRootFolder> [cacheFolder] [configFolder]");
+            LOGGER.log( Level.SEVERE, "Usage: <picturesRootFolder> [cacheFolder] [configFolder]");
             System.exit(-1);
         }
 
@@ -48,21 +57,23 @@ public class Photato {
         String cacheRootFolder = (args.length >= 2 ? args[1] : "cache");
         String thumbnailCacheFolder = cacheRootFolder + "/thumbnails";
         String fullscreenCacheFolder = cacheRootFolder + "/fullscreen";
+        String metadataCacheLocation = cacheRootFolder + "/metadata.cache";
         String extractedPicturesCacheFolder = cacheRootFolder + "/extracted";
         String configFile = (args.length >= 3 ? args[2] : ".") + "/photato.ini";
 
         PhotatoConfig.init(configFile);
 
-        System.out.println("Starting photato");
-        System.out.println("-- Config file: " + configFile);
-        System.out.println("-- Cache folder: " + cacheRootFolder);
-        System.out.println("-- Pictures folder: " + rootFolder);
-
+        LOGGER.log(Level.INFO, "Starting photato");
+        LOGGER.log(Level.INFO, "-- Config file: {0}", configFile);
+        LOGGER.log(Level.INFO, "-- Cache file: {0}", cacheRootFolder);
+        LOGGER.log(Level.INFO, "-- Pictures file: {0}", rootFolder);
+        
         HttpServer server = getDefaultServer(fileSystem.getPath("www"));
         server.start();
 
-        if (!Files.exists(fileSystem.getPath("cache"))) {
-            Files.createDirectory(fileSystem.getPath("cache"));
+        if (!Files.exists(fileSystem.getPath(cacheRootFolder))) {
+            LOGGER.log(Level.INFO, "Creating cache folder");
+            Files.createDirectory(fileSystem.getPath(cacheRootFolder));
         }
 
         HttpClient httpClient = HttpClientBuilder.create().setUserAgent(serverName).build();
@@ -72,7 +83,7 @@ public class Photato {
 
         ThumbnailGenerator thumbnailGenerator = new ThumbnailGenerator(fileSystem, rootFolder, thumbnailCacheFolder, extractedPicturesCacheFolder, PhotatoConfig.thumbnailHeight, PhotatoConfig.thumbnailQuality);
         IGpsCoordinatesDescriptionGetter gpsCoordinatesDescriptionGetter = new OSMGpsCoordinatesDescriptionGetter(httpClient, PhotatoConfig.addressElementsCount);
-        MetadataAggregator metadataGetter = new MetadataAggregator(fileSystem, "cache/metadata.cache", gpsCoordinatesDescriptionGetter);
+        MetadataAggregator metadataGetter = new MetadataAggregator(fileSystem, metadataCacheLocation, gpsCoordinatesDescriptionGetter);
         FullScreenImageGetter fullScreenImageGetter = new FullScreenImageGetter(fileSystem, rootFolder, fullscreenCacheFolder, extractedPicturesCacheFolder, PhotatoConfig.fullScreenPictureQuality, PhotatoConfig.maxFullScreenPictureWitdh, PhotatoConfig.maxFullScreenPictureHeight);
 
         PhotatoFilesManager photatoFilesManager = new PhotatoFilesManager(rootFolder, fileSystem, metadataGetter, thumbnailGenerator, fullScreenImageGetter, PhotatoConfig.prefixModeOnly, PhotatoConfig.indexFolderName, PhotatoConfig.useParallelPicturesGeneration);
@@ -98,11 +109,12 @@ public class Photato {
                         .registerHandler("*", new DefaultHandler(fileSystem.getPath("www")))
                         .create();
                 server.start();
-                System.out.println("Server started on port " + server.getLocalPort() + " (http://" + getLocalIp() + ":" + server.getLocalPort() + ")");
+
+                LOGGER.log(Level.INFO, "Server started http://{0}:{1}", new Object[] {getLocalIp(), server.getLocalPort()});
                 server.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
             } catch (IOException | InterruptedException ex) {
                 // In case of port already binded
-                System.err.println("Could not start the server ...");
+                LOGGER.log( Level.SEVERE, "Could not start the server ...");
                 Thread.sleep(1000);
             }
         }

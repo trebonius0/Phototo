@@ -8,6 +8,7 @@ import photato.core.entities.PhotatoFolder;
 import photato.core.entities.PhotatoPicture;
 import photato.core.metadata.IMetadataAggregator;
 import photato.core.metadata.Metadata;
+import photato.core.metadata.gps.Position;
 import photato.helpers.Tuple;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
@@ -85,7 +86,7 @@ public class PhotatoFilesManagerTest {
             List<String> tagsList = this.map.get(path.toString());
             metadata.tags = tagsList == null ? new String[0] : tagsList.toArray(new String[tagsList.size()]);
             metadata.persons = new String[0];
-
+            metadata.position = new Position(0.0,0.0,null, null);
             return metadata;
         }
 
