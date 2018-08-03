@@ -1,5 +1,7 @@
 package photato.core;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import photato.helpers.SearchQueryHelper;
 import photato.Photato;
 import photato.core.entities.PhotatoFolder;
@@ -36,7 +38,7 @@ import photato.core.resize.thumbnails.IThumbnailGenerator;
 import photato.helpers.MediaHelper;
 
 public class PhotatoFilesManager implements Closeable {
-
+    private static final Logger LOGGER = Logger.getLogger( PhotatoFilesManager.class.getName() );
     private final FileSystem fileSystem;
     private final IMetadataAggregator metadataAggregator;
     private final IThumbnailGenerator thumbnailGenerator;
@@ -141,7 +143,7 @@ public class PhotatoFilesManager implements Closeable {
 
             while (!foldersToExplore.isEmpty()) {
                 PhotatoFolder currentFolder = foldersToExplore.remove();
-                System.out.println("Exploring " + currentFolder);
+                LOGGER.log(Level.INFO, "Exploring {0}", currentFolder);
 
                 // Registering currentDirectory to watcher
                 WatchKey key = currentFolder.fsPath.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_DELETE);
@@ -165,7 +167,7 @@ public class PhotatoFilesManager implements Closeable {
                         Path newPath = path.resolveSibling(newFilename);
                         path.toFile().renameTo(newPath.toFile());
 
-                        System.err.println("[WARNING] Renamed \"" + path + "\" to \"" + newPath + "\"");
+                        LOGGER.log(Level.SEVERE, "Renamed {0} to {1}", new Object[] {path, newPath});
                     }
                 });
 
@@ -227,7 +229,7 @@ public class PhotatoFilesManager implements Closeable {
     }
 
     private class WatchServiceThread extends Thread {
-
+        private final Logger LOGGER = Logger.getLogger( WatchServiceThread.class.getName() );
         private final WatchService watcher;
         private boolean shouldRun;
 
@@ -259,8 +261,7 @@ public class PhotatoFilesManager implements Closeable {
                                         }
 
                                         Path filename = folder.resolve(ev.context());
-
-                                        System.out.println("[" + (new Date()) + "] Detected event: " + kind + " on " + filename);
+                                        LOGGER.log(Level.INFO, "Detected event: {0} on {1}", new Object[] {kind, filename});
                                         if (Files.isDirectory(filename)) {
                                             if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
                                                 this.manageDirectoryCreation(filename);
@@ -286,7 +287,7 @@ public class PhotatoFilesManager implements Closeable {
 
                         boolean valid = key.reset();
                         if (!valid) {
-                            System.err.println("Not valid key, breaking");
+                            LOGGER.log(Level.SEVERE, "Not valid key, breaking");
                             // break;
                         }
                     }

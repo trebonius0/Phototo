@@ -20,8 +20,12 @@ import java.util.*;
  * JpegEncoder - The JPEG main program which performs a jpeg compression of
  * an image.
  */
-public class JpegEncoder {
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
+public class JpegEncoder {
+    private static final Logger LOGGER = Logger.getLogger(JpegEncoder.class.getName() );
     private BufferedOutputStream outStream;
     private JpegInfo JpegObj;
     private Huffman Huf;
@@ -75,7 +79,7 @@ public class JpegEncoder {
         try {
             outStream.flush();
         } catch (IOException e) {
-            System.out.println("IO Error: " + e.getMessage());
+            LOGGER.log(Level.INFO, "IO Error: {0}", e.getMessage());
         }
     }
 
@@ -292,7 +296,7 @@ public class JpegEncoder {
         try {
             out.write(data, 0, 2);
         } catch (IOException e) {
-            System.out.println("IO Error: " + e.getMessage());
+            LOGGER.log(Level.INFO, "IO Error: {0}", e.getMessage());
         }
     }
 
@@ -302,7 +306,7 @@ public class JpegEncoder {
             length = (((int) (data[2] & 0xFF)) << 8) + (int) (data[3] & 0xFF) + 2;
             out.write(data, 0, length);
         } catch (IOException e) {
-            System.out.println("IO Error: " + e.getMessage());
+            LOGGER.log(Level.INFO, "IO Error: {0}", e.getMessage());
         }
     }
 }
@@ -745,7 +749,7 @@ class DCT {
 // It now incorporates Huffman table derivation as in the C jpeg library
 // from the IJG, Jpeg-6a.
 class Huffman {
-
+    private static final Logger LOGGER = Logger.getLogger(Huffman.class.getName() );
     int bufferPutBits, bufferPutBuffer;
     public int ImageHeight;
     public int ImageWidth;
@@ -925,13 +929,13 @@ class Huffman {
             try {
                 outStream.write(c);
             } catch (IOException e) {
-                System.out.println("IO Error: " + e.getMessage());
+                LOGGER.log(Level.INFO, "IO Error: {0}", e.getMessage());
             }
             if (c == 0xFF) {
                 try {
                     outStream.write(0);
                 } catch (IOException e) {
-                    System.out.println("IO Error: " + e.getMessage());
+                    LOGGER.log(Level.INFO, "IO Error: {0}", e.getMessage());
                 }
             }
             PutBuffer <<= 8;
@@ -950,13 +954,13 @@ class Huffman {
             try {
                 outStream.write(c);
             } catch (IOException e) {
-                System.out.println("IO Error: " + e.getMessage());
+                LOGGER.log(Level.INFO, "IO Error: {0}", e.getMessage());
             }
             if (c == 0xFF) {
                 try {
                     outStream.write(0);
                 } catch (IOException e) {
-                    System.out.println("IO Error: " + e.getMessage());
+                    LOGGER.log(Level.INFO, "IO Error: {0}", e.getMessage());
                 }
             }
             PutBuffer <<= 8;
@@ -967,7 +971,7 @@ class Huffman {
             try {
                 outStream.write(c);
             } catch (IOException e) {
-                System.out.println("IO Error: " + e.getMessage());
+                LOGGER.log(Level.INFO, "IO Error: {0}", e.getMessage());
             }
         }
     }

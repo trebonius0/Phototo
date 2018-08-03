@@ -1,5 +1,7 @@
 package photato.core.metadata.exif;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,7 +24,7 @@ import org.apache.http.client.methods.HttpGet;
 import photato.helpers.OsHelper;
 
 public class ExifToolDownloader {
-
+    private static final Logger LOGGER = Logger.getLogger( ExifToolDownloader.class.getName() );
     private static final Pattern namePattern = Pattern.compile("http://owl\\.phy\\.queensu\\.ca/~phil/exiftool/exiftool-[0-9]+\\.[0-9]+\\.zip");
     private static final String exifToolRslUrl = "http://owl.phy.queensu.ca/~phil/exiftool/rss.xml";
     private static final String tmpFilename = "exiftool.exe.tmp";
@@ -34,9 +36,9 @@ public class ExifToolDownloader {
             if (!fileSystem.getPath(targetFilename).toFile().exists()
                     || forceExifToolsDownload
                     || Files.getLastModifiedTime(fileSystem.getPath(targetFilename)).toMillis() + maxDelayBeforeRedownload < System.currentTimeMillis()) {
-                System.out.println("Starting exifTools download");
+                LOGGER.log(Level.INFO, "Starting exifTools download");
                 downloadExifTools(getExifToolsZipUrl(httpClient), httpClient, fileSystem);
-                System.out.println("End of exifTools download");
+                LOGGER.log(Level.INFO, "End of exifTools download");
             }
         }
     }

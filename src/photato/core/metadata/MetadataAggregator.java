@@ -1,5 +1,8 @@
 package photato.core.metadata;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 import photato.core.metadata.exif.ExifMetadata;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -24,7 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MetadataAggregator implements IMetadataAggregator, Closeable {
-
+    private static final Logger LOGGER = Logger.getLogger( MetadataAggregator.class.getName() );
     private final FileSystem fileSystem;
     private final String metadataCacheFilename;
     private final IGpsCoordinatesDescriptionGetter coordinatesDescriptionGetter;
@@ -154,10 +157,10 @@ public class MetadataAggregator implements IMetadataAggregator, Closeable {
                 }
             }
 
-            System.out.println("Read " + resultMap.size() + " metadata from cache!");
+            LOGGER.log(Level.INFO, "Read {0} metadata from cache!", resultMap.size());
             return resultMap;
         } catch (IOException ex) {
-            System.err.println("Cannot read metadata from cache!");
+            LOGGER.log(Level.WARNING, "Cannot read metadata from cache");
             return new HashMap<>();
         }
 
