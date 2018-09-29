@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM openjdk:11
 MAINTAINER trebonius0
 
 WORKDIR /app
@@ -6,13 +6,17 @@ VOLUME /pictures /cache /config
 EXPOSE 8186
 
 # User creation
-RUN addgroup -S abc && adduser -S -G abc abc
+RUN useradd abc 
 RUN chown -R abc:abc /app /pictures /cache /config
 
 # Dependencies install
-RUN apk update && apk upgrade && apk add exiftool openjdk8-jre-base unzip ffmpeg curl wget
+RUN apt update -y
+RUN apt upgrade -y 
+RUN apt install -y exiftool unzip ffmpeg curl wget
 
 USER abc
+
+ENV LANG C.UTF-8
 
 # Software install
 RUN \
@@ -21,4 +25,4 @@ RUN \
     && rm *.zip
 
 # start
-ENTRYPOINT ["java", "-Dfile.encoding=UTF8", "-Xmx1g", "-jar", "Photato-Release.jar", "/pictures", "/cache", "/config"]
+ENTRYPOINT ["java", "-jar", "Photato-Release.jar", "/pictures", "/cache", "/config"]
